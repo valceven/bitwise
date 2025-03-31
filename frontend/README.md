@@ -1,12 +1,8 @@
-# React + Vite
+hello kyle skibidi keiru here
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ni add nako sa routes, u can add more sa main.jsx
 
-Currently, two official plugins are available:
+wala pa ko ka add ug navigation bar sa babaw so e type lang ang path largo hahaha
+naka add nakog font akong ge default, ma kita nimo ang default sa styles/index.css
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+DI MU GANA ANG CUSTOM COLOR SA TAILWIND IDK WHY e fix pa nako skibidi pero so far mu gana raman sha
