@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Stsystem.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models
@@ -14,7 +14,7 @@ namespace backend.Models
         public int TopicId { get; set; }
 
         [Required]
-        [Column(TypeName = "nvarchar(max)")]
+        [Column(TypeName = "varchar(255)")]
         public string ContentName { get; set; }
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

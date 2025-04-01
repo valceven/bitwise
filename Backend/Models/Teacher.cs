@@ -8,8 +8,8 @@ namespace backend.Models
     {
         [Required]
         [StringLength(25)]
-        [Column(TypeName = "nvarchar(25)")]
-        public string TeacherIdNumber { get; set; }
+        [Column(TypeName = "varchar(25)")]
+        public required string TeacherIdNumber { get; set; }
 
         public List<Classroom> Classrooms { get; set; } = new List<Classroom>();
     }

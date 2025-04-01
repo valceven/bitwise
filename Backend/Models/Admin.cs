@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace backend.Models
 {
-    public class Admin
+    public class Admin : User
     {
-        
+
     }
 }

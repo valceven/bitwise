@@ -1,0 +1,28 @@
+# Environment variables
+.env
+appsettings.Development.json
+
+#Build Artifacts daw
+bin/
+obj/
+
+# Visual Studio Code files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates 
+
+# Logs and temporary files daw
+*.log 
+*.tmp 
+
+# Dependency Files 
+project.lock.json
+
+# Generated files
+*.generated.cs 
+
+# Secrets and keys
+*.key 
+*.pfx

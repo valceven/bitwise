@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Backend.Models
+namespace backend.Models
 {
     public class Classroom
     {
@@ -13,10 +13,9 @@ namespace Backend.Models
         [ForeignKey("Teacher")]
         public int TeacherId { get; set; }
 
-        [Required]
         [StringLength(25)]
-        [Column(TypeName = "nvarchar(25)")]
-        public string ClassName { get; set; }
+        [Column(TypeName = "varchar(25)")]
+        public required string ClassName { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

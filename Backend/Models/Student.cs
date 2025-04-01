@@ -1,12 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace backend.Models {
+namespace backend.Models 
+{
     public class Student : User
     {
         [Required]
         [StringLength(25)]
-        [Column(TypeName = "nvarchar(25)")]
+        [Column(TypeName = "varchar(25)")]
         public int StudentIdNumber { get; set; }
 
         [ForeignKey("Classroom")]

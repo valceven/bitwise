@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models
 {
@@ -14,15 +12,13 @@ namespace backend.Models
         [ForeignKey("Topic")]
         public int TopicId { get; set; }
 
-        [Required]
-        [Column(TypeName = "nvarchar(25)")]
-        public string Title { get; set; }
+        [Column(TypeName = "varchar(25)")]
+        public required string Title { get; set; }
 
         public DateTime DueDate { get; set; }
 
-        [Required]
-        [Column(TypeName = "nvarchar(20)")]
-        public string Type { get; set; } // e.g., "Quiz", "Test", "Assignment"
+        [Column(TypeName = "varchar(20)")]
+        public required string Type { get; set; } // e.g., "Quiz", "Test", "Assignment"
 
     }
 }

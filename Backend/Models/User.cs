@@ -8,20 +8,17 @@ namespace backend.Models
         [Key]
         public int UserID { get; set; }
 
-        [Required]
         [StringLength(50)]
-        [Column(TypeName = "nvarchar(50)")]
-        public string Name { get; set; }
+        [Column(TypeName = "varchar(50)")]
+        public required string Name { get; set; }
 
-        [Required]
         [StringLength(50)]
-        [Column(TypeName = "nvarchar(50)")]
-        public string Email { get; set; }
+        [Column(TypeName = "varchar(50)")]
+        public required string Email { get; set; }
 
-        [Required]
         [StringLength(25)]
-        [Column(TypeName = "nvarchar(25)")]
-        public string Password { get; set; }
+        [Column(TypeName = "varchar(25)")]
+        public required string Password { get; set; }
 
         [Required]
         public byte UserType { get; set; } // 1: user 2 : teacher 7: admin
