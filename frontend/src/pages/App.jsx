@@ -4,7 +4,7 @@ import "../styles/App.css";
 function App() {
   return (
     <>
-      <div className="flex justify-center items-center mt-48 text-redz">
+      <div className="flex justify-center items-center mt-48 text-greenz">
         <div className="flex justify-center items-center border-2-blue flex-col">
           <h1 className="font-black text-black-300 text-5xl">
             Landing ni (app.jsx ni nga file lmao){" "}
