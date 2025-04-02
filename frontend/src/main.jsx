@@ -8,6 +8,7 @@ import HomePage from "./pages/Home.jsx";
 import PageNotFound from "./pages/PageNotFound.jsx";
 import ColorPalette from "./pages/ColorPalette.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -23,7 +24,11 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage/>,
-  }
+  },
+  {
+    path: "/signup",
+    element: <SignupPage/>,
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(
