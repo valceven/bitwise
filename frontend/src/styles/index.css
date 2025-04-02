@@ -50,5 +50,5 @@ h6 {
 
 .btn-shadow:active {
   box-shadow: 0px 0px 0px #0b1e2d;
-  @apply bg-indigo-900
+  @apply bg-indigo-900;
 }
