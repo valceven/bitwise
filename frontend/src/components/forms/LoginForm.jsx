@@ -15,7 +15,7 @@ const LoginForm = () => {
         email: Yup.string().email('Invalid email address').required('Email is required'),
         password: Yup.string().min(6, 'Password must be at least 6 characters').required('Password is required')
                             .max(25, 'Password must be at most 25 characters')
-                            .matches(/(?=.*[0-9])/, 'Password must contain a number'),
+                            .matches(/(?=.*[0-9])/, 'Password must contain a number'),//tangalon diay ni kay login man diay BUT wait
     });
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
