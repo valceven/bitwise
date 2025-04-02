@@ -6,6 +6,7 @@ import App from "./pages/App.jsx";
 import HomePage from "./pages/Home.jsx";
 import PageNotFound from "./pages/PageNotFound.jsx";
 import ColorPalette from "./pages/ColorPalette.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
     path: "/colors",
     element: <ColorPalette />,
   },
+  {
+    path: "/login",
+    element: <LoginPage/>,
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(
