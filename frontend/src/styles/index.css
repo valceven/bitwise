@@ -28,3 +28,27 @@ h5,
 h6 {
   font-family: "Space Grotesk", sans-serif;
 }
+
+.addgrotesk {
+  font-family: "Space Grotesk", sans-serif;
+}
+.addinter {
+  font-family: "Inter", sans-serif;
+}
+
+.btn-shadow {
+  @apply rounded-full border border-black transition-all;
+}
+
+.btn-shadow {
+  box-shadow: 4px 4px 0px #0b1e2d;
+}
+
+.btn-shadow:hover {
+  box-shadow: 0px 0px 0px #0b1e2d;
+}
+
+.btn-shadow:active {
+  box-shadow: 0px 0px 0px #0b1e2d;
+  @apply bg-indigo-900
+}
