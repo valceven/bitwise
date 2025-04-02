@@ -1,6 +1,9 @@
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
+using backend.Repositories;
+using backend.Repositories.Interfaces;
+using backend.Services;
 
 DotNetEnv.Env.Load(); // Load environment variables from .env file
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +22,10 @@ var connectionString = builder.Configuration.GetConnectionString("bitwiseDbConte
 builder.Services.AddDbContext<bitwiseDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// Register Repository & Service
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<UserService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,6 +34,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseHttpsRedirection();
+app.UseAuthorization();
 app.UseHttpsRedirection();
 app.Run();
