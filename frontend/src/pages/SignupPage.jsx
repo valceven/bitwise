@@ -6,6 +6,7 @@ import Button from '../components/buttons/PurpleButton';
 import DropdownField from '../components/fields/DropDownField';
 import Stepper from '../components/Stepper'; 
 import logo from '../assets/logo.png'; 
+import { authApi } from '../api/auth/authApi';
 
 const SignupPage = () => {
     const [step, setStep] = useState(1); // Track the current step
@@ -36,9 +37,21 @@ const SignupPage = () => {
         }),
     ];
 
-    const handleSubmit = (values) => {
+    const handleSubmit = async (values) => {
         console.log('Form submitted:', values);
-        alert('Registration successful!');
+        if (values.userType === 'admin') {
+            values.userType = '7';
+        } else if (values.userType === 'teacher') {
+            values.userType = '1';
+        } else if (values.userType === 'student') {
+            values.userType = '2';
+        }
+        try {
+            const response = await authApi.registerUser(values);
+            console.log('Registration successful:', response);
+        } catch (error) {
+            console.error('Registration error:', error);
+        }
     };
 
     const renderStepFields = () => {
