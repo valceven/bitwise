@@ -1,25 +1,33 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./styles/index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import App from "./pages/App.jsx";
+import "./styles/index.css"; 
+
+import Layout from "./components/Layout.jsx";
 import HomePage from "./pages/Home.jsx";
 import PageNotFound from "./pages/PageNotFound.jsx";
 import ColorPalette from "./pages/ColorPalette.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <Layout />,
     errorElement: <PageNotFound />,
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: "home", element: <HomePage /> },
+      { path: "colors", element: <ColorPalette /> },
+    ],
   },
   {
-    path: "/home",
-    element: <HomePage />,
+    path: "/login",
+    element: <LoginPage/>,
   },
   {
-    path: "/colors",
-    element: <ColorPalette />,
+    path: "/signup",
+    element: <SignupPage/>,
   },
 ]);
 
