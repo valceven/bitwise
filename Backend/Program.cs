@@ -6,6 +6,7 @@ using DotNetEnv;
 using backend.Repositories;
 using backend.Repositories.Interfaces;
 using backend.Services;
+using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -19,8 +20,8 @@ DotNetEnv.Env.Load();  // Load environment variables from .env file
 var environment = builder.Environment.EnvironmentName.ToLower();
 
 // Read the connection string based on the environment
-var connectionString = environment == "production" 
-    ? builder.Configuration.GetConnectionString("AzureConnection") 
+var connectionString = environment == "production"
+    ? builder.Configuration.GetConnectionString("AzureConnection")
     : builder.Configuration.GetConnectionString("SupabaseConnection");
 
 // Add DbContext for PostgreSQL using the appropriate connection string
@@ -29,7 +30,8 @@ builder.Services.AddDbContext<bitwiseDbContext>(options =>
 
 // Register services for dependency injection
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddControllers();
 
 // Add authentication using JWT Bearer tokens
@@ -39,7 +41,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.Authority = builder.Configuration["Auth:ValidIssuer"]; // JWT authority URL from appsettings.json
         options.Audience = builder.Configuration["Auth:ValidAudience"]; // JWT audience from appsettings.json
         options.RequireHttpsMetadata = false; // Set to true for production
-        
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
