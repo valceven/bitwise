@@ -1,38 +1,66 @@
-using backend.DTOs.User;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using backend.Models;
-using backend.Repositories;
-using backend.Repositories.Interfaces;
-using backend.Services.Interfaces;
+using backend.Data;
+using Microsoft.Extensions.Configuration;
+using BCrypt.Net;
 
 namespace backend.Services
 {
-    public class AuthService : IAuthService
+    public class AuthService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly bitwiseDbContext _context;
+        private readonly IConfiguration _config;
 
-        public AuthService(IUserRepository userRepository)
+        public AuthService(bitwiseDbContext context, IConfiguration config)
         {
-            _userRepository = userRepository;
+            _context = context;
+            _config = config;
         }
 
-        public Task<User> RegisterUserAsync(UserRegisterDto userDto)
+        public async Task<string?> AuthenticateUserAsync(string email, string password)
         {
-            string hashedPassword = HashPassword(userDto.Password);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
+                return null; // Authentication failed
 
-            var user = new User
+            return GenerateJwtToken(user);
+        }
+
+        public async Task<User> RegisterUserAsync(User user)
+        {
+            // Hash the password before saving
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            var jwtSettings = _config.GetSection("Jwt");
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
             {
-                Name = userDto.Name,
-                Email = userDto.Email,
-                Password = hashedPassword,
-                UserType = userDto.UserType
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserID.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("UserType", user.UserType.ToString())
             };
 
-            return AuthRepository.CreateUserAsync(user);
-        }
+            var token = new JwtSecurityToken(
+                issuer: jwtSettings["Issuer"],
+                audience: jwtSettings["Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: credentials
+            );
 
-        private string HashPassword(string password)
-        {
-            return BCrypt.Net.BCrypt.HashPassword(password);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

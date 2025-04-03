@@ -1,7 +1,7 @@
 using backend.Models;
 using backend.Services;
+using backend.DTOs.User;
 using Microsoft.AspNetCore.Mvc;
-
 namespace backend.Presentation
 {
     [Route("api/users")]
@@ -15,41 +15,30 @@ namespace backend.Presentation
             _userService = userService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<User>>> GetAllUsers()
+        // Register User
+        [HttpPost("register")]
+        public async Task<ActionResult<User>> RegisterUser([FromBody] UserRegisterDto userRegisterDto)
         {
-            return await _userService.GetAllUsersAsync();
+            var user = userRegisterDto.User;
+            var password = userRegisterDto.Password;
+
+            var createdUser = await _userService.RegisterUserAsync(user, password);
+            return CreatedAtAction(nameof(RegisterUser), new { id = createdUser.UserID }, createdUser);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUserById(int id)
+        // Login User and get JWT
+        [HttpPost("login")]
+        public async Task<ActionResult<string>> LoginUser([FromBody] UserLoginDto loginDto)
         {
-            var user = await _userService.GetUserByIdAsync(id);
-            if (user == null) return NotFound();
-            return user;
-        }
-
-        [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
-        {
-            var createdUser = await _userService.CreateUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = createdUser.UserID }, createdUser);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult<User>> UpdateUser(int id, User user)
-        {
-            var updatedUser = await _userService.UpdateUserAsync(id, user);
-            if (updatedUser == null) return NotFound();
-            return updatedUser;
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
-        {
-            var success = await _userService.DeleteUserAsync(id);
-            if (!success) return NotFound();
-            return NoContent();
+            try
+            {
+                var token = await _userService.LoginUserAsync(loginDto.Email, loginDto.Password);
+                return Ok(new { Token = token });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
         }
     }
 }
