@@ -22,12 +22,17 @@ namespace backend.Services
         }
 
         // Register User
-        public async Task<User> RegisterUserAsync(User user, string password)
+        public async Task<User> RegisterUserAsync(String email, string password)
         {
-            // Hash the password
-            user.Password = BCrypt.Net.BCrypt.HashPassword(password);
+            var existingUser = await _userRepository.GetUserByEmailAsync(email);
+            if (existingUser != null)
+            {
+                throw new InvalidOperationException("Email is already in use.");
+            }
 
-            return await _userRepository.CreateUserAsync(user);
+            // Hash the password
+            existingUser.Password = BCrypt.Net.BCrypt.HashPassword(password);
+            return await _userRepository.CreateUserAsync(existingUser);
         }
 
         // Login User and generate JWT
@@ -42,7 +47,13 @@ namespace backend.Services
 
             // Create JWT Token
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Auth:SecretKey"]);
+            var secretKey = _configuration["Auth:SecretKey"];
+            if (string.IsNullOrEmpty(secretKey))
+                {
+                    throw new InvalidOperationException("JWT SecretKey is not configured.");
+                }   
+            var key = Encoding.ASCII.GetBytes(secretKey);   
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]

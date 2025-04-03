@@ -20,6 +20,8 @@ namespace backend.Models
         [Column(TypeName = "varchar(25)")]
         public required string Password { get; set; }
 
+        
+
         [Required]
         public byte UserType { get; set; } // 1: user 2 : teacher 7: admin
 

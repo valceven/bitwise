@@ -8,8 +8,9 @@ namespace backend.DTOs.User
 {
     public class UserRegisterDto
     {
-        public required backend.Models.User User { get; set; } // Fully qualify the User type
-        public required string Password { get; set; }
+        public  string Email { get; set; }
+        public  string Password { get; set; }
+        public string ConfirmPassword { get; set; }
     }
 }
 

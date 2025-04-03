@@ -18,11 +18,14 @@ namespace backend.Presentation
         // Register User
         [HttpPost("register")]
         public async Task<ActionResult<User>> RegisterUser([FromBody] UserRegisterDto userRegisterDto)
-        {
-            var user = userRegisterDto.User;
-            var password = userRegisterDto.Password;
+        {   
+            if(userRegisterDto.Password != userRegisterDto.ConfirmPassword)
+            {
+                return BadRequest("Passwords do not match.");
+            }
 
-            var createdUser = await _userService.RegisterUserAsync(user, password);
+            var createdUser = await _userService.RegisterUserAsync(userRegisterDto.Email, userRegisterDto.Password);
+            
             return CreatedAtAction(nameof(RegisterUser), new { id = createdUser.UserID }, createdUser);
         }
 

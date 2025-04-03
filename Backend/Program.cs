@@ -30,7 +30,6 @@ builder.Services.AddDbContext<bitwiseDbContext>(options =>
 // Register services for dependency injection
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<AuthService>();
 builder.Services.AddControllers();
 
 // Add authentication using JWT Bearer tokens
