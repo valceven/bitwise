@@ -15,7 +15,7 @@ namespace backend.Models
 
         [Required]
         [Column(TypeName = "varchar(255)")]
-        public string ContentName { get; set; }
+        public required string ContentName { get; set; }
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }

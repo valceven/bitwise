@@ -30,9 +30,16 @@ namespace backend.Repositories
 
         public async Task<User> CreateUserAsync(User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return user;
+            try {
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+                Console.WriteLine($"User created: {user.Name}");
+                return user;
+            } catch (Exception ex) {
+                Console.WriteLine($"Error creating user: {ex.Message}");
+                throw new Exception("An error occurred while creating the user.", ex);
+            }
+            
         }
 
         public async Task<User?> UpdateUserAsync(int id, User user)

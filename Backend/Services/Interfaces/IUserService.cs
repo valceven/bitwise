@@ -1,5 +1,5 @@
+using backend.DTOs.User;
 using backend.Models;
-using System.Collections.Generic;
 
 namespace backend.Services.Interfaces
 {
@@ -7,7 +7,7 @@ namespace backend.Services.Interfaces
     {
         Task<List<User>> GetAllUsersAsync();
         Task<User?> GetUserByIdAsync(int id);
-        Task<User> CreateUserAsync(User user);
+        Task<User> CreateUserAsync(UserRegisterDto user);
         Task<User?> UpdateUserAsync(int id, User user);
         Task<bool> DeleteUserAsync(int id);
     }

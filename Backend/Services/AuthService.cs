@@ -8,11 +8,16 @@ namespace backend.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserRepository _authRepository;
 
-        public AuthService(IUserRepository userRepository)
+        public AuthService(IUserRepository authRepository)
         {
-            _userRepository = userRepository;
+            _authRepository = authRepository;
+        }
+
+        public Task<User> LoginUserAsync(UserLoginDto user)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<User> RegisterUserAsync(UserRegisterDto userDto)
@@ -27,7 +32,12 @@ namespace backend.Services
                 UserType = userDto.UserType
             };
 
-            return AuthRepository.CreateUserAsync(user);
+            return _authRepository.CreateUserAsync(user);
+        }
+
+        internal Task LoginUserAsync(UserRegisterDto userDto)
+        {
+            throw new NotImplementedException();
         }
 
         private string HashPassword(string password)

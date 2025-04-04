@@ -1,3 +1,4 @@
+using backend.DTOs.User;
 using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,19 +17,20 @@ namespace backend.Presentation
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] User user)
-        {
-            var newUser = await _authService.RegisterUserAsync(user);
+        public async Task<IActionResult> Register([FromBody] UserRegisterDto userDto)
+        {   
+            Console.WriteLine("Registering user: " + userDto.Name);
+            var newUser = await _authService.RegisterUserAsync(userDto);
             return CreatedAtAction(nameof(Register), new { id = newUser.UserID }, newUser);
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] User user)
-        {
-            var token = await _authService.LoginUserAsync(user.Email, user.Password);
-            if (token == null) return Unauthorized("Invalid credentials");
+        // [HttpPost("login")]
+        // public async Task<IActionResult> Login([FromBody] UserRegisterDto userDto)
+        // {
+        //     var token = await _authService.LoginUserAsync(userDto);
+        //     if (token == null) return Unauthorized("Invalid credentials");
 
-            return Ok(new { Token = token });
-        }
+        //     return Ok(new { Token = token });
+        // }
     }
 }

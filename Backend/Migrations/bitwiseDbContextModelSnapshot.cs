@@ -227,8 +227,8 @@ namespace backend.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("varchar(25)");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

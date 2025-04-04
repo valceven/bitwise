@@ -16,8 +16,8 @@ namespace backend.Models
         [Column(TypeName = "varchar(50)")]
         public required string Email { get; set; }
 
-        [StringLength(25)]
-        [Column(TypeName = "varchar(25)")]
+        [StringLength(50)]
+        [Column(TypeName = "varchar(50)")]
         public required string Password { get; set; }
 
         [Required]

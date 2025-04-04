@@ -1,3 +1,4 @@
+using backend.DTOs.User;
 using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -30,11 +31,13 @@ namespace backend.Presentation
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> CreateUser(User user)
+        public async Task<ActionResult<User>> CreateUser(UserRegisterDto userDto)
         {
-            var createdUser = await _userService.CreateUserAsync(user);
+            var createdUser = await _userService.CreateUserAsync(userDto);
             return CreatedAtAction(nameof(GetUserById), new { id = createdUser.UserID }, createdUser);
         }
+
+        
 
         [HttpPut("{id}")]
         public async Task<ActionResult<User>> UpdateUser(int id, User user)
