@@ -6,7 +6,8 @@ import Button from '../components/buttons/PurpleButton';
 import UserRoleButton from '../components/buttons/UserRoleButton';
 import Stepper from '../components/Stepper';
 import logo from '../assets/logo.png';
-import { register } from '../api/auth';
+import { register } from '../api/authApi';
+import Background from '../components/Background';
 
 const SignupPage = () => {
     const [step, setStep] = useState(1); // Track the current step
@@ -129,7 +130,10 @@ const SignupPage = () => {
     };
 
     return (
-        <div className="w-1/2 flex flex-col justify-center items-center min-h-screen mx-auto">
+        <div className="flex justify-center items-center bg-offwhite relative">
+            <Background />
+            <div className="relative z-10 w-1/2 flex flex-col justify-center items-center min-h-screen mx-auto">
+            
             <img src={logo} alt="Logo" className="w-30 h-6 mb-10" />
             <div className="flex flex-col items-enter justify-center w-full mb-10">
                 <Stepper step={step} />
@@ -173,6 +177,8 @@ const SignupPage = () => {
                 )}
             </Formik>
         </div>
+        </div>
+        
     );
 };
 
