@@ -3,18 +3,11 @@ import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import InputField from '../components/fields/InputField';
 import Button from '../components/buttons/PurpleButton';
-<<<<<<< HEAD
-import DropdownField from '../components/fields/DropDownField';
-import Stepper from '../components/Stepper'; 
-import logo from '../assets/logo.png'; 
-import { authApi } from '../api/auth/authApi';
-=======
 import UserRoleButton from '../components/buttons/UserRoleButton';
 import Stepper from '../components/Stepper';
 import logo from '../assets/logo.png';
-import { register } from '../api/authApi';
+import { authApi } from '../api/auth/authApi';
 import Background from '../components/Background';
->>>>>>> origin/main
 
 const SignupPage = () => {
     const [step, setStep] = useState(1); // Track the current step
@@ -24,13 +17,8 @@ const SignupPage = () => {
         email: '',
         username: '',
         password: '',
-<<<<<<< HEAD
         confirmPassword: '',
-        userType: '',
-=======
-        confirm_password: '',
         userType: null,
->>>>>>> origin/main
     };
 
     const validationSchemas = [
@@ -48,45 +36,20 @@ const SignupPage = () => {
                 .required('Password is required')
                 .max(25, 'Password must be at most 25 characters')
                 .matches(/(?=.*[0-9])/, 'Password must contain a number'),
-<<<<<<< HEAD
             confirmPassword: Yup.string()
-                .required('Confirm password is required')
-                .oneOf([Yup.ref('password'), null], 'Passwords must match')
-        }),
-        Yup.object({
-            userType: Yup.string().required('User type is required'),
-=======
-            confirm_password: Yup.string()
                 .oneOf([Yup.ref('password'), null], 'Passwords must match')
                 .required('Confirm password is required'),
->>>>>>> origin/main
         }),
     ];
 
     const handleSubmit = async (values) => {
-<<<<<<< HEAD
-        console.log('Form submitted:', values);
-        if (values.userType === 'admin') {
-            values.userType = '7';
-        } else if (values.userType === 'teacher') {
-            values.userType = '1';
-        } else if (values.userType === 'student') {
-            values.userType = '2';
-        }
         try {
-            const response = await authApi.registerUser(values);
-            console.log('Registration successful:', response);
-        } catch (error) {
-            console.error('Registration error:', error);
-=======
-        try {
-            const response = await register(values); // Call the register API
+            const response = await authApi.registerUser(values); // Call the register API
             console.log('Registration successful:', response);
             alert('Registration successful!');
         } catch (error) {
             console.error('Registration failed:', error);
             alert('Registration failed. Please try again.');
->>>>>>> origin/main
         }
     };
 
@@ -144,18 +107,6 @@ const SignupPage = () => {
                         <InputField id="email" name="email" type="email" placeholder="user@bitwise.io" />
                     </>
                 );
-<<<<<<< HEAD
-            case 2:
-                return (
-                    <>
-                        
-                        <InputField id="username" name="username" type="text" placeholder="Username" />
-                        <InputField id="password" name="password" type="password" placeholder="Password" />
-                        <InputField id="confirmPassword" name="confirmPassword" type="confirmPassword" placeholder="Confirm Password" />
-                    </>
-                );
-=======
->>>>>>> origin/main
             case 3:
                 return (
                     <>
@@ -170,7 +121,7 @@ const SignupPage = () => {
                         <label>Enter your password</label>
                         <InputField id="password" name="password" type="password" placeholder="Password" />
                         <label>Confirm password</label>
-                        <InputField id="confirm_password" name="confirm_password" type="password" placeholder="Confirm password" />
+                        <InputField id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm password" />
                     </>
                 );
             default:
