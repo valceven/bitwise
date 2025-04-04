@@ -4,9 +4,8 @@ namespace backend.Data
 {
     public class bitwiseDbContext : DbContext
     {
-        public bitwiseDbContext(DbContextOptions<bitwiseDbContext> dbContextOptions) : base(dbContextOptions)
+        public bitwiseDbContext(DbContextOptions<bitwiseDbContext> options) : base(options)
         {
-
         }
 
         public DbSet<Models.User> Users { get; set; }

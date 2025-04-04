@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class INITIALCREATION : Migration
+    public partial class InitialCreation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,9 +19,9 @@ namespace backend.Migrations
                     AssessmentId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TopicId = table.Column<int>(type: "integer", nullable: false),
-                    Title = table.Column<string>(type: "varchar(25)", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
                     DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Type = table.Column<string>(type: "varchar(20)", nullable: false)
+                    Type = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -35,7 +35,7 @@ namespace backend.Migrations
                     ContentId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TopicId = table.Column<int>(type: "integer", nullable: false),
-                    ContentName = table.Column<string>(type: "varchar(255)", nullable: false),
+                    ContentName = table.Column<string>(type: "text", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -82,7 +82,7 @@ namespace backend.Migrations
                     ClassroomId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TeacherId = table.Column<int>(type: "integer", nullable: false),
-                    ClassName = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: false),
+                    ClassName = table.Column<string>(type: "text", maxLength: 25, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -97,7 +97,7 @@ namespace backend.Migrations
                     LessonId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ClassroomId = table.Column<int>(type: "integer", nullable: false),
-                    LessonName = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: false),
+                    LessonName = table.Column<string>(type: "text", maxLength: 25, nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -117,17 +117,17 @@ namespace backend.Migrations
                 {
                     UserID = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
-                    Password = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: false),
+                    Name = table.Column<string>(type: "text", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "text", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "text", maxLength: 50, nullable: false),
                     UserType = table.Column<byte>(type: "smallint", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Discriminator = table.Column<string>(type: "character varying(8)", maxLength: 8, nullable: false),
-                    StudentIdNumber = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true),
+                    StudentIdNumber = table.Column<string>(type: "text", maxLength: 25, nullable: true),
                     ClassroomId = table.Column<int>(type: "integer", nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    TeacherIdNumber = table.Column<string>(type: "varchar(25)", maxLength: 25, nullable: true)
+                    TeacherIdNumber = table.Column<string>(type: "text", maxLength: 25, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -147,7 +147,7 @@ namespace backend.Migrations
                     TopicId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     LessonId = table.Column<int>(type: "integer", nullable: false),
-                    TopicName = table.Column<string>(type: "varchar(25)", nullable: false),
+                    TopicName = table.Column<string>(type: "text", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>

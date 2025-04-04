@@ -8,7 +8,7 @@ namespace backend.Models
     {
         [Required]
         [StringLength(25)]
-        [Column(TypeName = "varchar(25)")]
+        [Column(TypeName = "text")]
         public required string TeacherIdNumber { get; set; }
 
         public List<Classroom> Classrooms { get; set; } = new List<Classroom>();

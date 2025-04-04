@@ -9,18 +9,18 @@ namespace backend.Models
         public int UserID { get; set; }
 
         [StringLength(50)]
-        [Column(TypeName = "varchar(50)")]
-        public required string Name { get; set; }
+        [Column(TypeName = "text")]
+        public string Name { get; set; }
 
         [StringLength(50)]
-        [Column(TypeName = "varchar(50)")]
+        [Column(TypeName = "text")]
         public required string Email { get; set; }
 
-        [StringLength(25)]
-        [Column(TypeName = "varchar(25)")]
+        [StringLength(50)]
+        [Column(TypeName = "text")]
         public required string Password { get; set; }
 
-        [Required]
+        
         public byte UserType { get; set; } // 1: user 2 : teacher 7: admin
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

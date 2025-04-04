@@ -6,7 +6,7 @@ import Button from '../components/buttons/PurpleButton';
 import UserRoleButton from '../components/buttons/UserRoleButton';
 import Stepper from '../components/Stepper';
 import logo from '../assets/logo.png';
-import { register } from '../api/authApi';
+import { authApi } from '../api/auth/authApi';
 import Background from '../components/Background';
 
 const SignupPage = () => {
@@ -17,7 +17,7 @@ const SignupPage = () => {
         email: '',
         username: '',
         password: '',
-        confirm_password: '',
+        confirmPassword: '',
         userType: null,
     };
 
@@ -36,7 +36,7 @@ const SignupPage = () => {
                 .required('Password is required')
                 .max(25, 'Password must be at most 25 characters')
                 .matches(/(?=.*[0-9])/, 'Password must contain a number'),
-            confirm_password: Yup.string()
+            confirmPassword: Yup.string()
                 .oneOf([Yup.ref('password'), null], 'Passwords must match')
                 .required('Confirm password is required'),
         }),
@@ -44,7 +44,7 @@ const SignupPage = () => {
 
     const handleSubmit = async (values) => {
         try {
-            const response = await register(values); // Call the register API
+            const response = await authApi.registerUser(values); // Call the register API
             console.log('Registration successful:', response);
             alert('Registration successful!');
         } catch (error) {
@@ -121,7 +121,7 @@ const SignupPage = () => {
                         <label>Enter your password</label>
                         <InputField id="password" name="password" type="password" placeholder="Password" />
                         <label>Confirm password</label>
-                        <InputField id="confirm_password" name="confirm_password" type="password" placeholder="Confirm password" />
+                        <InputField id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm password" />
                     </>
                 );
             default:
