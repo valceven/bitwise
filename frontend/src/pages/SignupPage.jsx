@@ -134,7 +134,7 @@ const SignupPage = () => {
             <Background />
             <div className="relative z-10 w-1/2 flex flex-col justify-center items-center min-h-screen mx-auto">
             
-            <img src={logo} alt="Logo" className="w-30 h-6 mb-10" />
+            <img draggable='false' src={logo} alt="Logo" className="w-30 h-6 mb-10" />
             <div className="flex flex-col items-enter justify-center w-full mb-10">
                 <Stepper step={step} />
             </div>

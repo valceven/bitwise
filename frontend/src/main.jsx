@@ -9,6 +9,7 @@ import PageNotFound from "./pages/PageNotFound.jsx";
 import ColorPalette from "./pages/ColorPalette.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SignupPage from "./pages/SignupPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 
 const router = createBrowserRouter([
   {
@@ -24,10 +25,20 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage/>,
+    errorElement: <PageNotFound />,
   },
   {
     path: "/signup",
     element: <SignupPage/>,
+    errorElement: <PageNotFound />,
+  },
+  {
+    path: "/profile",
+    element: <Layout />,
+    errorElement: <PageNotFound />,
+    children: [
+      { index: true, element: <ProfilePage /> }, 
+    ],
   },
 ]);
 
