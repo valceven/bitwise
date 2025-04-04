@@ -19,7 +19,7 @@ namespace backend.Services
         // Register User
         public async Task<User> RegisterUserAsync(UserRegisterDto userRegisterDto)
         {
-            //ValidateUserRegistration(userRegisterDto);
+            ValidateUserRegistration(userRegisterDto);
 
             // Check if the email is already in use
             var existingUser = await _userRepository.GetUserByEmailAsync(userRegisterDto.Email);

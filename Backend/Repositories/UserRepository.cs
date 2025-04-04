@@ -2,6 +2,7 @@ using backend.Models;
 using backend.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
+using backend.DTOs.User;
 
 namespace backend.Repositories
 {
@@ -48,20 +49,22 @@ namespace backend.Repositories
         }
 
         // Update an existing user
-        public async Task<User?> UpdateUserAsync(int id, User user)
+        public async Task<User?> UpdateUserAsync(int id, UserUpdateDto userUpdateDto)
         {
-            var existingUser = await _context.Users.FindAsync(id);
-            if (existingUser == null) return null;
+            var user = await _context.Users.FindAsync(id);
 
-            // Update user fields
-            existingUser.Name = user.Name;
-            existingUser.Email = user.Email;
-            existingUser.Password = user.Password;
-            existingUser.UserType = user.UserType;
-            existingUser.UpdatedAt = DateTime.UtcNow;
+            if (user == null) return null;
+
+            if (userUpdateDto.Name != null) user.Name = userUpdateDto.Name;
+            if (userUpdateDto.Email != null) user.Email = userUpdateDto.Email;
+            if (userUpdateDto.Password != null) user.Password = BCrypt.Net.BCrypt.HashPassword(userUpdateDto.Password);
+            // if (userUpdateDto.DateOfBirth != null) user.DateOfBirth = userUpdateDto.DateOfBirth;
+            // if (userUpdateDto.StudentIdNumber != null) user.StudentIdNumber = userUpdateDto.StudentIdNumber;
+            // if (userUpdateDto.TeacherIdNumber != null) user.TeacherIdNumber = userUpdateDto.TeacherIdNumber;
+            user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-            return existingUser;
+            return user;
         }
 
         // Delete a user by ID

@@ -5,10 +5,10 @@ namespace backend.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<List<User>> GetAllUsersAsync();
-        Task<User?> GetUserByIdAsync(int id);
-        Task<User> CreateUserAsync(UserRegisterDto user);
-        Task<User?> UpdateUserAsync(int id, User user);
+        Task<List<UserResponseDto?>> GetAllUsersAsync();
+        Task<UserResponseDto?> GetUserByIdAsync(int id);
+        Task<UserResponseDto> CreateUserAsync(UserRegisterDto user);
+        Task<UserResponseDto?> UpdateUserAsync(int id, UserUpdateDto user);
         Task<bool> DeleteUserAsync(int id);
     }
 }
