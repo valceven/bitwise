@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,7 +12,7 @@ namespace backend.Models
         [ForeignKey("Lesson")]
         public int LessonId { get; set; }
 
-        [Column(TypeName = "varchar(25)")]
+        [Column(TypeName = "text")]
         public required string TopicName { get; set; }
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

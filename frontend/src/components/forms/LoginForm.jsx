@@ -3,7 +3,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import InputField from "../fields/InputField";
 import Button from "../buttons/PurpleButton";
-import axios from "axios";
+import { authApi } from "../../api/auth/authApi";
 
 const LoginForm = () => {
   const initialValues = {
@@ -24,7 +24,7 @@ const LoginForm = () => {
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      const data = await login(values);
+      const data = await authApi.loginUser(values);
       console.log("API Response:", data);
       alert("Login successful!");
     } catch (error) {
@@ -63,7 +63,7 @@ const LoginForm = () => {
           <div className="flex justify-center">
             <Button
               type="submit"
-              className="w-2/3 mt-4 py-2 px-4 btn-shadow addgrotesk"
+              className="bg-bluez w-2/3 mt-4 py-2 px-4 btn-shadow addgrotesk"
             >
               Log in
             </Button>

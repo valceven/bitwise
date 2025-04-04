@@ -9,7 +9,7 @@ namespace backend.Models
         public int LeaderboardId { get; set; }
 
         [Required]
-        [ForeignKey("Assessment")]
+        [ForeignKey("AssessmentId")]
         public int AssessmentId { get; set; }
 
         [Required]

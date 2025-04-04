@@ -8,10 +8,10 @@ namespace backend.Models
         [Key]
         public int LeaderboardEntryId { get; set; }
 
-        [ForeignKey("Leaderboard")]
+        [ForeignKey("LeaderboardId")]
         public int LeaderboardId { get; set; }
 
-        [ForeignKey("Student")]
+        [ForeignKey("StudentId")]
         public int StudentId { get; set; }
 
         [Required]

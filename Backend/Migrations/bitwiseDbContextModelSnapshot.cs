@@ -35,14 +35,14 @@ namespace backend.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("varchar(25)");
+                        .HasColumnType("text");
 
                     b.Property<int>("TopicId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("text");
 
                     b.HasKey("AssessmentId");
 
@@ -60,7 +60,7 @@ namespace backend.Migrations
                     b.Property<string>("ClassName")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("varchar(25)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -85,7 +85,7 @@ namespace backend.Migrations
 
                     b.Property<string>("ContentName")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("text");
 
                     b.Property<int>("TopicId")
                         .HasColumnType("integer");
@@ -162,7 +162,7 @@ namespace backend.Migrations
                     b.Property<string>("LessonName")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("varchar(25)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -187,7 +187,7 @@ namespace backend.Migrations
 
                     b.Property<string>("TopicName")
                         .IsRequired()
-                        .HasColumnType("varchar(25)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -218,17 +218,17 @@ namespace backend.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("varchar(25)");
+                        .HasMaxLength(50)
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -265,7 +265,7 @@ namespace backend.Migrations
                     b.Property<string>("StudentIdNumber")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("varchar(25)");
+                        .HasColumnType("text");
 
                     b.HasIndex("ClassroomId");
 
@@ -279,7 +279,7 @@ namespace backend.Migrations
                     b.Property<string>("TeacherIdNumber")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("varchar(25)");
+                        .HasColumnType("text");
 
                     b.HasDiscriminator().HasValue("Teacher");
                 });

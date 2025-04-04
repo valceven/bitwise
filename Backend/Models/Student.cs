@@ -7,10 +7,10 @@ namespace backend.Models
     {
         [Required]
         [StringLength(25)]
-        [Column(TypeName = "varchar(25)")]
+        [Column(TypeName = "text")]
         public int StudentIdNumber { get; set; }
 
-        [ForeignKey("Classroom")]
+        [ForeignKey("ClassroomId")]
         public int ClassroomId { get; set; }
 
         public DateTime DateOfBirth { get; set; }

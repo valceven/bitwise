@@ -9,15 +9,15 @@ namespace backend.Models
         public int AssessmentId { get; set; }
 
         [Required]
-        [ForeignKey("Topic")]
+        [ForeignKey("TopicId")]
         public int TopicId { get; set; }
 
-        [Column(TypeName = "varchar(25)")]
+        [Column(TypeName = "text")]
         public required string Title { get; set; }
 
         public DateTime DueDate { get; set; }
 
-        [Column(TypeName = "varchar(20)")]
+        [Column(TypeName = "text")]
         public required string Type { get; set; } // e.g., "Quiz", "Test", "Assignment"
 
     }
