@@ -11,12 +11,12 @@ namespace backend.Models
         public int LessonId { get; set; }
 
         [Required]
-        [ForeignKey("Classroom")]
+        [ForeignKey("ClassroomId")]
         public int ClassroomId { get; set; }
 
         [Required]
         [StringLength(25)]
-        [Column(TypeName = "varchar(25)")]
+        [Column(TypeName = "text")]
         public required string LessonName { get; set; }
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

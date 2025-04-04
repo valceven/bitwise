@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,11 +9,11 @@ namespace backend.Models
         public int ClassroomId { get; set; }
 
         [Required]
-        [ForeignKey("Teacher")]
+        [ForeignKey("TeacherId")]
         public int TeacherId { get; set; }
 
         [StringLength(25)]
-        [Column(TypeName = "varchar(25)")]
+        [Column(TypeName = "text")]
         public required string ClassName { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

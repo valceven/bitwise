@@ -24,6 +24,7 @@ namespace backend.Presentation
             {
                 return BadRequest("Passwords do not match.");
             }
+            Console.WriteLine(userRegisterDto);
 
             var createdUser = await _authService.RegisterUserAsync(userRegisterDto);
             

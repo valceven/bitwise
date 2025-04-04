@@ -10,11 +10,11 @@ namespace backend.Models
         public int ContentId { get; set; }
 
         [Required]
-        [ForeignKey("Topic")]
+        [ForeignKey("TopicId")]
         public int TopicId { get; set; }
 
         [Required]
-        [Column(TypeName = "varchar(255)")]
+        [Column(TypeName = "text")]
         public required string ContentName { get; set; }
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

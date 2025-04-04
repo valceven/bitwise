@@ -9,15 +9,15 @@ namespace backend.Models
         public int UserID { get; set; }
 
         [StringLength(50)]
-        [Column(TypeName = "varchar(50)")]
+        [Column(TypeName = "text")]
         public string Name { get; set; }
 
         [StringLength(50)]
-        [Column(TypeName = "varchar(50)")]
+        [Column(TypeName = "text")]
         public required string Email { get; set; }
 
         [StringLength(50)]
-        [Column(TypeName = "varchar(50)")]
+        [Column(TypeName = "text")]
         public required string Password { get; set; }
 
         
