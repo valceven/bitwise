@@ -4,9 +4,9 @@ import * as Yup from 'yup';
 import InputField from '../components/fields/InputField';
 import Button from '../components/buttons/PurpleButton';
 import UserRoleButton from '../components/buttons/UserRoleButton';
-import DropdownField from '../components/fields/DropDownField';
 import Stepper from '../components/Stepper';
 import logo from '../assets/logo.png';
+import { register } from '../api/auth';
 
 const SignupPage = () => {
     const [step, setStep] = useState(1); // Track the current step
@@ -41,9 +41,15 @@ const SignupPage = () => {
         }),
     ];
 
-    const handleSubmit = (values) => {
-        console.log('Form submitted:', values);
-        alert('Registration successful!');
+    const handleSubmit = async (values) => {
+        try {
+            const response = await register(values); // Call the register API
+            console.log('Registration successful:', response);
+            alert('Registration successful!');
+        } catch (error) {
+            console.error('Registration failed:', error);
+            alert('Registration failed. Please try again.');
+        }
     };
 
     const renderStepFields = (setFieldValue, values) => {
@@ -125,7 +131,7 @@ const SignupPage = () => {
     return (
         <div className="w-1/2 flex flex-col justify-center items-center min-h-screen mx-auto">
             <img src={logo} alt="Logo" className="w-30 h-6 mb-10" />
-            <div className="flex flex-col items-enter justify-center w-full">
+            <div className="flex flex-col items-enter justify-center w-full mb-10">
                 <Stepper step={step} />
             </div>
             
