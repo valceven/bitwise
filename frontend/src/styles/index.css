@@ -53,6 +53,9 @@ h6 {
   @apply bg-indigo-900;
 }
 
+.box-shadow {
+  box-shadow: 4px 4px 0px #0b1e2d;
+}
 
 .btn-shadow-square {
   @apply rounded-md border border-black transition-all;
