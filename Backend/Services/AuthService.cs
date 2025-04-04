@@ -19,13 +19,10 @@ namespace backend.Services
         // Register User
         public async Task<User> RegisterUserAsync(UserRegisterDto userRegisterDto)
         {
-            var email = userRegisterDto.Email;
-            var password = userRegisterDto.Password;
-            var name = userRegisterDto.Name;
-            byte userType = userRegisterDto.UserType;
+            ValidateUserRegistration(userRegisterDto);
 
             // Check if the email is already in use
-            var existingUser = await _userRepository.GetUserByEmailAsync(email);
+            var existingUser = await _userRepository.GetUserByEmailAsync(userRegisterDto.Email);
             if (existingUser != null)
             {
                 throw new InvalidOperationException("Email is already in use.");
@@ -34,10 +31,10 @@ namespace backend.Services
             // Create new user object
             var newUser = new User
             {
-                Email = email,
-                Name = name,
-                Password = BCrypt.Net.BCrypt.HashPassword(password), // Hash the password
-                UserType = userType,
+                Email = userRegisterDto.Email,
+                Name = userRegisterDto.Name,
+                Password = BCrypt.Net.BCrypt.HashPassword(userRegisterDto.Password),
+                UserType = userRegisterDto.UserType,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -68,6 +65,27 @@ namespace backend.Services
             return _tokenService.GenerateToken(user);
 
             
+        }
+
+        // Validate user registration data for a cleaner code
+        // This method checks if the registration data is valid
+        // and throws an exception if any required field is missing or invalid.
+        private void ValidateUserRegistration(UserRegisterDto dto)
+        {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto), "Registration data is required.");
+
+            if (string.IsNullOrWhiteSpace(dto.Email))
+                throw new ArgumentException("Email is required.");
+
+            if (string.IsNullOrWhiteSpace(dto.Password))
+                throw new ArgumentException("Password is required.");
+
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                throw new ArgumentException("Name is required.");
+
+            if (dto.UserType == 0)
+                throw new ArgumentException("User type is required.");
         }
     }
 }
