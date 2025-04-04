@@ -2,6 +2,7 @@ using backend.Models;
 using backend.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
@@ -25,7 +26,13 @@ namespace backend.Services
                 throw new InvalidOperationException("JWT SecretKey is not configured.");
             }
 
-            var key = Encoding.ASCII.GetBytes(secretKey);
+            var key = Encoding.UTF8.GetBytes(secretKey);
+            if (key.Length != 32) // 32 bytes == 256 bits
+            {
+                // If the key is shorter than 32 bytes, hash it to 256 bits (SHA256)
+                key = new SHA256Managed().ComputeHash(key);
+            }
+
             var tokenHandler = new JwtSecurityTokenHandler();
 
             var tokenDescriptor = new SecurityTokenDescriptor

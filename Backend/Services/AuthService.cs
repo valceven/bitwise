@@ -24,6 +24,7 @@ namespace backend.Services
         {
             var email = userRegisterDto.Email;
             var password = userRegisterDto.Password;
+            var name = userRegisterDto.Name;
 
             // Check if the email is already in use
             var existingUser = await _userRepository.GetUserByEmailAsync(email);
@@ -36,6 +37,7 @@ namespace backend.Services
             var newUser = new User
             {
                 Email = email,
+                Name = name,
                 Password = BCrypt.Net.BCrypt.HashPassword(password), // Hash the password
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
