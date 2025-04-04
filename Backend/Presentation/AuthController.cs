@@ -2,35 +2,51 @@ using backend.DTOs.User;
 using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
-
+using backend.Services.Interfaces;
 namespace backend.Presentation
 {
-    [Route("api/auth")]
+    [Route("api/users/")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public AuthController(AuthService authService)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
         }
 
+        // Register User
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserRegisterDto userDto)
+        public async Task<ActionResult<User>> RegisterUser([FromBody] UserRegisterDto userRegisterDto)
         {   
-            Console.WriteLine("Registering user: " + userDto.Name);
-            var newUser = await _authService.RegisterUserAsync(userDto);
-            return CreatedAtAction(nameof(Register), new { id = newUser.UserID }, newUser);
+            if(userRegisterDto.Password != userRegisterDto.ConfirmPassword)
+            {
+                return BadRequest("Passwords do not match.");
+            }
+
+            var createdUser = await _authService.RegisterUserAsync(userRegisterDto);
+            
+            return CreatedAtAction(nameof(RegisterUser), new { id = createdUser.UserID }, createdUser);
         }
 
-        // [HttpPost("login")]
-        // public async Task<IActionResult> Login([FromBody] UserRegisterDto userDto)
-        // {
-        //     var token = await _authService.LoginUserAsync(userDto);
-        //     if (token == null) return Unauthorized("Invalid credentials");
-
-        //     return Ok(new { Token = token });
-        // }
+        // Login User and get JWT
+        [HttpPost("login")]
+        public async Task<ActionResult<string>> LoginUser([FromBody] UserLoginDto loginDto)
+        {
+            try
+            {
+                var token = await _authService.LoginUserAsync(loginDto);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Unauthorized("Invalid email or password.");
+                }
+                return Ok(new { Message = "Authenticated", Token = token });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+        }
     }
 }

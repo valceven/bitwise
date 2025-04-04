@@ -1,48 +1,73 @@
-using backend.DTOs.User;
 using backend.Models;
-using backend.Repositories;
 using backend.Repositories.Interfaces;
+using backend.DTOs.User;
 using backend.Services.Interfaces;
 
 namespace backend.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IUserRepository _authRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ITokenService _tokenService;
 
-        public AuthService(IUserRepository authRepository)
+        public AuthService(IUserRepository userRepository, ITokenService tokenService)
         {
-            _authRepository = authRepository;
+            _userRepository = userRepository;
+            _tokenService = tokenService;
         }
 
-        public Task<User> LoginUserAsync(UserLoginDto user)
+        // Register User
+        public async Task<User> RegisterUserAsync(UserRegisterDto userRegisterDto)
         {
-            throw new NotImplementedException();
-        }
+            var email = userRegisterDto.Email;
+            var password = userRegisterDto.Password;
+            var name = userRegisterDto.Name;
+            byte userType = userRegisterDto.UserType;
 
-        public Task<User> RegisterUserAsync(UserRegisterDto userDto)
-        {
-            string hashedPassword = HashPassword(userDto.Password);
-
-            var user = new User
+            // Check if the email is already in use
+            var existingUser = await _userRepository.GetUserByEmailAsync(email);
+            if (existingUser != null)
             {
-                Name = userDto.Name,
-                Email = userDto.Email,
-                Password = hashedPassword,
-                UserType = userDto.UserType
+                throw new InvalidOperationException("Email is already in use.");
+            }
+
+            // Create new user object
+            var newUser = new User
+            {
+                Email = email,
+                Name = name,
+                Password = BCrypt.Net.BCrypt.HashPassword(password), // Hash the password
+                UserType = userType,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
 
-            return _authRepository.CreateUserAsync(user);
+            return await _userRepository.CreateUserAsync(newUser);
         }
 
-        internal Task LoginUserAsync(UserRegisterDto userDto)
+        // Login User and generate JWT
+        public async Task<string> LoginUserAsync(UserLoginDto userLoginDto)
         {
-            throw new NotImplementedException();
-        }
+            var email = userLoginDto.Email;
+            var password = userLoginDto.Password;
 
-        private string HashPassword(string password)
-        {
-            return BCrypt.Net.BCrypt.HashPassword(password);
+            // Validate user credentials
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                throw new ArgumentException("Email and password are required.");
+            }
+
+            // Check if the user exists and verify the password
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
+            {
+                throw new UnauthorizedAccessException("Invalid email or password.");
+            }
+
+            // Generate JWT token using TokenService
+            return _tokenService.GenerateToken(user);
+
+            
         }
     }
 }

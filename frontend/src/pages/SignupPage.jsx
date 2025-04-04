@@ -16,6 +16,7 @@ const SignupPage = () => {
         email: '',
         username: '',
         password: '',
+        confirmPassword: '',
         userType: '',
     };
 
@@ -31,6 +32,9 @@ const SignupPage = () => {
                 .required('Password is required')
                 .max(25, 'Password must be at most 25 characters')
                 .matches(/(?=.*[0-9])/, 'Password must contain a number'),
+            confirmPassword: Yup.string()
+                .required('Confirm password is required')
+                .oneOf([Yup.ref('password'), null], 'Passwords must match')
         }),
         Yup.object({
             userType: Yup.string().required('User type is required'),
@@ -78,6 +82,7 @@ const SignupPage = () => {
                         
                         <InputField id="username" name="username" type="text" placeholder="Username" />
                         <InputField id="password" name="password" type="password" placeholder="Password" />
+                        <InputField id="confirmPassword" name="confirmPassword" type="confirmPassword" placeholder="Confirm Password" />
                     </>
                 );
             case 3:

@@ -1,69 +1,58 @@
-using Supabase;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.OpenApi.Models;
+using backend.Data;
+using DotNetEnv;
 using backend.Repositories;
 using backend.Repositories.Interfaces;
 using backend.Services;
-using System.Text;
+using backend.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using backend.Data;
-using Microsoft.EntityFrameworkCore;
-
-DotNetEnv.Env.Load(); // Load environment variables from .env file
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Load environment variables
+DotNetEnv.Env.Load();  // Load environment variables from .env file
 
-// Supabase configuration
-var url = Environment.GetEnvironmentVariable("SUPABASE_URL");
-var key = Environment.GetEnvironmentVariable("SUPABASE_KEY");
-var options = new SupabaseOptions
-{
-    AutoRefreshToken = true,
-    AutoConnectRealtime = true,
-};
+// Get the current environment (development or production)
+var environment = builder.Environment.EnvironmentName.ToLower();
 
-builder.Services.AddSingleton(provider => new Supabase.Client(url!, key, options));
+// Read the connection string based on the environment
+var connectionString = environment == "production"
+    ? builder.Configuration.GetConnectionString("AzureConnection")
+    : builder.Configuration.GetConnectionString("SupabaseConnection");
 
-// Database configuration
-var connectionString = Environment.GetEnvironmentVariable("SUPABASE_DB_CONNECTION")
-    ?? throw new InvalidOperationException("SUPABASE_DB_CONNECTION is not set in the environment variables.");
-
+// Add DbContext for PostgreSQL using the appropriate connection string
 builder.Services.AddDbContext<bitwiseDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") ?? connectionString));
 
-// Authentication with JWTBearer
-var jwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET")
-    ?? throw new InvalidOperationException("JWT_SECRET is not set in the environment variables.");
-var bytes = Encoding.UTF8.GetBytes(jwtSecret);
+// Register services for dependency injection
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddControllers();
 
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication()
+// Add authentication using JWT Bearer tokens
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        options.Authority = builder.Configuration["Auth:ValidIssuer"]; // JWT authority URL from appsettings.json
+        options.Audience = builder.Configuration["Auth:ValidAudience"]; // JWT audience from appsettings.json
+        options.RequireHttpsMetadata = false; // Set to true for production
+
+        options.TokenValidationParameters = new TokenValidationParameters
         {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(bytes),
-            ValidAudience = builder.Configuration["Auth:ValidAudience"],
-            ValidIssuer = builder.Configuration["Auth:ValidIssuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["Auth:SecretKey"] ?? string.Empty) // Use a fallback value
+            )
         };
     });
-
-// add https redirection
-builder.Services.AddHttpsRedirection(options =>
-{
-    options.HttpsPort = 5159;  // Adjust this to match the port you want for HTTPS
-});
-
-// Register Repository & Service & Controllers
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>
 {
@@ -74,24 +63,39 @@ builder.Services.AddCors(options =>
                         .AllowCredentials());
 });
 
+// Add authorization services
+builder.Services.AddAuthorization();
 
-builder.Services.AddHttpContextAccessor();
+// Add Swagger service to generate OpenAPI documentation
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Optionally, you can customize the Swagger documentation settings here
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Bitwise API", Version = "v1" });
+});
+
+
 
 var app = builder.Build();
 
+// Set up Swagger for API documentation (in development mode)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Bitwise API V1");
+    });
 }
 
-app.UseCors("AllowFrontend");
+// Use authentication and authorization middleware
 app.UseRouting();
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.UseEndpoints(endpoints =>
-{
-    _ = endpoints.MapControllers();
-});
+app.UseCors("AllowFrontend"); // Use the CORS policy defined above
+app.UseAuthentication();  // Add authentication middleware
+//app.UseHttpsRedirection();
+app.UseAuthorization();   // Add authorization middleware
 
+app.MapControllers();
+
+// Start the application
 app.Run();

@@ -2,15 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using backend.Models;
 
 namespace backend.DTOs.User
 {
     public class UserRegisterDto
-    {
-        public required string Name { get; set; }
-        public required string Email { get; set; }
-        public required string Password { get; set; }
-        public required byte UserType { get; set; } // 0 = User, 1 = Admin, 2 = SuperAdmin
-        
+    {   
+        public  string Email { get; set; }
+        public string Name { get; set; }
+        public  string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+        public byte UserType { get; set; }
     }
 }
+
