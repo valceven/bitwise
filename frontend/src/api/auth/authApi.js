@@ -15,7 +15,8 @@ const registerUser = async (userData) => {
 
 const loginUser = async (credentials) => {  
     try {
-        const response = await apiService.post('/auth/login', credentials);
+        console.log("Credentials in login function:", credentials);
+        const response = await apiService.post('/users/login', credentials);
         return response.data;
     } catch (error) {
         throw error.response.data || error.message || "An unknown error occurred";
