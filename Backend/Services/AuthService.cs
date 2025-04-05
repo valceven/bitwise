@@ -70,6 +70,7 @@ namespace backend.Services
         // Validate user registration data for a cleaner code
         // This method checks if the registration data is valid
         // and throws an exception if any required field is missing or invalid.
+
         private void ValidateUserRegistration(UserRegisterDto dto)
         {
             if (dto == null)

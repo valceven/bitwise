@@ -30,8 +30,9 @@ namespace backend.Presentation
             
             return CreatedAtAction(nameof(RegisterUser), new { id = createdUser.UserID }, createdUser);
         }
-
+    
         // Login User and get JWT
+        // This method is responsible for authenticating the user and generating a JWT token. (wala rani aron ra naa koy ma push hehe)
         [HttpPost("login")]
         public async Task<ActionResult<string>> LoginUser([FromBody] UserLoginDto loginDto)
         {
