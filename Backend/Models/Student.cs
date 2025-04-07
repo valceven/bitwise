@@ -3,16 +3,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models 
 {
-    public class Student : User
+    public class Student
     {
+        [Key]
+        [ForeignKey("UserID")]
+        public int StudentID { get; set; }
+
         [Required]
         [StringLength(25)]
         [Column(TypeName = "text")]
-        public int StudentIdNumber { get; set; }
+        public string StudentIdNumber { get; set; }
+
+        public DateTime DateOfBirth { get; set; }
 
         [ForeignKey("ClassroomId")]
         public int ClassroomId { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
+        public Classroom Classroom { get; set; }
     }
+
 }
