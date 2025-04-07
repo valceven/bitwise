@@ -73,6 +73,13 @@ const ProfileForm = () => {
     alert("Form submitted successfully!");
   };
 
+  const handlePhotoUploadClick = () => {
+    const photoInput = document.getElementById("photo");
+    if (photoInput) {
+      photoInput.click(); 
+    }
+  };
+
   return (
     <Formik
       initialValues={initialValues}
@@ -86,12 +93,41 @@ const ProfileForm = () => {
           <div className="border-b border-gray-900/10 pb-12">
             
           <div className="w-full flex flex-row items-center space-x-5">
-                                  <img draggable="false" src="/src/assets/user.svg" alt="" className="sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18" />
-                                  <Button className="bg-bluez btn-shadow addgrotesk h-3/4 justify-center items-center">
-                                      Upload Photo
-                                  </Button>
-                              </div>
+                <img
+                  draggable="false"
+                  src={initialValues?.photo || "/src/assets/user.svg"}
+                  alt="Profile"
+                  className="sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18 rounded-full object-cover"
+                />
+                <label htmlFor="photo">
+                  <Button
+                    type="button"
+                    className="bg-bluez btn-shadow addgrotesk h-3/4 justify-center items-center"
+                    onClick={handlePhotoUploadClick}
+                  >
+                    Upload Photo
+                  </Button>
+                </label>
 
+                <input
+                    id="photo"
+                    type="file"
+                    accept="image/*"
+                    className="hidden" 
+                    onChange={(event) => {
+                      const file = event.target.files[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          console.log("Base64 Image:", reader.result); 
+                          setFieldValue("photo", reader.result); 
+                        };
+                        reader.readAsDataURL(file); 
+                      }
+                    }}
+                  />
+                
+              </div>
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-6">
               
               
