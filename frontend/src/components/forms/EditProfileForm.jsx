@@ -97,7 +97,7 @@ const ProfileForm = () => {
                   draggable="false"
                   src={initialValues?.photo || "/src/assets/user.svg"}
                   alt="Profile"
-                  className="sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18 rounded-full object-cover"
+                  className="profile-img"
                 />
                 <label htmlFor="photo">
                   <Button
@@ -209,9 +209,9 @@ const ProfileForm = () => {
 
         
           <div className="border-b border-gray-900/10 pb-12">
-            <h2 className="text-base font-semibold text-gray-900">Personal Information</h2>
+            <h2 className="text-base font-semibold text-gray-900">Update Password</h2>
             <p className="mt-1 text-sm text-gray-600">
-              Use a permanent address where you can receive mail.
+            Keep your account secure by updating your password regularly. Make sure to use a strong and unique combination.
             </p>
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
