@@ -65,6 +65,7 @@ namespace backend.Services
 
             return new AuthResponseDto
             {
+                user.Name
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             };
@@ -86,7 +87,7 @@ namespace backend.Services
             await _userRepository.UpdateUserTokenAsync(user);
 
             return new AuthResponseDto
-            {
+            {   
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken
             };
