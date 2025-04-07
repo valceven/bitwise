@@ -9,7 +9,7 @@ function LoginPage() {
     <div className="flex justify-center items-center min-h-screen bg-offwhite">
         <Background />
       <div className="relative z-10 flex flex-col justify-center items-center">
-        <img src={logo} alt="Logo" className="w-30 h-6 mb-10" />
+        <img draggable='false' src={logo} alt="Logo" className="w-30 h-6 mb-10" />
         <h1 className="text-3xl font-bold text-black-500 mb-4">
           Welcome Back!
         </h1>
