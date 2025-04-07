@@ -31,23 +31,32 @@ namespace backend.Presentation
             return CreatedAtAction(nameof(RegisterUser), new { id = createdUser.UserID }, createdUser);
         }
 
-        // Login User and get JWT
+        // Login User and generate JWT
         [HttpPost("login")]
-        public async Task<ActionResult<string>> LoginUser([FromBody] UserLoginDto loginDto)
+        public async Task<ActionResult<AuthResponseDto>> LoginUser([FromBody] UserLoginDto loginDto)
         {
             try
             {
-                var token = await _authService.LoginUserAsync(loginDto);
-                if (string.IsNullOrEmpty(token))
+                var response = await _authService.LoginUserAsync(loginDto);
+                return Ok(new
                 {
-                    return Unauthorized("Invalid email or password.");
-                }
-                return Ok(new { Message = "Authenticated", Token = token });
+                    Message = "Authenticated",
+                    AccessToken = response.AccessToken,
+                    RefreshToken = response.RefreshToken
+                });
             }
             catch (UnauthorizedAccessException)
             {
                 return Unauthorized();
             }
+        }
+
+        // Returns refres token to the client
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto refreshDto)
+        {
+            var result = await _authService.RefreshTokenAsync(refreshDto);
+            return result == null ? Unauthorized("Invalid or expired refresh token.") : Ok(result);
         }
     }
 }

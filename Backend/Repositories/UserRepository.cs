@@ -77,5 +77,11 @@ namespace backend.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
+
+        // Updates user token
+        public async Task UpdateUserTokenAsync(User user){
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
     }
 }
