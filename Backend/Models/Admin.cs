@@ -1,12 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models
 {
-    public class Admin : User
+    [Table("Admins")]
+    public class Admin
     {
-
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int AdminID { get; set; }
+        public string Passkey { get; set; }
     }
 }

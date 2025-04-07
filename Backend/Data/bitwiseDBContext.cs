@@ -9,7 +9,7 @@ namespace backend.Data
         }
 
         public DbSet<Models.User> Users { get; set; }
-        public DbSet<Models.Admin> Admins { get; set; }
+        //public DbSet<Models.Admin> Admins { get; set; }
         public DbSet<Models.Teacher> Teachers { get; set; }
         public DbSet<Models.Topic> Topics { get; set; }
         public DbSet<Models.Student> Students { get; set; }

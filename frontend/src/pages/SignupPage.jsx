@@ -68,11 +68,11 @@ const SignupPage = () => {
                             <UserRoleButton
                                 type="button"
                                 onClick={() => {
-                                    setFieldValue('userType', 0); 
+                                    setFieldValue('userType', 1); 
                                 
                                 }}
                                 className={`bg-amber-50 text-black hover:bg-gray-600 btn-shadow-square addgrotesk ${
-                                    values.userType === 0? 'bg-bluez' : ''
+                                    values.userType === 1? 'bg-bluez' : ''
                                 }`} // Highlight selected button
                             >
                                 Student
@@ -80,11 +80,11 @@ const SignupPage = () => {
                             <UserRoleButton
                                 type="button"
                                 onClick={() => {
-                                    setFieldValue('userType', 1);
+                                    setFieldValue('userType', 2);
                                     
                                 }}
                                 className={`bg-amber-50 text-black hover:bg-gray-600 btn-shadow-square addgrotesk ${
-                                    values.userType === 1 ?'bg-bluez' : ''
+                                    values.userType === 2 ?'bg-bluez' : ''
                                 }`} 
                             >
                                 Teacher
