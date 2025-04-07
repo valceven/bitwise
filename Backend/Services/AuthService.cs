@@ -43,29 +43,55 @@ namespace backend.Services
         }
 
         // Login User and generate JWT
-        public async Task<string> LoginUserAsync(UserLoginDto userLoginDto)
+        public async Task<AuthResponseDto> LoginUserAsync(UserLoginDto userLoginDto)
         {
             var email = userLoginDto.Email;
             var password = userLoginDto.Password;
 
-            // Validate user credentials
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-            {
                 throw new ArgumentException("Email and password are required.");
-            }
 
-            // Check if the user exists and verify the password
             var user = await _userRepository.GetUserByEmailAsync(email);
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
-            {
                 throw new UnauthorizedAccessException("Invalid email or password.");
+
+            //  Generate tokens
+            var accessToken = _tokenService.GenerateToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7); // expires in 7 days
+            await _userRepository.UpdateUserTokenAsync(user);
+
+            return new AuthResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            };
+        }
+
+        public async Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshDto)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(refreshDto.Email);
+            if (user == null || user.RefreshToken != refreshDto.RefreshToken || user.RefreshTokenExpiry < DateTime.UtcNow)
+            {
+                return null; // invalid token or expired
             }
 
-            // Generate JWT token using TokenService
-            return _tokenService.GenerateToken(user);
+            var newAccessToken = _tokenService.GenerateToken(user);
+            var newRefreshToken = _tokenService.GenerateRefreshToken();
 
-            
+            user.RefreshToken = newRefreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            await _userRepository.UpdateUserTokenAsync(user);
+
+            return new AuthResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
         }
+
 
         // Validate user registration data for a cleaner code
         // This method checks if the registration data is valid

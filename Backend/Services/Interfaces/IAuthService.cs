@@ -6,6 +6,7 @@ namespace backend.Services.Interfaces
     public interface IAuthService
     {
         Task<User> RegisterUserAsync (UserRegisterDto user);
-        Task<string> LoginUserAsync (UserLoginDto user);
+        Task<AuthResponseDto> LoginUserAsync (UserLoginDto user);
+        Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshDto);
     }
 }

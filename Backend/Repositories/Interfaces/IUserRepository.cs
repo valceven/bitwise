@@ -12,5 +12,7 @@ namespace backend.Repositories.Interfaces
         Task<User> CreateUserAsync(User user);
         Task<User?> UpdateUserAsync(int id, UserUpdateDto user);
         Task<bool> DeleteUserAsync(int id);
+        Task UpdateUserTokenAsync(User user);
+        
     }
 }
