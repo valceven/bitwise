@@ -63,11 +63,19 @@ namespace backend.Services
             user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7); // expires in 7 days
             await _userRepository.UpdateUserTokenAsync(user);
 
+            var UserResponseDto = new UserResponseDto
+            {
+                UserID = user.UserID,
+                Name = user.Name,
+                Email = user.Email,
+                UserType = user.UserType
+            };
+
             return new AuthResponseDto
             {
-                user.Name
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                User = UserResponseDto
             };
         }
 
@@ -93,7 +101,6 @@ namespace backend.Services
             };
         }
 
-
         // Validate user registration data for a cleaner code
         // This method checks if the registration data is valid
         // and throws an exception if any required field is missing or invalid.
@@ -115,5 +122,6 @@ namespace backend.Services
             if (dto.UserType == 0)
                 throw new ArgumentException("User type is required.");
         }
+
     }
 }

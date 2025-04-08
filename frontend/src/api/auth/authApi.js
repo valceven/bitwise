@@ -23,6 +23,16 @@ const loginUser = async (credentials) => {
     }
 }
 
+const editUser = async (userId, userData) => {
+  try {
+    console.log("User data in edit function:", userData);
+    const response = await apiService.patch(`/users/${userId}`, userData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+};
+
 const refreshAccessToken = async (data) => {
   try {
     const response = await apiService.post('/users/refresh', data);
@@ -36,4 +46,5 @@ export const authApi = {
   registerUser,
   loginUser,
   refreshAccessToken,
+  editUser
 };

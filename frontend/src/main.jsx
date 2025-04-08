@@ -34,7 +34,7 @@ const router = createBrowserRouter([
     errorElement: <PageNotFound />,
   },
   {
-    path: "/profile",
+    path: "/profile/:userid",
     element: <Layout />,
     errorElement: <PageNotFound />,
     children: [

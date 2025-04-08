@@ -3,6 +3,8 @@ using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using backend.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
+
 namespace backend.Presentation
 {
     [Route("api/users/")]
@@ -38,11 +40,28 @@ namespace backend.Presentation
             try
             {
                 var response = await _authService.LoginUserAsync(loginDto);
+
+                Response.Cookies.Append("AccessToken", response.AccessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(1)
+                });
+
+                Response.Cookies.Append("RefreshToken", response.RefreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTimeOffset.UtcNow.AddDays(3)
+                });
+
                 return Ok(new
                 {
                     Message = "Authenticated",
                     AccessToken = response.AccessToken,
-                    RefreshToken = response.RefreshToken
+                    User = response.User
                 });
             }
             catch (UnauthorizedAccessException)
@@ -58,5 +77,7 @@ namespace backend.Presentation
             var result = await _authService.RefreshTokenAsync(refreshDto);
             return result == null ? Unauthorized("Invalid or expired refresh token.") : Ok(result);
         }
+        
+
     }
 }

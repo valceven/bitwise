@@ -9,11 +9,11 @@ import { useNavigate } from "react-router-dom";
 function LoginPage() {
 
   const navigate = useNavigate();
-  const { accessToken } = useUser();
+  const { accessToken, user } = useUser();
 
   if (accessToken) {
     setTimeout(() => {
-      navigate("/profile");
+      navigate(`/profile/${user.userID}`);
     }, 2000);
     return (
       <div className="w-full min-h-screen flex items-center justify-center">

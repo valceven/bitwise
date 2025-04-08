@@ -46,6 +46,22 @@ export const UserProvider = ({ children }) => {
           setIsLoading(false);
         }
       };
+    
+    const updateUser = async (userId, userData) => {
+        try {
+            setIsLoading(true);
+            const response = await authApi.editUser(userId, userData);  
+            if (response) {
+                console.log("HELLO WORLD")
+                const updatedUser = { ...user, ...response };
+                setUser(updatedUser);   
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+            }
+            return response.data;
+        } catch (error) {
+            console.error('Error updating user:', error);
+        }
+    };
 
     const logoutUser = () => {
         setUser(null);
@@ -123,6 +139,7 @@ export const UserProvider = ({ children }) => {
           isLoading,
           loginUser,
           logoutUser,
+          updateUser,
           refreshAccessToken
         }}>
           {children}
