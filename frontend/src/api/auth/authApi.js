@@ -23,7 +23,17 @@ const loginUser = async (credentials) => {
     }
 }
 
+const refreshAccessToken = async (data) => {
+  try {
+    const response = await apiService.post('/users/refresh', data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+};
+
 export const authApi = {
-    registerUser,
-    loginUser,
+  registerUser,
+  loginUser,
+  refreshAccessToken,
 };

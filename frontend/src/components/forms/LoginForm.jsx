@@ -4,8 +4,14 @@ import * as Yup from "yup";
 import InputField from "../fields/InputField";
 import Button from "../buttons/PurpleButton";
 import { authApi } from "../../api/auth/authApi";
+import { useUser } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+
+  const { loginUser } = useUser();
+  const navigate = useNavigate();
+
   const initialValues = {
     email: "",
     password: "",
@@ -24,9 +30,13 @@ const LoginForm = () => {
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      const data = await authApi.loginUser(values);
-      console.log("API Response:", data);
-      alert("Login successful!");
+      const response = await authApi.loginUser(values);
+      
+      if (response) {
+        console.log("Logging in and navigating to /profile");
+        loginUser(response);
+        navigate("/profile");
+      }
     } catch (error) {
       console.error("Error during form submission:", error);
 

@@ -3,8 +3,25 @@ import { Link } from "react-router-dom";
 import LoginForm from "../components/forms/LoginForm";
 import logo from "../assets/logo.png";
 import Background from "../components/Background";
+import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
+
+  const navigate = useNavigate();
+  const { accessToken } = useUser();
+
+  if (accessToken) {
+    setTimeout(() => {
+      navigate("/profile");
+    }, 2000);
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <p className="text-xl text-center">You are already logged in. Redirecting to profile...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-offwhite">
         <Background />

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import InputField from '../components/fields/InputField';
@@ -10,6 +11,9 @@ import { authApi } from '../api/auth/authApi';
 import Background from '../components/Background';
 
 const SignupPage = () => {
+
+    const navigate = useNavigate();
+
     const [step, setStep] = useState(1); // Track the current step
 
     const initialValues = {
@@ -45,8 +49,10 @@ const SignupPage = () => {
     const handleSubmit = async (values) => {
         try {
             const response = await authApi.registerUser(values); // Call the register API
-            console.log('Registration successful:', response);
-            alert('Registration successful!');
+            
+            if (response.status === 200) {
+                navigate('/login');
+            }
         } catch (error) {
             console.error('Registration failed:', error);
             alert('Registration failed. Please try again.');
