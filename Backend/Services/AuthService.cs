@@ -60,6 +60,10 @@ namespace backend.Services
                 throw new ArgumentException("Email and password are required.");
 
             var user = await _userRepository.GetUserByEmailAsync(email);
+            Console.WriteLine($"User found: {user?.UserID}");
+            Console.WriteLine($"Stored hash: {user.Password}");
+            Console.WriteLine($"Password match: {BCrypt.Net.BCrypt.Verify(password, user.Password)}");
+
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
                 throw new UnauthorizedAccessException("Invalid email or password.");
 
