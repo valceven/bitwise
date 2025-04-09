@@ -70,7 +70,7 @@ namespace backend.Services
                 {
                     var teacher = new Teacher
                     {
-                        TeacherId = user.UserID,
+                        TeacherID = user.UserID,
                         TeacherIdNumber = userUpdateDto.TeacherIdNumber
                     };
 

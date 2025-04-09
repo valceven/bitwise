@@ -6,12 +6,12 @@ namespace backend.Models
     public class Classroom
     {
         [Key]
-        public int ClassroomId { get; set; }
+        public int ClassroomID { get; set; }
 
         [Required]
-        [ForeignKey("TeacherId")]
-        public int TeacherId { get; set; }
-
+        [ForeignKey("TeacherID")]
+        public int TeacherID { get; set; }
+        
         [StringLength(25)]
         [Column(TypeName = "text")]
         public required string ClassName { get; set; }
@@ -19,9 +19,9 @@ namespace backend.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation property daw ani si Copilot;
-        public List<Student> Students { get; set; } = new List<Student>();
+        public List<Student>? Students { get; set; } = new List<Student>();
 
         // Navigation property for the lessons;
-        public List<Lesson> Lessons { get; set; } = new List<Lesson>();
+        public List<Lesson>? Lessons { get; set; } = new List<Lesson>();
     }
 }
