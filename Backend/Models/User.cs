@@ -28,6 +28,6 @@ namespace backend.Models
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public string? RefreshToken { get; set; }
-        public DateTime RefreshTokenExpiry { get; set; }
+        public DateTime? RefreshTokenExpiry { get; set; }
     }
 }
