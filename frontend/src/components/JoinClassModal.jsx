@@ -22,9 +22,10 @@ const JoinClassModal = ({ isOpen, onClose, title }) => {
   };
 
   return (
-    <div className="fixed inset-0 modal-overlay flex items-center justify-center z-50">
+    <div className="fixed inset-0 modal-overlay flex items-center justify-center z-50 ">
 
-      <div className="bg-white rounded-2xl shadow-lg p-8 sm:w-3/4 lg:w-1/3 relative">
+      <div style={{ boxShadow: '4px 4px 0px #0b1e2d' }}
+       className="bg-white rounded-2xl shadow-lg p-8 sm:w-3/4 lg:w-1/3 relative ">
         
          <img
           src={Star}
