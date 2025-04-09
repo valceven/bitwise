@@ -5,7 +5,9 @@ const DashboardLayout = () => {
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar />
+      <div className="mt-24 w-full pr-14">
       <Outlet />
+      </div>
     </div>
   );
 };

@@ -134,7 +134,7 @@ const DashboardSidebar = () => {
         <img src={Sidebar} />
       </button>
 
-      <div className="absolute top-4 right-8 flex items-center space-x-4">
+      <div className="absolute top-4 right-14 flex items-center space-x-4">
         <img src={Bell} />
         <div className="h-8 w-8 bg-gray-300 rounded-full"></div>
         <div className="text-xs font-semibold text-white bg-bluez px-4 py-2 btn-shadow addgrotesk flex flex-row items-center">
