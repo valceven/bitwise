@@ -13,9 +13,7 @@ import Sidebar from "../assets/bx_sidebar.svg";
 import Bell from "../assets/bell-icon.svg";
 import RightArrow from "../assets/chevron-right-white.svg";
 
-
 const DashboardSidebar = (user) => {
-
   const [isOpen, setIsOpen] = useState(true);
   const [hovered, setHovered] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
@@ -141,9 +139,67 @@ const DashboardSidebar = (user) => {
       <div className="absolute top-4 right-14 flex items-center space-x-4">
         <img src={Bell} />
         <div className="h-8 w-8 bg-gray-300 rounded-full"></div>
-        <div className="text-xs font-semibold text-white bg-bluez px-4 py-2 btn-shadow addgrotesk flex flex-row items-center">
-          {user.user.name}
-          <img src={RightArrow} className="h-4 ml-1" />
+
+        <div
+          className="relative"
+          onMouseEnter={() => setShowDropdown(true)}
+          onMouseLeave={() => setShowDropdown(false)}
+        >
+          <button
+            className="border text-white bg-bluez hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-md text-xs px-5 py-2.5 text-center inline-flex items-center btn-shadow"
+            type="button"
+          >
+            {user.user.name}
+            <svg
+              className="w-2.5 h-2.5 ms-3"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
+              />
+            </svg>
+          </button>
+
+          {showDropdown && (
+            <div className="absolute right-0 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
+              <ul
+                className="py-2 text-sm text-gray-700"
+                aria-labelledby="dropdownHoverButton"
+              >
+                <li>
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    Profile
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/settings"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    Settings
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/logout"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    Sign out
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>
