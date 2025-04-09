@@ -53,9 +53,9 @@ namespace backend.Services
 
             if (user == null) return null;
 
-            if (!user.IsVerified && (userUpdateDto.StudentIdNumber != null || userUpdateDto.TeacherIdNumber != null))
+            if (!user.IsVerified)
             {
-                if (userUpdateDto.StudentIdNumber != null)
+                if (user.UserType == 1 && userUpdateDto.StudentIdNumber != null)
                 {
                     var student = new Student
                     {
@@ -66,11 +66,11 @@ namespace backend.Services
                     await _studentRepository.AddAsync(student);
                     user.IsVerified = true;
                 }
-                else if (userUpdateDto.TeacherIdNumber != null)
+                else if (user.UserType == 2 && userUpdateDto.TeacherIdNumber != null)
                 {
                     var teacher = new Teacher
                     {
-                        TeacherId = user.UserID,
+                        TeacherID = user.UserID,
                         TeacherIdNumber = userUpdateDto.TeacherIdNumber
                     };
 

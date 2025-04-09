@@ -13,7 +13,9 @@ import Sidebar from "../assets/bx_sidebar.svg";
 import Bell from "../assets/bell-icon.svg";
 import RightArrow from "../assets/chevron-right-white.svg";
 
-const DashboardSidebar = () => {
+
+const DashboardSidebar = (user) => {
+
   const [isOpen, setIsOpen] = useState(true);
   const [hovered, setHovered] = useState("");
   const location = useLocation();
@@ -138,7 +140,7 @@ const DashboardSidebar = () => {
         <img src={Bell} />
         <div className="h-8 w-8 bg-gray-300 rounded-full"></div>
         <div className="text-xs font-semibold text-white bg-bluez px-4 py-2 btn-shadow addgrotesk flex flex-row items-center">
-          John Doe
+          {user.user.name}
           <img src={RightArrow} className="h-4 ml-1" />
         </div>
       </div>

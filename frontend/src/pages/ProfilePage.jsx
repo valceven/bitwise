@@ -6,29 +6,20 @@ import Ellipse from '../assets/Ellipse.svg';
 import Polygon from '../assets/Polygon.svg';
 import Zigzag from '../assets/zig-zag.svg';
 import EditBackground from '../components/EditBackgroud';
-import { useUser } from '../context/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useAuthGuard } from '../hooks/useAuthGuard';
 
 const ProfilePage = () => {
-  const { user, accessToken, refreshAccessToken } = useUser();
-  const navigate = useNavigate();
-
-  // Check for the access token and refresh if needed
-  useEffect(() => {
-    if (!accessToken) {
-      refreshAccessToken();
+  const { user, isRedirecting, isCheckingAuth } = useAuthGuard();
+  
+    if (isCheckingAuth || isRedirecting) {
+      return (
+        <div className="w-full min-h-screen flex items-center justify-center">
+          <p className="text-xl text-center">
+            {isCheckingAuth ? "Checking authentication..." : "You are not authenticated. Redirecting to login..."}
+          </p>
+        </div>
+      );
     }
-  }, [accessToken, refreshAccessToken]);
-
-  // If no user or access token, redirect to login page
-  if (!user || !accessToken) {
-    navigate('/login');
-    return (
-      <div className="w-full min-h-screen flex items-center justify-center">
-        <p className="text-xl text-center">You are not authenticated. Redirecting to login...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="w-full bg-offwhite py-20">

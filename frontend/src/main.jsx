@@ -14,6 +14,7 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
 import DashboardClassroom from "./pages/dashboard/DashboardClassroom.jsx";
 import DashboardTopics from "./pages/dashboard/DashboardTopics.jsx";
+import DashboardLayout from "./components/DashboardLayout.jsx";
 
 const router = createBrowserRouter([
   {
@@ -38,7 +39,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/user",  // The parent path for user-related routes
-    element: <Layout />,
+    element: <DashboardLayout />,
     children: [
       {
         path: "dashboard",  // Main dashboard path
