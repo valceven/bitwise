@@ -9,7 +9,7 @@ const DashboardHome = () => {
     <div className="h-screen flex items-center justify-center">
       <button
         onClick={() => setIsModalOpen(true)}
-        className="bg-bluez text-white px-4 py-2 rounded hover:bg-blue-700"
+        className="bg-bluez text-white px-4 py-2 rounded btn-shadow"
       >
         Join a Class
       </button>
@@ -19,7 +19,6 @@ const DashboardHome = () => {
         onClose={() => setIsModalOpen(false)}
         title="Join a Class"
       >
-        
       </Modal>
     </div>
   );
