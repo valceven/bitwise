@@ -14,6 +14,7 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
 import DashboardClassroom from "./pages/dashboard/DashboardClassroom.jsx";
 import DashboardTopics from "./pages/dashboard/DashboardTopics.jsx";
+import DashboardLayout from "./components/DashboardLayout.jsx";
 
 const router = createBrowserRouter([
   {
@@ -37,25 +38,15 @@ const router = createBrowserRouter([
     errorElement: <PageNotFound />,
   },
   {
-    path: "/user",  // The parent path for user-related routes
-    element: <Layout />,
+    path: "/app",
+    element: <DashboardLayout />,
+    errorElement: <PageNotFound />,
     children: [
-      {
-        path: "dashboard",  // Main dashboard path
-        element: <DashboardHome />,
-      },
-      {
-        path: "classroom",
-        element: <DashboardClassroom />,
-      },
-      {
-        path: "topics",
-        element: <DashboardTopics />  // Dynamic classroom path
-      },
-      {
-        path: "profile/:userid",  // Updated profile path
-        element: <ProfilePage />,
-      },
+      { index: true, element: <DashboardHome /> },
+      { path: "classroom", element: <DashboardClassroom /> },
+      { path: "topics", element: <DashboardTopics /> },
+      { path: "student-report", element: <DashboardTopics /> },
+      { path: "profile/:userid", element: <ProfilePage /> },
     ],
   },
 ]);

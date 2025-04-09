@@ -9,9 +9,9 @@ namespace backend.Models
         public int ClassroomID { get; set; }
 
         [Required]
-        [ForeignKey("TeacherID")]
-        public int TeacherID { get; set; }
-        
+        [ForeignKey("TeacherId")]
+        public int TeacherId { get; set; }
+
         [StringLength(25)]
         [Column(TypeName = "text")]
         public required string ClassName { get; set; }
