@@ -12,7 +12,7 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    [Migration("20250404100654_InitialCreation")]
+    [Migration("20250409185223_Initial Creation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -54,11 +54,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
-                    b.Property<int>("ClassroomId")
+                    b.Property<int>("ClassroomID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClassroomId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClassroomID"));
 
                     b.Property<string>("ClassName")
                         .IsRequired()
@@ -68,10 +68,13 @@ namespace backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("TeacherID")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TeacherId")
                         .HasColumnType("integer");
 
-                    b.HasKey("ClassroomId");
+                    b.HasKey("ClassroomID");
 
                     b.HasIndex("TeacherId");
 
@@ -177,6 +180,41 @@ namespace backend.Migrations
                     b.ToTable("Lessons");
                 });
 
+            modelBuilder.Entity("backend.Models.Student", b =>
+                {
+                    b.Property<int>("StudentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ClassroomId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StudentIdNumber")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("text");
+
+                    b.HasKey("StudentId");
+
+                    b.HasIndex("ClassroomId");
+
+                    b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("backend.Models.Teacher", b =>
+                {
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TeacherIdNumber")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("text");
+
+                    b.HasKey("TeacherId");
+
+                    b.ToTable("Teachers");
+                });
+
             modelBuilder.Entity("backend.Models.Topic", b =>
                 {
                     b.Property<int>("TopicId")
@@ -204,24 +242,22 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.User", b =>
                 {
-                    b.Property<int>("UserID")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("character varying(8)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -233,67 +269,32 @@ namespace backend.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("text");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RefreshTokenExpiry")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<byte>("UserType")
                         .HasColumnType("smallint");
 
-                    b.HasKey("UserID");
+                    b.HasKey("UserId");
 
                     b.ToTable("Users");
-
-                    b.HasDiscriminator().HasValue("User");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("backend.Models.Admin", b =>
-                {
-                    b.HasBaseType("backend.Models.User");
-
-                    b.HasDiscriminator().HasValue("Admin");
-                });
-
-            modelBuilder.Entity("backend.Models.Student", b =>
-                {
-                    b.HasBaseType("backend.Models.User");
-
-                    b.Property<int>("ClassroomId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("StudentIdNumber")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("text");
-
-                    b.HasIndex("ClassroomId");
-
-                    b.HasDiscriminator().HasValue("Student");
-                });
-
-            modelBuilder.Entity("backend.Models.Teacher", b =>
-                {
-                    b.HasBaseType("backend.Models.User");
-
-                    b.Property<string>("TeacherIdNumber")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("text");
-
-                    b.HasDiscriminator().HasValue("Teacher");
                 });
 
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
-                    b.HasOne("backend.Models.Teacher", null)
+                    b.HasOne("backend.Models.Teacher", "Teacher")
                         .WithMany("Classrooms")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("backend.Models.Lesson", b =>
@@ -305,20 +306,39 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("backend.Models.Student", b =>
+                {
+                    b.HasOne("backend.Models.Classroom", "Classroom")
+                        .WithMany("Students")
+                        .HasForeignKey("ClassroomId");
+
+                    b.HasOne("backend.Models.User", "User")
+                        .WithOne("Student")
+                        .HasForeignKey("backend.Models.Student", "StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Classroom");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend.Models.Teacher", b =>
+                {
+                    b.HasOne("backend.Models.User", "User")
+                        .WithOne("Teacher")
+                        .HasForeignKey("backend.Models.Teacher", "TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("backend.Models.Topic", b =>
                 {
                     b.HasOne("backend.Models.Lesson", null)
                         .WithMany("Topics")
                         .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("backend.Models.Student", b =>
-                {
-                    b.HasOne("backend.Models.Classroom", null)
-                        .WithMany("Students")
-                        .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -338,6 +358,13 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Teacher", b =>
                 {
                     b.Navigation("Classrooms");
+                });
+
+            modelBuilder.Entity("backend.Models.User", b =>
+                {
+                    b.Navigation("Student");
+
+                    b.Navigation("Teacher");
                 });
 #pragma warning restore 612, 618
         }

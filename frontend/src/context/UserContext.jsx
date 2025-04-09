@@ -63,9 +63,12 @@ export const UserProvider = ({ children }) => {
         }
     };
 
-    const logoutUser = () => {
+    const logoutUser = async () => {
+        await authApi.logoutUser(); // Call the logout API
         setUser(null);
         localStorage.removeItem('user');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('accessTokenExpiration');
     };
 
     const isTokenExpired = () => {

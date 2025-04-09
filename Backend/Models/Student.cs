@@ -6,18 +6,21 @@ namespace backend.Models
     public class Student
     {
         [Key]
-        [ForeignKey("UserID")]
-        public int StudentID { get; set; }
+        [ForeignKey("User")] // One-to-one relationship with User
+        public int StudentId { get; set; }
 
         [Required]
         [StringLength(25)]
         [Column(TypeName = "text")]
         public string StudentIdNumber { get; set; }
 
-        [ForeignKey("ClassroomId")]
+        // Optional many-to-one relationship: Student may belong to a Classroom
         public int? ClassroomId { get; set; }
 
-        public Classroom Classroom { get; set; }
-    }
+        [ForeignKey("ClassroomId")]
+        public Classroom? Classroom { get; set; }
 
+        // Navigation property to User
+        public User User { get; set; }
+    }
 }

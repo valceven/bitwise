@@ -51,11 +51,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
-                    b.Property<int>("ClassroomId")
+                    b.Property<int>("ClassroomID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClassroomId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClassroomID"));
 
                     b.Property<string>("ClassName")
                         .IsRequired()
@@ -68,9 +68,12 @@ namespace backend.Migrations
                     b.Property<int>("TeacherID")
                         .HasColumnType("integer");
 
-                    b.HasKey("ClassroomId");
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("integer");
 
-                    b.HasIndex("TeacherID");
+                    b.HasKey("ClassroomID");
+
+                    b.HasIndex("TeacherId");
 
                     b.ToTable("Classrooms");
                 });
@@ -176,11 +179,8 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Student", b =>
                 {
-                    b.Property<int>("StudentID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("StudentId")
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StudentID"));
 
                     b.Property<int?>("ClassroomId")
                         .HasColumnType("integer");
@@ -190,7 +190,7 @@ namespace backend.Migrations
                         .HasMaxLength(25)
                         .HasColumnType("text");
 
-                    b.HasKey("StudentID");
+                    b.HasKey("StudentId");
 
                     b.HasIndex("ClassroomId");
 
@@ -199,18 +199,15 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Teacher", b =>
                 {
-                    b.Property<int>("TeacherID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("TeacherId")
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TeacherID"));
 
                     b.Property<string>("TeacherIdNumber")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("text");
 
-                    b.HasKey("TeacherID");
+                    b.HasKey("TeacherId");
 
                     b.ToTable("Teachers");
                 });
@@ -242,11 +239,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.User", b =>
                 {
-                    b.Property<int>("UserID")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -281,18 +278,20 @@ namespace backend.Migrations
                     b.Property<byte>("UserType")
                         .HasColumnType("smallint");
 
-                    b.HasKey("UserID");
+                    b.HasKey("UserId");
 
                     b.ToTable("Users");
                 });
 
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
-                    b.HasOne("backend.Models.Teacher", null)
+                    b.HasOne("backend.Models.Teacher", "Teacher")
                         .WithMany("Classrooms")
-                        .HasForeignKey("TeacherID")
+                        .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("backend.Models.Lesson", b =>
@@ -310,7 +309,26 @@ namespace backend.Migrations
                         .WithMany("Students")
                         .HasForeignKey("ClassroomId");
 
+                    b.HasOne("backend.Models.User", "User")
+                        .WithOne("Student")
+                        .HasForeignKey("backend.Models.Student", "StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Classroom");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend.Models.Teacher", b =>
+                {
+                    b.HasOne("backend.Models.User", "User")
+                        .WithOne("Teacher")
+                        .HasForeignKey("backend.Models.Teacher", "TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("backend.Models.Topic", b =>
@@ -337,6 +355,13 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Teacher", b =>
                 {
                     b.Navigation("Classrooms");
+                });
+
+            modelBuilder.Entity("backend.Models.User", b =>
+                {
+                    b.Navigation("Student");
+
+                    b.Navigation("Teacher");
                 });
 #pragma warning restore 612, 618
         }

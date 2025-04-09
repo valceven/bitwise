@@ -49,10 +49,8 @@ const SignupPage = () => {
     const handleSubmit = async (values) => {
         try {
             const response = await authApi.registerUser(values); // Call the register API
-            
-            if (response.status === 200) {
-                navigate('/login');
-            }
+            alert('Registration successful:', response.data);
+            navigate('/login'); // Redirect to login page after successful registration
         } catch (error) {
             console.error('Registration failed:', error);
             alert('Registration failed. Please try again.');

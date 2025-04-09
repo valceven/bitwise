@@ -39,7 +39,7 @@ namespace backend.Services
 
             return new UserResponseDto
             {
-                UserID = user.UserID,
+                UserID = user.UserId,
                 Name = user.Name,
                 Email = user.Email,
                 UserType = user.UserType,
@@ -59,7 +59,7 @@ namespace backend.Services
                 {
                     var student = new Student
                     {
-                        StudentID = user.UserID,
+                        StudentId = user.UserId,
                         StudentIdNumber = userUpdateDto.StudentIdNumber
                     };
 
@@ -70,7 +70,7 @@ namespace backend.Services
                 {
                     var teacher = new Teacher
                     {
-                        TeacherID = user.UserID,
+                        TeacherId = user.UserId,
                         TeacherIdNumber = userUpdateDto.TeacherIdNumber
                     };
 
@@ -79,11 +79,11 @@ namespace backend.Services
                 }
             }
 
-            user = await _userRepository.UpdateUserAsync(user.UserID, userUpdateDto);
+            user = await _userRepository.UpdateUserAsync(user.UserId, userUpdateDto);
 
             var UserResponseDto = new UserResponseDto
             {
-                UserID = user.UserID,
+                UserID = user.UserId,
                 Name = user.Name,
                 Email = user.Email,
                 UserType = user.UserType,
@@ -122,7 +122,7 @@ namespace backend.Services
             var users = await _userRepository.GetAllUsersAsync();
             return users.Select(user => new UserResponseDto
             {
-                UserID = user.UserID,
+                UserID = user.UserId,
                 Name = user.Name,
                 Email = user.Email,
                 UserType = user.UserType

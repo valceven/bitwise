@@ -42,9 +42,19 @@ const refreshAccessToken = async (data) => {
   }
 };
 
+const logoutUser = async (email) => {
+  try {
+    const response = await apiService.post('/users/logout', JSON.stringify(email));
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+}
+
 export const authApi = {
   registerUser,
   loginUser,
   refreshAccessToken,
-  editUser
+  editUser,
+  logoutUser
 };

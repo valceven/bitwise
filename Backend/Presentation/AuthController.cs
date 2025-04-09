@@ -30,7 +30,7 @@ namespace backend.Presentation
 
             var createdUser = await _authService.RegisterUserAsync(userRegisterDto);
             
-            return CreatedAtAction(nameof(RegisterUser), new { id = createdUser.UserID }, createdUser);
+            return CreatedAtAction(nameof(RegisterUser), new { id = createdUser.UserId }, createdUser);
         }
 
         // Login User and generate JWT
@@ -71,11 +71,11 @@ namespace backend.Presentation
         }
         // Logout User
         [HttpPost("logout")]
-        public async Task<IActionResult> LogoutUser([FromBody] string email)
+        public async Task<IActionResult> LogoutUser([FromBody] LogoutDto logoutDto)
         {
             try
             {
-                await _authService.LogoutUserAsync(email);
+                await _authService.LogoutUserAsync(logoutDto.Email);
                 return Ok("Logged out successfully.");
             }
             catch (Exception ex)

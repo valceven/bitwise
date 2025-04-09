@@ -13,7 +13,7 @@ function LoginPage() {
 
   if (accessToken) {
     setTimeout(() => {
-      navigate(`user/profile/${user.userID}`);
+      navigate(`app/profile/${user.userID}`);
     }, 2000);
     return (
       <div className="w-full min-h-screen flex items-center justify-center">

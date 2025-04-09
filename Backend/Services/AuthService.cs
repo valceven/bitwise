@@ -74,7 +74,7 @@ namespace backend.Services
 
             var UserResponseDto = new UserResponseDto
             {
-                UserID = user.UserID,
+                UserID = user.UserId,
                 Name = user.Name,
                 Email = user.Email,
                 UserType = user.UserType,
@@ -86,7 +86,7 @@ namespace backend.Services
             {
                 if (user.UserType == 1) // student
                 {
-                    var student = await _studentRepository.GetByUserIdAsync(user.UserID);
+                    var student = await _studentRepository.GetByUserIdAsync(user.UserId);
                     if (student != null)
                     {
                         UserResponseDto.StudentInfo = new StudentDto
@@ -97,7 +97,7 @@ namespace backend.Services
                 }
                 else if (user.UserType == 2) // teacher
                 {
-                    var teacher = await _teacherRepository.GetByUserIdAsync(user.UserID);
+                    var teacher = await _teacherRepository.GetByUserIdAsync(user.UserId);
                     if (teacher != null)
                     {
                         UserResponseDto.TeacherInfo = new TeacherDto

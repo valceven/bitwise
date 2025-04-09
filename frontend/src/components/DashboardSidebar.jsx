@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link, useLocation } from "react-router-dom";
 import NavLogo from "../assets/nav-bar-logo-black.svg";
 import LogoIcon from "../assets/icon-logo-sidebar.svg";
@@ -12,13 +13,23 @@ import StudentReportIconBlack from "../assets/student-report-icon-black.svg";
 import Sidebar from "../assets/bx_sidebar.svg";
 import Bell from "../assets/bell-icon.svg";
 import RightArrow from "../assets/chevron-right-white.svg";
+import { useUser } from "../context/UserContext";
+import Button from "./buttons/PurpleButton";
 
 const DashboardSidebar = (user) => {
   const [isOpen, setIsOpen] = useState(true);
   const [hovered, setHovered] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
-
+  
+  const { logoutUser } = useUser();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = (email) => {
+    console.log("Logging out user:", email);
+    logoutUser(email);
+    navigate("/login");
+  }
 
   const currentPath = location.pathname;
 
@@ -190,12 +201,12 @@ const DashboardSidebar = (user) => {
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/logout"
+                  <Button
+                    onClick={() => handleLogout(user.user.email)}
                     className="block px-4 py-2 hover:bg-gray-100"
                   >
                     Sign out
-                  </Link>
+                  </Button>
                 </li>
               </ul>
             </div>

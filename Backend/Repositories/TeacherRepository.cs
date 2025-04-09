@@ -27,7 +27,7 @@ namespace backend.Repositories
 
         public async Task<Teacher?> GetByUserIdAsync(int userId)
         {
-            return await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherID == userId);
+            return await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == userId);
         }
     }
 }
