@@ -114,6 +114,18 @@ namespace backend.Services
                 User = UserResponseDto
             };
         }
+        // Logout User
+        public async Task LogoutUserAsync(string email)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if (user == null)
+                throw new InvalidOperationException("User not found.");
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiry = null;
+
+            await _userRepository.UpdateUserTokenAsync(user);
+        }
 
         public async Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshDto)
         {
@@ -136,11 +148,8 @@ namespace backend.Services
                 RefreshToken = newRefreshToken
             };
         }
-
-        // Validate user registration data for a cleaner code
         // This method checks if the registration data is valid
         // and throws an exception if any required field is missing or invalid.
-
         private void ValidateUserRegistration(UserRegisterDto dto)
         {
             if (dto == null)

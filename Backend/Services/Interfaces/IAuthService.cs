@@ -7,6 +7,7 @@ namespace backend.Services.Interfaces
     {
         Task<User> RegisterUserAsync (UserRegisterDto user);
         Task<AuthResponseDto> LoginUserAsync (UserLoginDto user);
+        Task LogoutUserAsync (string email);
         Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshDto);
     }
 }
