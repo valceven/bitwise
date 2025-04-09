@@ -32,7 +32,6 @@ const ProfileForm = (profileData) => {
   const validationSchema = Yup.object({
     username: Yup.string(),
     about: Yup.string().max(500, "About must be at most 500 characters"),
-    website: Yup.string().url("Invalid URL format"),
     password: Yup.string()
       .min(6, "Password must be at least 6 characters")
       .max(25, "Password must be at most 25 characters")
@@ -48,6 +47,8 @@ const ProfileForm = (profileData) => {
     email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
+  
+  
   });
 
   const handleSubmit = async (values) => {
@@ -156,13 +157,12 @@ const ProfileForm = (profileData) => {
                     placeholder="user@bitwise.com"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                   />
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
+                  <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
                 </div>
               </div>
+
+
+           
 
               {/* About */}
               <div className="col-span-full">
@@ -264,17 +264,17 @@ const ProfileForm = (profileData) => {
                     type="password"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                   />
-                  <ErrorMessage
-                    name="confirmPassword"
-                    component="div"
-                    className="text-red-500 text-sm"
-                  />
+                  <ErrorMessage name="confirmPassword" component="div" className="text-red-500 text-sm" />
                 </div>
               </div>
+
+            
             </div>
           </div>
 
-          {/* Submit Button - moved outside the grid layout */}
+          
+
+          {/* Submit Button */}
           <div className="mt-6 flex items-center justify-end gap-x-6">
             <Button
               type="button"
