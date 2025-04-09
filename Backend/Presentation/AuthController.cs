@@ -1,9 +1,7 @@
 using backend.DTOs.User;
 using backend.Models;
-using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using backend.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 
 namespace backend.Presentation
 {
@@ -70,17 +68,26 @@ namespace backend.Presentation
             }
         }
         // Logout User
-        [HttpPost("logout")]
-        public async Task<IActionResult> LogoutUser([FromBody] LogoutDto logoutDto)
+        [HttpPut("logout")]
+        [Microsoft.AspNetCore.Cors.EnableCors("AllowFrontend")]
+        public async Task<IActionResult> LogoutUser([FromBody] UserLogoutDto logoutDto)
         {
             try
             {
+                // Delete cookies when logging out
+                Response.Cookies.Delete("AccessToken");
+                Response.Cookies.Delete("RefreshToken");
+
+                // Handle other logout logic
                 await _authService.LogoutUserAsync(logoutDto.Email);
+
                 return Ok("Logged out successfully.");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                // Log the exception
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, "Internal Server Error");
             }
         }
 

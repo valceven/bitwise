@@ -61,11 +61,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:5173") // Specify full origin
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials());
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Allow requests from this origin
+              .AllowAnyMethod() // Allow any HTTP methods (GET, POST, etc.)
+              .AllowAnyHeader() // Allow any headers
+              .AllowCredentials(); // Allow cookies/credentials to be sent
+    });
 });
 
 // Add authorization services
