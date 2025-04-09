@@ -10,7 +10,7 @@ namespace backend.Models
 
         [Required]
         [ForeignKey("TeacherID")]
-        public int TeacherId { get; set; }
+        public int TeacherID { get; set; }
 
         [StringLength(25)]
         [Column(TypeName = "text")]
