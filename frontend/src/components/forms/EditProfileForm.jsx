@@ -27,8 +27,8 @@ const ProfileForm = (profileData) => {
         newPassword: "",
         confirmPassword: "",
         email: profileData.user.email || "",
-        //teacherIdNumber: profileData.user.teacherInfo.teacherIdNumber || "",
-        studentIdNumber: profileData.user.studentInfo.studentIdNumber || "",
+        teacherIdNumber: profileData.user.teacherInfo?.teacherIdNumber || "",
+        studentIdNumber: profileData.user.studentInfo?.studentIdNumber || null,
       });
       setLoading(false);
     };
