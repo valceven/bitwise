@@ -69,6 +69,20 @@ namespace backend.Presentation
                 return Unauthorized();
             }
         }
+        // Logout User
+        [HttpPost("logout")]
+        public async Task<IActionResult> LogoutUser([FromBody] string email)
+        {
+            try
+            {
+                await _authService.LogoutUserAsync(email);
+                return Ok("Logged out successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
         // Returns refres token to the client
         [HttpPost("refresh")]

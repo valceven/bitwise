@@ -7,7 +7,7 @@ namespace backend.Models
     {
         [Key]
         [ForeignKey("UserID")]
-        public int TeacherId { get; set; }
+        public int TeacherID { get; set; }
 
         [Required]
         [StringLength(25)]
