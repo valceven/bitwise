@@ -74,7 +74,6 @@ h6 {
   @apply bg-indigo-900;
 }
 
-<<<<<<< HEAD
 .profile-img {
   width: 3rem; /* Default size */
   height: 3rem;
@@ -108,12 +107,4 @@ h6 {
     width: 5rem;
     height: 5rem;
   }
-=======
-.box-shadow2 {
-  box-shadow: 10px 10px 0px #0b1e2d;
-}
-
-.box-shadow3 {
-  box-shadow: 0px 5px 0px #0b1e2d;
->>>>>>> origin/keiru
 }

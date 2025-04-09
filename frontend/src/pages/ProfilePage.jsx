@@ -38,7 +38,7 @@ const ProfilePage = () => {
         <div className="w-full flex flex-col my-5">
           <h1 className="text-3xl font-bold mb-4 addgrotesk">Account</h1>
           <p className="text-md addgrotesk">
-            Welcome to your profile! Here you can manage your account settings.
+            Welcome to your {user.userType === 1 ? 'student' : user.userType === 2 ? 'teacher' : 'user'} profile!
           </p>
         </div>
 

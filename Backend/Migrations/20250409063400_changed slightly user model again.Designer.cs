@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    partial class bitwiseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250409063400_changed slightly user model again")]
+    partial class changedslightlyusermodelagain
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,8 +185,11 @@ namespace backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StudentID"));
 
-                    b.Property<int?>("ClassroomId")
+                    b.Property<int>("ClassroomId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("StudentIdNumber")
                         .IsRequired()
@@ -308,7 +314,9 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Classroom", "Classroom")
                         .WithMany("Students")
-                        .HasForeignKey("ClassroomId");
+                        .HasForeignKey("ClassroomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Classroom");
                 });

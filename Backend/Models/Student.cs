@@ -14,10 +14,8 @@ namespace backend.Models
         [Column(TypeName = "text")]
         public string StudentIdNumber { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
-
         [ForeignKey("ClassroomId")]
-        public int ClassroomId { get; set; }
+        public int? ClassroomId { get; set; }
 
         public Classroom Classroom { get; set; }
     }

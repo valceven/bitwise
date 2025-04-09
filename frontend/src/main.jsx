@@ -11,6 +11,9 @@ import ColorPalette from "./pages/ColorPalette.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import SignupPage from "./pages/SignupPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
+import DashboardClassroom from "./pages/dashboard/DashboardClassroom.jsx";
+import DashboardTopics from "./pages/dashboard/DashboardTopics.jsx";
 
 const router = createBrowserRouter([
   {
@@ -25,20 +28,34 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <LoginPage/>,
+    element: <LoginPage />,
     errorElement: <PageNotFound />,
   },
   {
     path: "/signup",
-    element: <SignupPage/>,
+    element: <SignupPage />,
     errorElement: <PageNotFound />,
   },
   {
-    path: "/profile/:userid",
+    path: "/user",  // The parent path for user-related routes
     element: <Layout />,
-    errorElement: <PageNotFound />,
     children: [
-      { index: true, element: <ProfilePage /> }, 
+      {
+        path: "dashboard",  // Main dashboard path
+        element: <DashboardHome />,
+      },
+      {
+        path: "classroom",
+        element: <DashboardClassroom />,
+      },
+      {
+        path: "topics",
+        element: <DashboardTopics />  // Dynamic classroom path
+      },
+      {
+        path: "profile/:userid",  // Updated profile path
+        element: <ProfilePage />,
+      },
     ],
   },
 ]);

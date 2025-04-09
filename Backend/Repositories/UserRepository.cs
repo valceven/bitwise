@@ -55,9 +55,15 @@ namespace backend.Repositories
 
             if (user == null) return null;
 
+            if (userUpdateDto.oldPassword != null && !BCrypt.Net.BCrypt.Verify(userUpdateDto.oldPassword, user.Password))
+            {
+                throw new UnauthorizedAccessException("Old password is incorrect.");
+            }
+            if (userUpdateDto.newPassword != null) user.Password = BCrypt.Net.BCrypt.HashPassword(userUpdateDto.newPassword);
+
             if (userUpdateDto.Name != null) user.Name = userUpdateDto.Name;
             if (userUpdateDto.Email != null) user.Email = userUpdateDto.Email;
-            if (userUpdateDto.Password != null) user.Password = BCrypt.Net.BCrypt.HashPassword(userUpdateDto.Password);
+            
             // if (userUpdateDto.DateOfBirth != null) user.DateOfBirth = userUpdateDto.DateOfBirth;
             // if (userUpdateDto.StudentIdNumber != null) user.StudentIdNumber = userUpdateDto.StudentIdNumber;
             // if (userUpdateDto.TeacherIdNumber != null) user.TeacherIdNumber = userUpdateDto.TeacherIdNumber;

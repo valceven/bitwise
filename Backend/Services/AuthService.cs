@@ -9,11 +9,19 @@ namespace backend.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
+        private readonly IStudentRepository _studentRepository;
+        private readonly ITeacherRepository _teacherRepository;
 
-        public AuthService(IUserRepository userRepository, ITokenService tokenService)
+        public AuthService(
+            IUserRepository userRepository, 
+            ITokenService tokenService, 
+            IStudentRepository studentRepository, 
+            ITeacherRepository teacherRepository)
         {
             _userRepository = userRepository;
             _tokenService = tokenService;
+            _studentRepository = studentRepository;
+            _teacherRepository = teacherRepository;
         }
 
         // Register User
@@ -68,9 +76,37 @@ namespace backend.Services
                 UserID = user.UserID,
                 Name = user.Name,
                 Email = user.Email,
-                UserType = user.UserType
+                UserType = user.UserType,
+                IsVerified = user.IsVerified
             };
 
+            // Add this based on user type
+            if (user.IsVerified)
+            {
+                if (user.UserType == 1) // student
+                {
+                    var student = await _studentRepository.GetByUserIdAsync(user.UserID);
+                    if (student != null)
+                    {
+                        UserResponseDto.StudentInfo = new StudentDto
+                        {
+                            StudentIdNumber = student.StudentIdNumber
+                        };
+                    }
+                }
+                else if (user.UserType == 2) // teacher
+                {
+                    var teacher = await _teacherRepository.GetByUserIdAsync(user.UserID);
+                    if (teacher != null)
+                    {
+                        UserResponseDto.TeacherInfo = new TeacherDto
+                        {
+                            TeacherIdNumber = teacher.TeacherIdNumber
+                        };
+                    }
+                }
+            }
+            
             return new AuthResponseDto
             {
                 AccessToken = accessToken,

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    partial class bitwiseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250409062927_changed slightly user model")]
+    partial class changedslightlyusermodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,8 +185,11 @@ namespace backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StudentID"));
 
-                    b.Property<int?>("ClassroomId")
+                    b.Property<int>("ClassroomId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("StudentIdNumber")
                         .IsRequired()
@@ -256,9 +262,6 @@ namespace backend.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsVerified")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -280,6 +283,9 @@ namespace backend.Migrations
 
                     b.Property<byte>("UserType")
                         .HasColumnType("smallint");
+
+                    b.Property<bool>("isVerified")
+                        .HasColumnType("boolean");
 
                     b.HasKey("UserID");
 
@@ -308,7 +314,9 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Classroom", "Classroom")
                         .WithMany("Students")
-                        .HasForeignKey("ClassroomId");
+                        .HasForeignKey("ClassroomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Classroom");
                 });
