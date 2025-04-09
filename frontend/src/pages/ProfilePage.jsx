@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Button from '../components/buttons/PurpleButton';
 import EditProfileForm from '../components/forms/EditProfileForm';
 import Background from '../components/Background';
