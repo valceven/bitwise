@@ -51,9 +51,6 @@ namespace backend.Services
         {
             var user = await _userRepository.GetUserByIdAsync(id);
 
-            Console.WriteLine($"User found: {user.IsVerified}");
-            Console.WriteLine($"User found: {userUpdateDto.StudentIdNumber}");
-
             if (user == null) return null;
 
             if (!user.IsVerified && (userUpdateDto.StudentIdNumber != null || userUpdateDto.TeacherIdNumber != null))

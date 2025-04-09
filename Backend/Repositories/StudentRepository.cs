@@ -13,7 +13,7 @@ namespace backend.Repositories
             _context = context;
         }
 
-        public async Task<Student> AddAsync(Student student)
+        public async Task<Student?> AddAsync(Student student)
         {
             try {
                 _context.Students.Add(student);

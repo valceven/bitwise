@@ -22,13 +22,12 @@ const ProfileForm = (profileData) => {
       setInitialValues({
         photo: profileData.photo || null,
         name: profileData.user.name || "",
-        website: profileData.website || "",
         password: "",
         newPassword: "",
         confirmPassword: "",
         email: profileData.user.email || "",
-        //teacherIdNumber: profileData.user.teacherInfo.teacherIdNumber || "",
-        studentIdNumber: profileData.user.studentInfo.studentIdNumber || "",
+        teacherIdNumber: profileData.user.teacherInfo?.teacherIdNumber || "",
+        studentIdNumber: profileData.user.studentInfo?.studentIdNumber || "",
       });
       setLoading(false);
     };
@@ -50,22 +49,24 @@ const ProfileForm = (profileData) => {
       [Yup.ref("newPassword"), null],
       "Passwords must match"
     ),
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    teacherIdNumber: Yup.string().when('userType', {
-      is: 'teacher',
-      then: schema => schema.required('Teacher ID is required')
-    }),
-    studentIdNumber: Yup.string().when('userType', {
-      is: 'student',
-      then: schema => schema.required('Student ID is required')
-    }),
+    email: Yup.string().email("Invalid email address").required("Email is required")
   });
 
   const handleSubmit = async (values) => {
     try {
-      await updateUser(profileData.user.userID, values);
+      // Create a new object without the confirmPassword field
+      const dataToSubmit = {
+        photo: values.photo,
+        name: values.name,
+        password: values.password,
+        newPassword: values.newPassword,
+        email: values.email,
+        teacherIdNumber: values.teacherIdNumber,
+        studentIdNumber: values.studentIdNumber
+      };
+      
+      console.log(dataToSubmit);
+      await updateUser(profileData.user.userID, dataToSubmit);
       alert("Profile updated successfully!");
       setFormChanged(false);
     } catch (error) {
@@ -199,20 +200,20 @@ const ProfileForm = (profileData) => {
                 {profileData.user.userType === 2 && (
                   <div className="sm:col-span-4">
                     <label
-                      htmlFor="teacherId"
+                      htmlFor="teacherIdNumber"
                       className="block text-sm font-medium text-gray-900"
                     >
                       Teacher ID
                     </label>
                     <div className="mt-2">
                       <Field
-                        name="teacherId"
-                        id="teacherId"
+                        name="teacherIdNumber"
+                        id="teacherIdNumber"
                         type="text"
                         placeholder="Provide your teacher ID to be verified" 
                         className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                       />
-                      <ErrorMessage name="teacherId" component="div" className="text-red-500 text-sm" />
+                      <ErrorMessage name="teacherIdNumber" component="div" className="text-red-500 text-sm" />
                     </div>
                   </div>
                 )}
