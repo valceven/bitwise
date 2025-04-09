@@ -19,7 +19,7 @@ namespace backend.Services
             var classroom = new Classroom
             {
                 ClassName = classroomDTO.ClassName,
-                TeacherID = classroomDTO.TeacherID
+                TeacherId = classroomDTO.TeacherID
             };
 
             return await _classroomRepository.CreateClassroomAsync(classroom);

@@ -9,10 +9,8 @@ namespace backend.Models
         public int ClassroomID { get; set; }
 
         // Foreign key to Teacher
-        public int TeacherID { get; set; }
-
         [ForeignKey("TeacherId")]
-        public Teacher Teacher { get; set; }
+        public int TeacherId { get; set; }
 
         [Required]
         [StringLength(25)]
