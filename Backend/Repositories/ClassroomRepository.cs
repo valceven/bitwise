@@ -1,7 +1,8 @@
-using backend.DTOs.Classroom;
+
 using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.Data;
+using backend.Services;
 
 namespace backend.Repositories
 {
@@ -13,9 +14,15 @@ namespace backend.Repositories
             _context = context;
         }
         public async Task<Classroom> CreateClassroomAsync(Classroom classroom)
-        {
+        {  
+            
             try
             {
+                // ensure that the classcode is unique
+                while (_context.Classrooms.Any(c => c.ClassCode == classroom.ClassCode))
+                {
+                    classroom.ClassCode = CodeGenerator.GenerateClassCode();
+                }
                 _context.Classrooms.Add(classroom);
                 await _context.SaveChangesAsync();
                 return classroom;

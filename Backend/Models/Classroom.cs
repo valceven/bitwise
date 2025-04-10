@@ -19,6 +19,8 @@ namespace backend.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public string ClassCode { get; set; } = string.Empty;
+
         // One-to-many: Classroom has many Students
         public List<Student>? Students { get; set; } = new List<Student>();
 
