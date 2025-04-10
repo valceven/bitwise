@@ -6,6 +6,7 @@ import Background from "../components/Background";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 
+
 function LoginPage() {
 
   const navigate = useNavigate();
