@@ -21,7 +21,7 @@ namespace backend.Repositories
                 return teacher;
             } catch (Exception ex) {
                 Console.WriteLine($"Error creating student: {ex.Message}");
-                throw new Exception("An error occurred while creating the student.", ex);
+                throw new Exception("An error occurred while creating the teacher.", ex);
             }
         }
 

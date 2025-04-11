@@ -35,6 +35,8 @@ builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IClassroomRepository, ClassroomRepository>();
+builder.Services.AddScoped<IClassroomService, ClassroomService>();
 builder.Services.AddControllers();
 
 // Add authentication using JWT Bearer tokens
@@ -59,11 +61,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        policy => policy.WithOrigins("http://localhost:5173") // Specify full origin
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials());
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Allow requests from this origin
+              .AllowAnyMethod() // Allow any HTTP methods (GET, POST, etc.)
+              .AllowAnyHeader() // Allow any headers
+              .AllowCredentials(); // Allow cookies/credentials to be sent
+    });
 });
 
 // Add authorization services

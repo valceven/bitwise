@@ -6,6 +6,7 @@ import Background from "../components/Background";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 
+
 function LoginPage() {
 
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ function LoginPage() {
 
   if (accessToken) {
     setTimeout(() => {
-      navigate(`/profile/${user.userID}`);
+      navigate(`app/profile/${user.userID}`);
     }, 2000);
     return (
       <div className="w-full min-h-screen flex items-center justify-center">

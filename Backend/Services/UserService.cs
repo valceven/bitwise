@@ -39,7 +39,7 @@ namespace backend.Services
 
             return new UserResponseDto
             {
-                UserID = user.UserID,
+                UserID = user.UserId,
                 Name = user.Name,
                 Email = user.Email,
                 UserType = user.UserType,
@@ -51,29 +51,26 @@ namespace backend.Services
         {
             var user = await _userRepository.GetUserByIdAsync(id);
 
-            Console.WriteLine($"User found: {user.IsVerified}");
-            Console.WriteLine($"User found: {userUpdateDto.StudentIdNumber}");
-
             if (user == null) return null;
 
-            if (!user.IsVerified && (userUpdateDto.StudentIdNumber != null || userUpdateDto.TeacherIdNumber != null))
+            if (!user.IsVerified)
             {
-                if (userUpdateDto.StudentIdNumber != null)
+                if (user.UserType == 1 && userUpdateDto.StudentIdNumber != null)
                 {
                     var student = new Student
                     {
-                        StudentID = user.UserID,
+                        StudentId = user.UserId,
                         StudentIdNumber = userUpdateDto.StudentIdNumber
                     };
 
                     await _studentRepository.AddAsync(student);
                     user.IsVerified = true;
                 }
-                else if (userUpdateDto.TeacherIdNumber != null)
+                else if (user.UserType == 2 && userUpdateDto.TeacherIdNumber != null)
                 {
                     var teacher = new Teacher
                     {
-                        TeacherId = user.UserID,
+                        TeacherId = user.UserId,
                         TeacherIdNumber = userUpdateDto.TeacherIdNumber
                     };
 
@@ -82,11 +79,11 @@ namespace backend.Services
                 }
             }
 
-            user = await _userRepository.UpdateUserAsync(user.UserID, userUpdateDto);
+            user = await _userRepository.UpdateUserAsync(user.UserId, userUpdateDto);
 
             var UserResponseDto = new UserResponseDto
             {
-                UserID = user.UserID,
+                UserID = user.UserId,
                 Name = user.Name,
                 Email = user.Email,
                 UserType = user.UserType,
@@ -125,7 +122,7 @@ namespace backend.Services
             var users = await _userRepository.GetAllUsersAsync();
             return users.Select(user => new UserResponseDto
             {
-                UserID = user.UserID,
+                UserID = user.UserId,
                 Name = user.Name,
                 Email = user.Email,
                 UserType = user.UserType

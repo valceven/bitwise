@@ -29,7 +29,7 @@ namespace backend.Services
             if (key.Length != 32) // 32 bytes == 256 bits
             {
                 // If the key is shorter than 32 bytes, hash it to 256 bits (SHA256)
-                key = new SHA256Managed().ComputeHash(key);
+                key = SHA256.Create().ComputeHash(key);
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -38,7 +38,7 @@ namespace backend.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Name, user.UserID.ToString()),
+                    new Claim(ClaimTypes.Name, user.UserId.ToString()),
                     new Claim(ClaimTypes.Email, user.Email),
                     new Claim(ClaimTypes.Role, user.UserType.ToString())
                 }),

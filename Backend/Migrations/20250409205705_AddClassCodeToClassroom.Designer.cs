@@ -12,8 +12,8 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    [Migration("20250407170133_to fix bug part 1")]
-    partial class tofixbugpart1
+    [Migration("20250409205705_AddClassCodeToClassroom")]
+    partial class AddClassCodeToClassroom
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,11 +54,15 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
-                    b.Property<int>("ClassroomId")
+                    b.Property<int>("ClassroomID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClassroomId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClassroomID"));
+
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("ClassName")
                         .IsRequired()
@@ -71,7 +75,7 @@ namespace backend.Migrations
                     b.Property<int>("TeacherId")
                         .HasColumnType("integer");
 
-                    b.HasKey("ClassroomId");
+                    b.HasKey("ClassroomID");
 
                     b.HasIndex("TeacherId");
 
@@ -179,24 +183,18 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Student", b =>
                 {
-                    b.Property<int>("StudentID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StudentID"));
-
-                    b.Property<int>("ClassroomId")
+                    b.Property<int?>("ClassroomId")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("StudentIdNumber")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("text");
 
-                    b.HasKey("StudentID");
+                    b.HasKey("StudentId");
 
                     b.HasIndex("ClassroomId");
 
@@ -206,10 +204,7 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Teacher", b =>
                 {
                     b.Property<int>("TeacherId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TeacherId"));
 
                     b.Property<string>("TeacherIdNumber")
                         .IsRequired()
@@ -248,11 +243,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.User", b =>
                 {
-                    b.Property<int>("UserID")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserID"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -261,6 +256,9 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -275,7 +273,7 @@ namespace backend.Migrations
                     b.Property<string>("RefreshToken")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("RefreshTokenExpiry")
+                    b.Property<DateTime?>("RefreshTokenExpiry")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -284,7 +282,7 @@ namespace backend.Migrations
                     b.Property<byte>("UserType")
                         .HasColumnType("smallint");
 
-                    b.HasKey("UserID");
+                    b.HasKey("UserId");
 
                     b.ToTable("Users");
                 });
@@ -311,11 +309,28 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Classroom", "Classroom")
                         .WithMany("Students")
-                        .HasForeignKey("ClassroomId")
+                        .HasForeignKey("ClassroomId");
+
+                    b.HasOne("backend.Models.User", "User")
+                        .WithOne("Student")
+                        .HasForeignKey("backend.Models.Student", "StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Classroom");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend.Models.Teacher", b =>
+                {
+                    b.HasOne("backend.Models.User", "User")
+                        .WithOne("Teacher")
+                        .HasForeignKey("backend.Models.Teacher", "TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("backend.Models.Topic", b =>
@@ -342,6 +357,13 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Teacher", b =>
                 {
                     b.Navigation("Classrooms");
+                });
+
+            modelBuilder.Entity("backend.Models.User", b =>
+                {
+                    b.Navigation("Student");
+
+                    b.Navigation("Teacher");
                 });
 #pragma warning restore 612, 618
         }

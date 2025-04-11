@@ -5,25 +5,25 @@
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class changedslightlyusermodel : Migration
+    public partial class AddClassCodeToClassroom : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "isVerified",
-                table: "Users",
-                type: "boolean",
+            migrationBuilder.AddColumn<string>(
+                name: "ClassCode",
+                table: "Classrooms",
+                type: "text",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: "");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "isVerified",
-                table: "Users");
+                name: "ClassCode",
+                table: "Classrooms");
         }
     }
 }

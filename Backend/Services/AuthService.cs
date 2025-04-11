@@ -60,6 +60,7 @@ namespace backend.Services
                 throw new ArgumentException("Email and password are required.");
 
             var user = await _userRepository.GetUserByEmailAsync(email);
+
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.Password))
                 throw new UnauthorizedAccessException("Invalid email or password.");
 
@@ -73,7 +74,7 @@ namespace backend.Services
 
             var UserResponseDto = new UserResponseDto
             {
-                UserID = user.UserID,
+                UserID = user.UserId,
                 Name = user.Name,
                 Email = user.Email,
                 UserType = user.UserType,
@@ -85,7 +86,7 @@ namespace backend.Services
             {
                 if (user.UserType == 1) // student
                 {
-                    var student = await _studentRepository.GetByUserIdAsync(user.UserID);
+                    var student = await _studentRepository.GetByUserIdAsync(user.UserId);
                     if (student != null)
                     {
                         UserResponseDto.StudentInfo = new StudentDto
@@ -96,7 +97,7 @@ namespace backend.Services
                 }
                 else if (user.UserType == 2) // teacher
                 {
-                    var teacher = await _teacherRepository.GetByUserIdAsync(user.UserID);
+                    var teacher = await _teacherRepository.GetByUserIdAsync(user.UserId);
                     if (teacher != null)
                     {
                         UserResponseDto.TeacherInfo = new TeacherDto
@@ -113,6 +114,18 @@ namespace backend.Services
                 RefreshToken = refreshToken,
                 User = UserResponseDto
             };
+        }
+        // Logout User
+        public async Task LogoutUserAsync(string email)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if (user == null)
+                throw new InvalidOperationException("User not found.");
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiry = null;
+
+            await _userRepository.UpdateUserTokenAsync(user);
         }
 
         public async Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshDto)
@@ -136,11 +149,8 @@ namespace backend.Services
                 RefreshToken = newRefreshToken
             };
         }
-
-        // Validate user registration data for a cleaner code
         // This method checks if the registration data is valid
         // and throws an exception if any required field is missing or invalid.
-
         private void ValidateUserRegistration(UserRegisterDto dto)
         {
             if (dto == null)

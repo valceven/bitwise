@@ -1,26 +1,13 @@
 import React from "react";
-import { useState } from "react";
-import Modal from "../../components/JoinClassModal.jsx"; // Adjust the import path as necessary
 
 const DashboardHome = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="bg-bluez text-white px-4 py-2 rounded btn-shadow"
-      >
-        Join a Class
-      </button>
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Join a Class"
-      >
-      </Modal>
+    <div className="flex flex-col items-center justify-center w-full">
+      <h1>Dashboard Classroom</h1>
+      <p>Welcome to the Home page!</p>
     </div>
+    
   );
 };
 

@@ -35,7 +35,7 @@ const LoginForm = () => {
       if (response) {
         console.log("Logging in and navigating to /profile");
         loginUser(response);
-        navigate("/profile");
+        //navigate("/user/profile/" + response.userID);
       }
     } catch (error) {
       console.error("Error during form submission:", error);

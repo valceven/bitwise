@@ -6,22 +6,25 @@ namespace backend.Models
     public class Classroom
     {
         [Key]
-        public int ClassroomId { get; set; }
+        public int ClassroomID { get; set; }
 
         [Required]
         [ForeignKey("TeacherId")]
         public int TeacherId { get; set; }
 
+        [Required]
         [StringLength(25)]
         [Column(TypeName = "text")]
-        public required string ClassName { get; set; }
+        public string ClassName { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Navigation property daw ani si Copilot;
-        public List<Student> Students { get; set; } = new List<Student>();
+        public string ClassCode { get; set; } = string.Empty;
 
-        // Navigation property for the lessons;
-        public List<Lesson> Lessons { get; set; } = new List<Lesson>();
+        // One-to-many: Classroom has many Students
+        public List<Student>? Students { get; set; } = new List<Student>();
+
+        // One-to-many: Classroom has many Lessons (assuming Lesson model exists)
+        public List<Lesson>? Lessons { get; set; } = new List<Lesson>();
     }
 }

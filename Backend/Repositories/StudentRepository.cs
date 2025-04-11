@@ -13,7 +13,7 @@ namespace backend.Repositories
             _context = context;
         }
 
-        public async Task<Student> AddAsync(Student student)
+        public async Task<Student?> AddAsync(Student student)
         {
             try {
                 _context.Students.Add(student);
@@ -28,7 +28,7 @@ namespace backend.Repositories
 
         public async Task<Student?> GetByUserIdAsync(int userId)
         {
-            return await _context.Students.FirstOrDefaultAsync(s => s.StudentID == userId);
+            return await _context.Students.FirstOrDefaultAsync(s => s.StudentId == userId);
         }
     }
 

@@ -1,9 +1,7 @@
 using backend.DTOs.User;
 using backend.Models;
-using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using backend.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 
 namespace backend.Presentation
 {
@@ -30,7 +28,7 @@ namespace backend.Presentation
 
             var createdUser = await _authService.RegisterUserAsync(userRegisterDto);
             
-            return CreatedAtAction(nameof(RegisterUser), new { id = createdUser.UserID }, createdUser);
+            return CreatedAtAction(nameof(RegisterUser), new { id = createdUser.UserId }, createdUser);
         }
 
         // Login User and generate JWT
@@ -67,6 +65,29 @@ namespace backend.Presentation
             catch (UnauthorizedAccessException)
             {
                 return Unauthorized();
+            }
+        }
+        // Logout User
+        [HttpPut("logout")]
+        [Microsoft.AspNetCore.Cors.EnableCors("AllowFrontend")]
+        public async Task<IActionResult> LogoutUser([FromBody] UserLogoutDto logoutDto)
+        {
+            try
+            {
+                // Delete cookies when logging out
+                Response.Cookies.Delete("AccessToken");
+                Response.Cookies.Delete("RefreshToken");
+
+                // Handle other logout logic
+                await _authService.LogoutUserAsync(logoutDto.Email);
+
+                return Ok("Logged out successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, "Internal Server Error");
             }
         }
 
