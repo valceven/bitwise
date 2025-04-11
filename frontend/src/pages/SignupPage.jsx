@@ -15,6 +15,7 @@ const SignupPage = () => {
     const navigate = useNavigate();
 
     const [step, setStep] = useState(1); // Track the current step
+    const [isLoading, setIsLoading] = useState(false);
 
     const initialValues = {
         name: '',
@@ -23,6 +24,7 @@ const SignupPage = () => {
         password: '',
         confirmPassword: '',
         userType: null,
+        verificationCode: '',
     };
 
     const validationSchemas = [
@@ -31,8 +33,11 @@ const SignupPage = () => {
         }),
         Yup.object({
             name: Yup.string().required('Name is required'),
-            email: Yup.string().email('Invalid email address').required('Email is required'),
-        }),
+            email: Yup.string()
+              .email('Invalid email address')
+              .matches(/^[a-zA-Z0-9._%+-]+@cit\.edu$/, 'Email must be a valid cit.edu address')
+              .required('Email is required'),
+          }),          
         Yup.object({
             username: Yup.string().required('Username is required'),
             password: Yup.string()
@@ -44,18 +49,26 @@ const SignupPage = () => {
                 .oneOf([Yup.ref('password'), null], 'Passwords must match')
                 .required('Confirm password is required'),
         }),
+        Yup.object({
+            verificationCode: Yup.string()
+                .required('Verification code is required')
+                .length(6, 'Verification code must be 6 characters'),
+        }),
     ];
 
     const handleSubmit = async (values) => {
+        setIsLoading(true);
         try {
-            const response = await authApi.registerUser(values); // Call the register API
-            alert('Registration successful:', response.data);
-            navigate('/login'); // Redirect to login page after successful registration
+            const response = await authApi.registerUser(values);
+            navigate('/login');
         } catch (error) {
             console.error('Registration failed:', error);
             alert('Registration failed. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
+    
 
     const renderStepFields = (setFieldValue, values) => {
         switch (step) {
@@ -108,7 +121,7 @@ const SignupPage = () => {
                         <label>Enter your name</label>
                         <InputField id="name" name="name" type="text" placeholder="" />
                         <label>Enter your email</label>
-                        <InputField id="email" name="email" type="email" placeholder="user@bitwise.io" />
+                        <InputField id="email" name="email" type="email" placeholder="user@cit.edu" />
                     </>
                 );
             case 3:
@@ -128,6 +141,19 @@ const SignupPage = () => {
                         <InputField id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm password" />
                     </>
                 );
+                case 4:
+                    return (
+                            <>
+                                 <h1 className="text-3xl font-bold text-black-500 mb-4">
+                                        Verify Your Email
+                                </h1>
+                                <h6 className="text-xs text-black-500 mb-4 addinter">
+                                         We’ve sent a 6-digit verification code to your email. Please enter it below to complete your registration.
+                                </h6>
+                                <label>Enter verification code</label>
+                                <InputField id="verificationCode" name="verificationCode" type="text" placeholder="123456" />
+                            </>
+                    );
             default:
                 return null;
         }
@@ -142,12 +168,18 @@ const SignupPage = () => {
             <div className="flex flex-col items-enter justify-center w-full mb-10">
                 <Stepper step={step} />
             </div>
-            
+            {isLoading ? (
+                    <div className="flex justify-center items-center">
+                        <div className="loader border-t-4 border-bluez rounded-full w-12 h-12 animate-spin"></div>
+                        <p className="ml-4 text-lg text-gray-600">Processing...</p>
+                    </div>
+                ) : (
+
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchemas[step - 1]}
                 onSubmit={(values, { setSubmitting }) => {
-                    if (step === 3) {
+                    if (step === 4) {
                         handleSubmit(values); // Final submission
                     } else {
                         setStep(step + 1); // Move to the next step
@@ -174,12 +206,12 @@ const SignupPage = () => {
                                 className="bg-bluez btn-shadow addgrotesk"
                                 disabled={isSubmitting || !isValid}
                             >
-                                {step === 3 ? 'Submit' : 'Next'}
+                                {step === 4 ? 'Submit' : 'Next'}
                             </Button>
                         </div>
                     </Form>
                 )}
-            </Formik>
+            </Formik>)}
         </div>
         </div>
         
