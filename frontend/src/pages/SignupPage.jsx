@@ -159,7 +159,10 @@ const SignupPage = () => {
         }
     };
 
+    
+
     return (
+        
         <div className="flex justify-center items-center bg-offwhite relative">
             <Background />
             <div className="relative z-10 w-1/2 flex flex-col justify-center items-center min-h-screen mx-auto">
@@ -179,10 +182,21 @@ const SignupPage = () => {
                 initialValues={initialValues}
                 validationSchema={validationSchemas[step - 1]}
                 onSubmit={(values, { setSubmitting }) => {
+                    setIsLoading(true); 
                     if (step === 4) {
-                        handleSubmit(values); // Final submission
+                        setIsLoading(true); 
+                        setTimeout(async () => {
+                            try {
+                                await handleSubmit(values); 
+                            } catch (error) {
+                                console.error('Error during submission:', error);
+                            } finally {
+                                setIsLoading(false);
+                            }
+                            setSubmitting(false);
+                        }, 2000);
                     } else {
-                        setStep(step + 1); // Move to the next step
+                        setStep(step + 1); 
                     }
                     setSubmitting(false);
                 }}
