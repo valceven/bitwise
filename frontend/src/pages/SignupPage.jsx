@@ -56,11 +56,17 @@ const SignupPage = () => {
         }),
     ];
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values, { resetForm}) => {
         setIsLoading(true);
         try {
             const response = await authApi.registerUser(values);
-            navigate('/login');
+            if (response.success) {
+                alert('Registration successful! Please check your email for the verification code.');
+                navigate('/login');
+            } else {
+                alert('Registration failed. Please try again.');
+                resetForm();
+            }
         } catch (error) {
             console.error('Registration failed:', error);
             alert('Registration failed. Please try again.');
@@ -106,8 +112,8 @@ const SignupPage = () => {
                             >
                                 Teacher
                             </UserRoleButton>
-                    </div>
-                                        </>
+                        </div>
+                    </>
                 );
             case 2:
                 return (
@@ -182,7 +188,7 @@ const SignupPage = () => {
                 initialValues={initialValues}
                 validationSchema={validationSchemas[step - 1]}
                 onSubmit={(values, { setSubmitting }) => {
-                    setIsLoading(true); 
+                    // setIsLoading(true); 
                     if (step === 4) {
                         setIsLoading(true); 
                         setTimeout(async () => {

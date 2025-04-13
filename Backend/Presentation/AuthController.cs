@@ -16,15 +16,29 @@ namespace backend.Presentation
             _authService = authService;
         }
 
+        // Veify through otp code sent via email address.
+        [HttpPost("verify")]
+        public async Task<IActionResult> VerifyUser([FromBody] UserVerifyDto userVerifyDto)
+        {
+            if(userVerifyDto.Password != userVerifyDto.ConfirmPassword)
+            {
+                return BadRequest("Passwords do not match.");
+            }
+
+            var result = await _authService.VerifyUserAsync(userVerifyDto);
+
+            if (result == null)
+            {
+                return BadRequest("Invalid OTP code.");
+            }
+
+            return Ok(result);
+        }
+
         // Register User
         [HttpPost("register")]
         public async Task<ActionResult<User>> RegisterUser([FromBody] UserRegisterDto userRegisterDto)
         {   
-            if(userRegisterDto.Password != userRegisterDto.ConfirmPassword)
-            {
-                return BadRequest("Passwords do not match.");
-            }
-            Console.WriteLine(userRegisterDto);
 
             var createdUser = await _authService.RegisterUserAsync(userRegisterDto);
             

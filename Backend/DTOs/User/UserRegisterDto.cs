@@ -7,5 +7,6 @@ namespace backend.DTOs.User
         public  string Password { get; set; }
         public string ConfirmPassword { get; set; }
         public byte UserType { get; set; }
+        public int VerificationCode { get; set; }
     }
 }

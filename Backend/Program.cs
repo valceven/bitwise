@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using backend.Data;
-using DotNetEnv;
 using backend.Repositories;
 using backend.Repositories.Interfaces;
 using backend.Services;
@@ -10,6 +8,7 @@ using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using MailKit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,16 +27,23 @@ var connectionString = environment == "production"
 builder.Services.AddDbContext<bitwiseDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") ?? connectionString));
 
-// Register services for dependency injection
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+// Controllers
+builder.Services.AddControllers();
+
+// Services
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
-builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IClassroomRepository, ClassroomRepository>();
 builder.Services.AddScoped<IClassroomService, ClassroomService>();
-builder.Services.AddControllers();
+builder.Services.Configure<backend.EmailSettings>(builder.Configuration.GetSection("EmailSettings")); // Configure MailSettings from appsettings.json
+builder.Services.AddTransient<backend.Services.Interfaces.IEmailService, backend.Services.EmailService>(); // Register the email service
+
+// Repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IClassroomRepository, ClassroomRepository>();
 
 // Add authentication using JWT Bearer tokens
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

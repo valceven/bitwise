@@ -19,5 +19,6 @@ namespace backend.Data
         public DbSet<Models.Classroom> Classrooms { get; set; }
         public DbSet<Models.LeaderboardEntry> LeaderboardEntries { get; set; }
         public DbSet<Models.Content> Contents { get; set; }
+        public DbSet<Models.PendingUser> PendingUsers { get; set; }
     }
 }

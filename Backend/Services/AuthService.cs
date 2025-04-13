@@ -2,6 +2,8 @@ using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.DTOs.User;
 using backend.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace backend.Services
 {
@@ -11,17 +13,23 @@ namespace backend.Services
         private readonly ITokenService _tokenService;
         private readonly IStudentRepository _studentRepository;
         private readonly ITeacherRepository _teacherRepository;
+        private readonly IAuthRepository _authRepository;
+        private readonly IEmailService _emailService;
 
         public AuthService(
             IUserRepository userRepository, 
             ITokenService tokenService, 
             IStudentRepository studentRepository, 
-            ITeacherRepository teacherRepository)
+            ITeacherRepository teacherRepository,
+            IAuthRepository authRepository,
+            IEmailService emailService)
         {
             _userRepository = userRepository;
             _tokenService = tokenService;
             _studentRepository = studentRepository;
             _teacherRepository = teacherRepository;
+            _authRepository = authRepository;
+            _emailService = emailService;
         }
 
         // Register User
@@ -29,13 +37,21 @@ namespace backend.Services
         {
             ValidateUserRegistration(userRegisterDto);
 
-            // Check if the email is already in use
+            var pendingUserVerificationCode = await _authRepository.GetPendingUserVerificationCodeAsync(userRegisterDto.Email);
+            
+            if (pendingUserVerificationCode != userRegisterDto.VerificationCode)
+            {
+                // Invalid verification code
+                throw new InvalidOperationException("Invalid verification code.");
+            }
+
+
             var existingUser = await _userRepository.GetUserByEmailAsync(userRegisterDto.Email);
             if (existingUser != null)
             {
                 throw new InvalidOperationException("Email is already in use.");
             }
-
+            
             // Create new user object
             var newUser = new User
             {
@@ -169,5 +185,34 @@ namespace backend.Services
                 throw new ArgumentException("User type is required.");
         }
 
+        public async Task<string> VerifyUserAsync(UserVerifyDto userVerifyDto)
+        {
+            // Generate a new code
+            var code = new Random().Next(100000, 999999);
+
+            // Check if already pending
+            var pendingUser = await _authRepository.GetPendingUserByEmailAsync(userVerifyDto.Email);
+
+            if (pendingUser != null)
+            {
+                // Update existing pending record
+                pendingUser.VerificationCode = code;
+                await _authRepository.UpdatePendingUserAsync(pendingUser);
+            }
+            else
+            {
+                // Save new pending user
+                await _authRepository.CreatePendingUserAsync(new PendingUser
+                {
+                    Email = userVerifyDto.Email,
+                    VerificationCode = code
+                });
+            }
+
+            // Send email
+            await _emailService.SendEmailAsync(userVerifyDto.Email, "Your Verification Code", $"Code: {code}");
+
+            return "Verification code sent to your email.";
+        }
     }
 }

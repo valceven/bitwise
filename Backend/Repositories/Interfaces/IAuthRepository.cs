@@ -4,7 +4,9 @@ namespace backend.Repositories.Interfaces
 {
     public interface IAuthRepository
     {
-        Task<User> CreateUserAsync(User user);
-        Task<User> LoginUserAsync (User user);
+        Task<PendingUser> CreatePendingUserAsync(PendingUser pendingUser);
+        Task<PendingUser?> GetPendingUserByEmailAsync(string email);
+        Task<bool> UpdatePendingUserAsync(PendingUser pendingUser);
+        Task<int> GetPendingUserVerificationCodeAsync(string email);
     }
 }
