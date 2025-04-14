@@ -1,7 +1,7 @@
 export default function Stepper({ step }) {
     return (
         <div className="flex items-center justify-center w-full">
-            <ol className="flex items-center justify-center w-3/4 m-10 ml-30">
+            <ol className="flex items-center justify-center w-3/5 m-10 ml-30 text-xs">
                 {/* Step 1 */}
                 <li
                     className={`flex w-full items-center ${
@@ -11,9 +11,9 @@ export default function Stepper({ step }) {
                     }`}
                 >
                     <span
-                        className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${
+                        className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-8 lg:w-8 shrink-0 ${
                             step >= 1
-                                ? "bg-purple-500 btn-shadow text-white"
+                                ? "bg-bluez btn-shadow text-white"
                                 : "bg-gray-200 text-gray-500"
                         }`}
                     >
@@ -30,9 +30,9 @@ export default function Stepper({ step }) {
                     }`}
                 >
                     <span
-                        className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${
+                        className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-8 lg:w-8 shrink-0 ${
                             step >= 2
-                                ? "bg-purple-500 btn-shadow text-white"
+                                ? "bg-bluez btn-shadow text-white"
                                 : "bg-gray-200 text-gray-500"
                         }`}
                     >
@@ -49,9 +49,9 @@ export default function Stepper({ step }) {
                     }`}
                 >
                     <span
-                        className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${
+                        className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-8 lg:w-8 shrink-0 ${
                             step >= 3
-                                ? "bg-purple-500 btn-shadow text-white"
+                                ? "bg-bluez btn-shadow text-white"
                                 : "bg-gray-200 text-gray-500"
                         }`}
                     >
@@ -62,9 +62,9 @@ export default function Stepper({ step }) {
                 {/* Step 4 */}
                 <li className="flex items-center w-full ">
                     <span
-                        className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-12 lg:w-12 shrink-0 ${
+                        className={`flex items-center justify-center w-10 h-10 rounded-full lg:h-8 lg:w-8 shrink-0 ${
                             step >= 4
-                                ? "bg-purple-500 btn-shadow text-white"
+                                ? "bg-bluez btn-shadow text-white"
                                 : "bg-gray-200 text-gray-500"
                         }`}
                     >
