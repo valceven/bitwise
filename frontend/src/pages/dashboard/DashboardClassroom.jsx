@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import Modal from "../../components/JoinClassModal.jsx"; // Adjust the import path as necessary
 import plus_join from "../../assets/plus-join.svg";
+import { useUser } from "../../context/UserContext";
 
 const DashboardClassroom = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useUser();
 
   const classrooms = [
     {
@@ -33,13 +35,24 @@ const DashboardClassroom = () => {
       <div className="flex flex-col w-full space-y-6">
         <div className="w-full flex justify-between items-center">
           <h1 className="text-2xl font-bold">Classrooms</h1>
-          <button
+
+          {user.usertype === 2 ? (
+            <button
+            Link="/createclass"
+            className="bg-greenz2 text-white px-6 py-2 joinclass-shadow text-sm font-semibold flex items-center space-x-4"
+          >
+            <div>Create</div>
+            <img src={plus_join} />
+          </button>
+          ) : (
+            <button
             onClick={() => setIsModalOpen(true)}
             className="bg-greenz2 text-white px-6 py-2 joinclass-shadow text-sm font-semibold flex items-center space-x-4"
           >
             <div>Join</div>
             <img src={plus_join} />
           </button>
+          )}
         </div>
 
         <div className="flex flex-wrap justify-center gap-4">

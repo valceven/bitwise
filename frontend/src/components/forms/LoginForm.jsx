@@ -57,7 +57,7 @@ const LoginForm = () => {
       onSubmit={handleSubmit}
     >
       {() => (
-        <Form className="addinter text-md w-full">
+        <Form className="addinter text-md w-full space-y-2">
           <InputField
             id="email"
             name="email"

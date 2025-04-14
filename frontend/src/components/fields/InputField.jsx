@@ -5,7 +5,7 @@ const InputField = ({ label, ...props }) => {
   const [field, meta] = useField(props);
 
   return (
-    <div className="w-full h-15 py-2">
+    <div className="w-full h-15 py-4">
       <input
         {...field}
         {...props}

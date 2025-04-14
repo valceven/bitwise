@@ -201,12 +201,12 @@ const DashboardSidebar = (user) => {
                   </Link>
                 </li>
                 <li>
-                  <Button
+                  <button
                     onClick={() => handleLogout(user.user.email)}
-                    className="block px-4 py-2 hover:bg-gray-100"
+                    className="block px-4 py-2 hover:bg-gray-100 w-full h-full rounded-none p-0 m-0 text-left"
                   >
                     Sign out
-                  </Button>
+                  </button>
                 </li>
               </ul>
             </div>

@@ -7,6 +7,7 @@ import Polygon from '../assets/Polygon.svg';
 import Zigzag from '../assets/zig-zag.svg';
 import EditBackground from '../components/EditBackgroud';
 import { useAuthGuard } from '../hooks/useAuthGuard';
+import MuLoading from '../components/MuLoading';
 
 const ProfilePage = () => {
   const { user, isRedirecting, isCheckingAuth } = useAuthGuard();
@@ -15,7 +16,8 @@ const ProfilePage = () => {
       return (
         <div className="w-full min-h-screen flex items-center justify-center">
           <p className="text-xl text-center">
-            {isCheckingAuth ? "Checking authentication..." : "You are not authenticated. Redirecting to login..."}
+              {isCheckingAuth ? "Checking authentication..." : (
+          <MuLoading text={"You are already logged in. Redirecting to profile..."}/>)}
           </p>
         </div>
       );
