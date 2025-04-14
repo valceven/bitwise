@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
@@ -11,13 +11,11 @@ import { authApi } from '../api/auth/authApi';
 import Background from '../components/Background';
 
 const SignupPage = () => {
-
     const navigate = useNavigate();
-
-    const [step, setStep] = useState(1); // Track the current step
+    const [step, setStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
-
-    const initialValues = {
+    const [verificationSent, setVerificationSent] = useState(false);
+    const [formValues, setFormValues] = useState({
         name: '',
         email: '',
         username: '',
@@ -25,7 +23,7 @@ const SignupPage = () => {
         confirmPassword: '',
         userType: null,
         verificationCode: '',
-    };
+    });
 
     const validationSchemas = [
         Yup.object({
@@ -56,16 +54,47 @@ const SignupPage = () => {
         }),
     ];
 
-    const handleSubmit = async (values, { resetForm}) => {
+    const handleVerifyCode = async (values) => {
+        if (verificationSent) return;
+        try {
+            setIsLoading(true);
+            setFormValues(values);
+            const response = await authApi.verifyUser({
+                email: values.email,
+                password: values.password,
+                confirmPassword: values.confirmPassword,
+            });
+            console.log(response)
+            if (response.status === 200) {
+                alert(response.data);
+                setVerificationSent(true);
+            } else {
+                alert('Failed to send verification email.');
+            }
+        } catch (error) {
+            console.error('Verify error:', error);
+            alert('Something went wrong. Try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Modified to handle case when formikBag might not be provided
+    const handleSubmit = async (values, formikBag = {}) => {
         setIsLoading(true);
         try {
+            console.log('Submitting values:', values);
             const response = await authApi.registerUser(values);
+            console.log('Registration response:', response);
             if (response.success) {
-                alert('Registration successful! Please check your email for the verification code.');
+                alert('Registration successful!');
                 navigate('/login');
             } else {
                 alert('Registration failed. Please try again.');
-                resetForm();
+                // Only call resetForm if it exists
+                if (formikBag.resetForm) {
+                    formikBag.resetForm();
+                }
             }
         } catch (error) {
             console.error('Registration failed:', error);
@@ -75,6 +104,12 @@ const SignupPage = () => {
         }
     };
     
+    // Reset verificationSent if step changes back to 3
+    useEffect(() => {
+        if (step !== 3) {
+            setVerificationSent(false);
+        }
+    }, [step]);
 
     const renderStepFields = (setFieldValue, values) => {
         switch (step) {
@@ -122,7 +157,7 @@ const SignupPage = () => {
                             Let's start with your name & email
                         </h1>
                         <h6 className="text-xs text-black-500 mb-4 addinter">
-                            This helps us personalize your experience. Don’t worry, we won’t share your info!
+                            This helps us personalize your experience. Don't worry, we won't share your info!
                         </h6>
                         <label>Enter your name</label>
                         <InputField id="name" name="name" type="text" placeholder="" />
@@ -145,6 +180,12 @@ const SignupPage = () => {
                         <InputField id="password" name="password" type="password" placeholder="Password" />
                         <label>Confirm password</label>
                         <InputField id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm password" />
+                        {/* Show status of verification code */}
+                        {verificationSent && (
+                            <p className="text-green-600 text-sm mt-2">
+                                Verification code sent! Check your email.
+                            </p>
+                        )}
                     </>
                 );
                 case 4:
@@ -154,7 +195,7 @@ const SignupPage = () => {
                                         Verify Your Email
                                 </h1>
                                 <h6 className="text-xs text-black-500 mb-4 addinter">
-                                         We’ve sent a 6-digit verification code to your email. Please enter it below to complete your registration.
+                                         We've sent a 6-digit verification code to your email. Please enter it below to complete your registration.
                                 </h6>
                                 <label>Enter verification code</label>
                                 <InputField id="verificationCode" name="verificationCode" type="text" placeholder="123456" />
@@ -165,76 +206,78 @@ const SignupPage = () => {
         }
     };
 
-    
-
     return (
-        
         <div className="flex justify-center items-center bg-offwhite relative">
             <Background />
             <div className="relative z-10 w-1/2 flex flex-col justify-center items-center min-h-screen mx-auto">
             
-            <img draggable='false' src={logo} alt="Logo" className="w-30 h-6 mb-10" />
-            <div className="flex flex-col items-enter justify-center w-full mb-10">
-                <Stepper step={step} />
-            </div>
-            {isLoading ? (
+                <img draggable='false' src={logo} alt="Logo" className="w-30 h-6 mb-10" />
+                <div className="flex flex-col items-enter justify-center w-full mb-10">
+                    <Stepper step={step} />
+                </div>
+                {isLoading ? (
                     <div className="flex justify-center items-center">
                         <div className="loader border-t-4 border-bluez rounded-full w-12 h-12 animate-spin"></div>
                         <p className="ml-4 text-lg text-gray-600">Processing...</p>
                     </div>
                 ) : (
-
-            <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchemas[step - 1]}
-                onSubmit={(values, { setSubmitting }) => {
-                    // setIsLoading(true); 
-                    if (step === 4) {
-                        setIsLoading(true); 
-                        setTimeout(async () => {
-                            try {
-                                await handleSubmit(values); 
-                            } catch (error) {
-                                console.error('Error during submission:', error);
-                            } finally {
-                                setIsLoading(false);
+                    <Formik
+                        initialValues={formValues}
+                        enableReinitialize={true}
+                        validationSchema={validationSchemas[step - 1]}
+                        onSubmit={(values, formikHelpers) => {
+                            if (step === 3) {
+                                // On step 3, send verification code first before proceeding
+                                handleVerifyCode(values).then(() => {
+                                    setStep(step + 1);
+                                    formikHelpers.setSubmitting(false);
+                                });
+                            } else if (step === 4) {
+                                setIsLoading(true); 
+                                setTimeout(async () => {
+                                    try {
+                                        // Pass both values and formikHelpers to handleSubmit
+                                        await handleSubmit(values, formikHelpers); 
+                                    } catch (error) {
+                                        console.error('Error during submission:', error);
+                                    } finally {
+                                        setIsLoading(false);
+                                    }
+                                    formikHelpers.setSubmitting(false);
+                                }, 2000);
+                            } else {
+                                setStep(step + 1); 
+                                formikHelpers.setSubmitting(false);
                             }
-                            setSubmitting(false);
-                        }, 2000);
-                    } else {
-                        setStep(step + 1); 
-                    }
-                    setSubmitting(false);
-                }}
-            >
-                {({ values, setFieldValue, isSubmitting, isValid }) => (
-                    <Form className="w-3/4 space-y-4">
-                        {renderStepFields(setFieldValue, values)}
-                        <div className="flex justify-end space-x-10">
-                            {step > 1 && (
-                                <Button
-                                    type="button"
-                                    onClick={() => setStep(step - 1)}
-                                    className="bg-gray-500 hover:bg-gray-600 btn-shadow addgrotesk"
-                                >
-                                    Previous
-                                </Button>
-                            )}
-                            <Button
-                                type="submit"
-                                onClick={() => console.log(values)}
-                                className="bg-bluez btn-shadow addgrotesk"
-                                disabled={isSubmitting || !isValid}
-                            >
-                                {step === 4 ? 'Submit' : 'Next'}
-                            </Button>
-                        </div>
-                    </Form>
+                        }}
+                    >
+                        {({ values, setFieldValue, isSubmitting, isValid }) => (
+                            <Form className="w-3/4 space-y-4">
+                                {renderStepFields(setFieldValue, values)}
+                                <div className="flex justify-end space-x-10">
+                                    {step > 1 && (
+                                        <Button
+                                            type="button"
+                                            onClick={() => setStep(step - 1)}
+                                            className="bg-gray-500 hover:bg-gray-600 btn-shadow addgrotesk"
+                                        >
+                                            Previous
+                                        </Button>
+                                    )}
+                                    <Button
+                                        type="submit"
+                                        className="bg-bluez btn-shadow addgrotesk"
+                                        disabled={isSubmitting || !isValid}
+                                    >
+                                        {step === 4 ? 'Submit' : 'Next'}
+                                    </Button>
+                                </div>
+                            </Form>
+                        )}
+                    </Formik>
                 )}
-            </Formik>)}
+            </div>
         </div>
-        </div>
-        
     );
 };
 

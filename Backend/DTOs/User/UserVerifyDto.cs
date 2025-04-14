@@ -7,7 +7,7 @@ namespace backend.DTOs.User
 {
     public class UserVerifyDto
     {   
-        public  string Email { get; set; }
+        public string Email { get; set; }
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
     }

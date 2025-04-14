@@ -31,7 +31,6 @@ namespace backend.Presentation
             {
                 return BadRequest("Invalid OTP code.");
             }
-
             return Ok(result);
         }
 

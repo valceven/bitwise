@@ -55,7 +55,7 @@ namespace backend.Repositories
             }
         }
 
-        public async Task<bool> UpdatePendingUserAsync(PendingUser pendingUser)
+        public async Task<(bool Success, string Message)> UpdatePendingUserAsync(PendingUser pendingUser)
         {
             try {
                 await _context.PendingUsers
@@ -63,7 +63,6 @@ namespace backend.Repositories
                     .ExecuteUpdateAsync(setters => setters
                         .SetProperty(u => u.VerificationCode, pendingUser.VerificationCode));
                 await _context.SaveChangesAsync();
-                return true; // Changed from Task.FromResult(true) to return true directly
             } catch (Exception ex) {
                 Console.WriteLine($"Error updating pending user: {ex.Message}");
                 throw new Exception("An error occurred while updating the pending user.", ex);

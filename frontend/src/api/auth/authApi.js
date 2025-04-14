@@ -13,6 +13,15 @@ const registerUser = async (userData) => {
   }
 }
 
+const verifyUser = async (userData) => {
+  try {
+    const response = await apiService.post(`/users/verify/`, userData);
+    return response;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+}
+
 const loginUser = async (credentials) => {  
     try {
         console.log("Credentials in login function:", credentials);
@@ -56,5 +65,6 @@ export const authApi = {
   loginUser,
   refreshAccessToken,
   editUser,
-  logoutUser
+  logoutUser,
+  verifyUser
 };

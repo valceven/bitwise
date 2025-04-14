@@ -185,34 +185,41 @@ namespace backend.Services
                 throw new ArgumentException("User type is required.");
         }
 
-        public async Task<string> VerifyUserAsync(UserVerifyDto userVerifyDto)
+        public async Task<(bool Success, string Message)> VerifyUserAsync(UserVerifyDto userVerifyDto)
+{
+    try
+    {
+        // Generate a new code
+        var code = new Random().Next(100000, 999999);
+
+        // Check if already pending
+        var pendingUser = await _authRepository.GetPendingUserByEmailAsync(userVerifyDto.Email);
+
+        if (pendingUser != null)
         {
-            // Generate a new code
-            var code = new Random().Next(100000, 999999);
-
-            // Check if already pending
-            var pendingUser = await _authRepository.GetPendingUserByEmailAsync(userVerifyDto.Email);
-
-            if (pendingUser != null)
-            {
-                // Update existing pending record
-                pendingUser.VerificationCode = code;
-                await _authRepository.UpdatePendingUserAsync(pendingUser);
-            }
-            else
-            {
-                // Save new pending user
-                await _authRepository.CreatePendingUserAsync(new PendingUser
-                {
-                    Email = userVerifyDto.Email,
-                    VerificationCode = code
-                });
-            }
-
-            // Send email
-            await _emailService.SendEmailAsync(userVerifyDto.Email, "Your Verification Code", $"Code: {code}");
-
-            return "Verification code sent to your email.";
+            // Update existing pending record
+            pendingUser.VerificationCode = code;
+            await _authRepository.UpdatePendingUserAsync(pendingUser);
         }
+        else
+        {
+            // Save new pending user
+            await _authRepository.CreatePendingUserAsync(new PendingUser
+            {
+                Email = userVerifyDto.Email,
+                VerificationCode = code
+            });
+        }
+
+        // Send email
+        await _emailService.SendEmailAsync(userVerifyDto.Email, "Your Verification Code", $"Code: {code}");
+
+        return (true, "Verification code sent to your email.");
+    }
+    catch (Exception ex)
+    {
+        return (false, $"Failed to send verification code: {ex.Message}");
+    }
+}
     }
 }
