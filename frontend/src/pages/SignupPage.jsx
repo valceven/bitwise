@@ -64,9 +64,9 @@ const SignupPage = () => {
                 password: values.password,
                 confirmPassword: values.confirmPassword,
             });
-            console.log(response)
-            if (response.status === 200) {
-                alert(response.data);
+            console.log("gikan sa signbup", response)
+            if (response.success) {
+                alert(response.message);
                 setVerificationSent(true);
             } else {
                 alert('Failed to send verification email.');

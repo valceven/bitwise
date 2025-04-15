@@ -16,7 +16,7 @@ const registerUser = async (userData) => {
 const verifyUser = async (userData) => {
   try {
     const response = await apiService.post(`/users/verify/`, userData);
-    return response;
+    return response.data;
   } catch (error) {
     throw error.response?.data || error.message || "An unknown error occurred";
   }

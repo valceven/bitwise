@@ -20,19 +20,21 @@ namespace backend.Presentation
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyUser([FromBody] UserVerifyDto userVerifyDto)
         {
-            if(userVerifyDto.Password != userVerifyDto.ConfirmPassword)
+            if (userVerifyDto.Password != userVerifyDto.ConfirmPassword)
             {
-                return BadRequest("Passwords do not match.");
+                return BadRequest(new { success = false, message = "Passwords do not match." });
             }
 
             var result = await _authService.VerifyUserAsync(userVerifyDto);
 
-            if (result == null)
+            if (!result.Success)
             {
-                return BadRequest("Invalid OTP code.");
+                return BadRequest(new { success = false, message = result.Message });
             }
-            return Ok(result);
+
+            return Ok(new { success = true, message = result.Message });
         }
+
 
         // Register User
         [HttpPost("register")]

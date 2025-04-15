@@ -57,15 +57,26 @@ namespace backend.Repositories
 
         public async Task<(bool Success, string Message)> UpdatePendingUserAsync(PendingUser pendingUser)
         {
-            try {
-                await _context.PendingUsers
+            try
+            {
+                var affected = await _context.PendingUsers
                     .Where(u => u.Email == pendingUser.Email)
                     .ExecuteUpdateAsync(setters => setters
                         .SetProperty(u => u.VerificationCode, pendingUser.VerificationCode));
-                await _context.SaveChangesAsync();
-            } catch (Exception ex) {
+
+                if (affected > 0)
+                {
+                    return (true, "Pending user updated successfully.");
+                }
+                else
+                {
+                    return (false, "No pending user found to update.");
+                }
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine($"Error updating pending user: {ex.Message}");
-                throw new Exception("An error occurred while updating the pending user.", ex);
+                return (false, "An error occurred while updating the pending user.");
             }
         }
     }
