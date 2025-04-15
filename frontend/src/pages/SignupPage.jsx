@@ -9,12 +9,16 @@ import Stepper from '../components/Stepper';
 import logo from '../assets/logo.png';
 import { authApi } from '../api/auth/authApi';
 import Background from '../components/Background';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 const SignupPage = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [verificationSent, setVerificationSent] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
     const [formValues, setFormValues] = useState({
         name: '',
         email: '',
@@ -66,8 +70,14 @@ const SignupPage = () => {
             });
             console.log("gikan sa signbup", response)
             if (response.success) {
-                alert(response.message);
+                
                 setVerificationSent(true);
+                setShowAlert(true);
+
+                // auto-hide after 3 seconds
+                setTimeout(() => {
+                    setShowAlert(false);
+                }, 5000);
             } else {
                 alert('Failed to send verification email.');
             }
@@ -82,6 +92,7 @@ const SignupPage = () => {
     // Modified to handle case when formikBag might not be provided
     const handleSubmit = async (values, formikBag = {}) => {
         setIsLoading(true);
+ 
         try {
             console.log('Submitting values:', values);
             const response = await authApi.registerUser(values);
@@ -190,7 +201,21 @@ const SignupPage = () => {
                 );
                 case 4:
                     return (
+                        
                             <>
+                                {showAlert && (
+                                    <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-1/2 z-50 pt-10">
+                                    <Alert
+                                        variant="filled"
+                                        severity="success"
+                                        onClose={() => setShowAlert(false)}
+                                    >
+                                        Verification code sent to your email. Please check your inbox.
+                                    </Alert>
+                                    </div>
+                                )}
+
+
                                  <h1 className="text-3xl font-bold text-black-500 mb-4">
                                         Verify Your Email
                                 </h1>
