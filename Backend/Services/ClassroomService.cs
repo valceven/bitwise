@@ -20,6 +20,8 @@ namespace backend.Services
             {
                 ClassName = classroomDTO.ClassName,
                 TeacherId = classroomDTO.TeacherID,
+                Section = classroomDTO.Section,
+                Description = classroomDTO.Description,
                 ClassCode = CodeGenerator.GenerateClassCode(), // Generate a random class code
             };
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import Button from './buttons/PurpleButton';
-import Star from '../assets/Star.svg'; // Assuming you have a star image in your assets
+import Button from '../buttons/PurpleButton';
+import Star from '../../assets/Star.svg'; // Assuming you have a star image in your assets
 
 const JoinClassModal = ({ isOpen, onClose, title }) => {
   if (!isOpen) return null;

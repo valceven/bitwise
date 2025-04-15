@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import Modal from "../../components/JoinClassModal.jsx"; // Adjust the import path as necessary
+import CreateClassModal from "../../components/modals/CreateClassModal";
+import JoinClassModal from "../../components/modals/JoinClassModal";
 import plus_join from "../../assets/plus-join.svg";
 import { useUser } from "../../context/UserContext";
 
 const DashboardClassroom = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useUser();
+
+  console.log(user);
 
   const classrooms = [
     {
@@ -36,22 +39,22 @@ const DashboardClassroom = () => {
         <div className="w-full flex justify-between items-center">
           <h1 className="text-2xl font-bold">Classrooms</h1>
 
-          {user.usertype === 2 ? (
+          {user.userType === 2 ? (
             <button
-            Link="/createclass"
-            className="bg-greenz2 text-white px-6 py-2 joinclass-shadow text-sm font-semibold flex items-center space-x-4"
-          >
-            <div>Create</div>
-            <img src={plus_join} />
-          </button>
+              onClick={() => setIsModalOpen(true)}
+              className="bg-greenz2 text-white px-6 py-2 joinclass-shadow text-sm font-semibold flex items-center space-x-4"
+            >
+              <div>Create</div>
+              <img src={plus_join} />
+            </button>
           ) : (
             <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-greenz2 text-white px-6 py-2 joinclass-shadow text-sm font-semibold flex items-center space-x-4"
-          >
-            <div>Join</div>
-            <img src={plus_join} />
-          </button>
+              onClick={() => setIsModalOpen(true)}
+              className="bg-greenz2 text-white px-6 py-2 joinclass-shadow text-sm font-semibold flex items-center space-x-4"
+            >
+              <div>Join</div>
+              <img src={plus_join} />
+            </button>
           )}
         </div>
 
@@ -97,11 +100,22 @@ const DashboardClassroom = () => {
         </div>
       </div>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Join a Class"
-      />
+      {/* Conditionally render the appropriate modal based on user type */}
+      {user.userType === 2 ? (
+        <CreateClassModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Create a Class"
+          user={user}
+        />
+      ) : (
+        <JoinClassModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Join a Class"
+          user={user}
+        />
+      )}
     </>
   );
 };
