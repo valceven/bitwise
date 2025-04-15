@@ -8,9 +8,10 @@ namespace backend.Models
         [Key]
         public int ClassroomID { get; set; }
 
+        public int TeacherId { get; set; }
         [Required]
         [ForeignKey("TeacherId")]
-        public int TeacherId { get; set; }
+        public Teacher Teacher { get; set; } // Navigation property to Teacher
 
         [Required]
         [StringLength(25)]
@@ -22,9 +23,9 @@ namespace backend.Models
         public string ClassCode { get; set; } = string.Empty;
 
         // One-to-many: Classroom has many Students
-        public List<Student>? Students { get; set; } = new List<Student>();
+        public ICollection<StudentClassroom>? StudentClassrooms { get; set; }
 
         // One-to-many: Classroom has many Lessons (assuming Lesson model exists)
-        public List<Lesson>? Lessons { get; set; } = new List<Lesson>();
+        public List<Lesson>? Lessons { get; set; }
     }
 }

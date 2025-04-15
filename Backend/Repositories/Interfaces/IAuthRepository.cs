@@ -6,7 +6,7 @@ namespace backend.Repositories.Interfaces
     {
         Task<PendingUser> CreatePendingUserAsync(PendingUser pendingUser);
         Task<PendingUser?> GetPendingUserByEmailAsync(string email);
-        Task<(bool, string)> UpdatePendingUserAsync(PendingUser pendingUser);
+        Task<(bool Success, string Message)> UpdatePendingUserAsync(PendingUser pendingUser);
         Task<int> GetPendingUserVerificationCodeAsync(string email);
     }
 }

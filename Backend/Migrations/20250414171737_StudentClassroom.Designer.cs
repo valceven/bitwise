@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    partial class bitwiseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414171737_StudentClassroom")]
+    partial class StudentClassroom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -224,9 +227,6 @@ namespace backend.Migrations
                     b.Property<int>("ClassroomId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
@@ -358,21 +358,17 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.StudentClassroom", b =>
                 {
-                    b.HasOne("backend.Models.Classroom", "Classroom")
+                    b.HasOne("backend.Models.Classroom", null)
                         .WithMany("StudentClassrooms")
                         .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.Student", "Student")
-                        .WithMany("StudentClassrooms")
+                    b.HasOne("backend.Models.Student", null)
+                        .WithMany("StudentClassroom")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Classroom");
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("backend.Models.Teacher", b =>
@@ -409,7 +405,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Student", b =>
                 {
-                    b.Navigation("StudentClassrooms");
+                    b.Navigation("StudentClassroom");
                 });
 
             modelBuilder.Entity("backend.Models.Teacher", b =>

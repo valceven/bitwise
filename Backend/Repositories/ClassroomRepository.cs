@@ -3,6 +3,7 @@ using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.Data;
 using backend.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories
 {
@@ -33,5 +34,47 @@ namespace backend.Repositories
                 throw new Exception("An error occurred while creating the classroom.", ex);
             }
         }
+
+        public async Task<Classroom?> GetClassroomByIdAsync(string classCode)
+        {
+            try
+            {
+                return await _context.Classrooms
+                    .Include(c => c.StudentClassrooms)
+                    .FirstOrDefaultAsync(c => c.ClassCode == classCode);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting classroom: {ex.Message}");
+                throw new Exception("An error occurred while getting the classroom.", ex);
+            }
+        }
+        public async Task<User?> GetUserByIdAsync(int StudentId)
+        {
+            try
+            {
+                return await _context.Users.FirstOrDefaultAsync(u => u.UserId == StudentId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting user: {ex.Message}");
+                throw new Exception("An error occurred while getting the user.", ex);
+            }
+        }
+        public async Task SaveAsync()
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving changes: {ex.Message}");
+                throw new Exception("An error occurred while saving changes.", ex);
+            }
+        }
+
+    
+        
     }
 }

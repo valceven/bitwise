@@ -27,10 +27,11 @@ namespace backend.Presentation
 
             var result = await _authService.VerifyUserAsync(userVerifyDto);
 
-            if (result == null)
+            if (!result.Success)
             {
                 return BadRequest("Invalid OTP code.");
             }
+            
             return Ok(result);
         }
 

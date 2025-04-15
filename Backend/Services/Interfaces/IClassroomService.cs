@@ -4,6 +4,7 @@ namespace backend.Services.Interfaces
 {
     public interface IClassroomService
     {
-        Task<Classroom> CreateClassroomAsync(CreateClassroomDTO classroomDTO);
+        Task<Classroom> CreateClassroomAsync(CreateClassroomDto classroomDto);
+        Task<string> RequestToJoinClassroomAsync(int studentId, string classCode);
     }
 }
