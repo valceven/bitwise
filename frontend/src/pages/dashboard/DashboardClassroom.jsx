@@ -4,6 +4,11 @@ import JoinClassModal from "../../components/modals/JoinClassModal";
 import plus_join from "../../assets/plus-join.svg";
 import { useUser } from "../../context/UserContext";
 import { teacherApi } from "../../api/teacher/teacherApi";
+import { FiCopy } from 'react-icons/fi';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Link } from "react-router-dom";
+
 
 const DashboardClassroom = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,10 +20,8 @@ const DashboardClassroom = () => {
   useEffect(() => {
     const fetchClassrooms = async () => {
       try {
-        console.log(user.userID);
         const response = await teacherApi.fetchClassroomList(user.userID);
         setClassrooms(response);
-        console.log(classrooms);
       } catch (error) {
         console.error("Error fetching classrooms:", error.message);
       }
@@ -29,8 +32,8 @@ const DashboardClassroom = () => {
 
   return (
     <>
-      <div className="flex flex-col w-full space-y-6">
-        <div className="w-full flex justify-between items-center">
+      <div className="flex flex-col items-center justify-center w-full space-y-6">
+        <div className="w-9/10 flex justify-between items-center">
           <h1 className="text-2xl font-bold">Classrooms</h1>
 
           {user.userType === 2 ? (
@@ -54,42 +57,53 @@ const DashboardClassroom = () => {
 
         <div className="flex flex-wrap justify-center gap-4">
           {classrooms.map((classroom) => (
-            <div
+            <Link
+              to={classroom.classCode}
               key={classroom.className}
-              className="max-w-sm p-6 bg-white border border-black rounded-lg flex flex-col justify-between"
+              title={classroom.classCode}
+              className="w-86 h-50 p-6 bg-white border border-black rounded-lg flex flex-col justify-between hover:shadow-lg transition-shadow duration-300 ease-in-out"
             >
               <div>
-                <a href="#">
-                  <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">
-                    {classroom.title}
-                  </h5>
-                </a>
-                <p className="mb-3 font-normal text-gray-700">
+                  <div className="flex flex-row">  
+                    <div className="flex flex-col mb-3">
+                      <h5 className="text-2xl font-bold tracking-tight text-gray-900">
+                        {classroom.className}
+                      </h5>
+                      <div className="flex flex-row space-x-2 items-center text-sm">
+                      <p className="text-sm">
+                          {new Date(classroom.createdAt).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </p>
+                        <p>•</p>
+                        <p className="text-sm">{classroom.section}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-top space-x-4 ml-auto z-50">
+                      <span className="h-4 mt-2 items-center text-xs addgrotesk font-mono text-gray-800">{classroom.classCode}</span>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(classroom.classCode);
+                          toast.success('Class code copied!', { position: 'bottom-right', autoClose: 1500 });
+                        }}
+                        className="h-min p-1 hover:bg-gray-200 rounded transition"
+                        title="Copy class code"
+                        >
+                        <FiCopy className="text-gray-600 w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+                <p className="mb-3 font-normal text-sm text-gray-700 line-clamp-5">
                   {classroom.description}
                 </p>
               </div>
-              <a
-                href="#"
-                className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-black rounded-lg hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-blue-300 w-maxx"
-              >
-                View Classroom
-                <svg
-                  className="rtl:rotate-180 w-3.5 h-3.5 ms-2"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 14 10"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M1 5h12m0 0L9 1m4 4L9 9"
-                  />
-                </svg>
-              </a>
-            </div>
+              <ToastContainer toastClassName="border shadow-none text-black" bodyClassName="text-xs font-medium"/>
+            </Link>
           ))}
         </div>
       </div>

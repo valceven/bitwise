@@ -12,7 +12,7 @@ const createClassroom = async (classroomData) => {
 const fetchClassroomList = async (id) => {
   try {
     const response = await apiService.get("/classroom", {
-      params: { id }
+      params: { teacherID: id }
     });
     console.log(response);
     return response.data;
