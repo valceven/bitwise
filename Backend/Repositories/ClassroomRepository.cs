@@ -3,6 +3,8 @@ using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.Data;
 using backend.Services;
+using backend.DTOs.Classroom;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories
 {
@@ -31,6 +33,19 @@ namespace backend.Repositories
             {
                 Console.WriteLine($"Error creating classroom: {ex.Message}");
                 throw new Exception("An error occurred while creating the classroom.", ex);
+            }
+        }
+
+        public async Task<List<Classroom>> GetClassroomAsync(int teacherID)
+        {
+
+            try {
+                return await _context.Classrooms
+                .Where(c => c.TeacherId == teacherID)
+                .ToListAsync();
+            } catch (Exception ex) {
+                Console.WriteLine($"Error fetching classroom: {ex.Message}");
+                throw new Exception("An error occured while creating the classroom.", ex);
             }
         }
     }

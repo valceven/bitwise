@@ -1,37 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CreateClassModal from "../../components/modals/CreateClassModal";
 import JoinClassModal from "../../components/modals/JoinClassModal";
 import plus_join from "../../assets/plus-join.svg";
 import { useUser } from "../../context/UserContext";
+import { teacherApi } from "../../api/teacher/teacherApi";
 
 const DashboardClassroom = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [classrooms, setClassrooms] = useState([]);
   const { user } = useUser();
 
   console.log(user);
 
-  const classrooms = [
-    {
-      id: 1,
-      title: "Math 101",
-      description: "Basic algebra and geometry fundamentals.",
-    },
-    {
-      id: 2,
-      title: "History of Art",
-      description: "Explore art through the ages and major movements.",
-    },
-    {
-      id: 3,
-      title: "Computer Science",
-      description: "Learn programming, data structures, and algorithms.",
-    },
-    {
-      id: 4,
-      title: "Biology",
-      description: "Understand the science of living organisms.",
-    },
-  ];
+  useEffect(() => {
+    const fetchClassrooms = async () => {
+      try {
+        console.log(user.userID);
+        const response = await teacherApi.fetchClassroomList(user.userID);
+        setClassrooms(response);
+        console.log(classrooms);
+      } catch (error) {
+        console.error("Error fetching classrooms:", error.message);
+      }
+    };
+
+    if (user?.userID) fetchClassrooms();
+  }, [user]);
 
   return (
     <>
@@ -61,7 +55,7 @@ const DashboardClassroom = () => {
         <div className="flex flex-wrap justify-center gap-4">
           {classrooms.map((classroom) => (
             <div
-              key={classroom.id}
+              key={classroom.className}
               className="max-w-sm p-6 bg-white border border-black rounded-lg flex flex-col justify-between"
             >
               <div>

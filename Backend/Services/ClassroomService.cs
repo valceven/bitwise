@@ -2,6 +2,7 @@ using backend.DTOs.Classroom;
 using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.Services.Interfaces;
+using backend.DTOs;
 
 namespace backend.Services
 {
@@ -26,6 +27,23 @@ namespace backend.Services
             };
 
             return await _classroomRepository.CreateClassroomAsync(classroom);
+        }
+
+        public async Task<List<ClassroomResponseDTO>> GetClassroomAsync(int teacherID)
+        {
+            var classrooms = await _classroomRepository.GetClassroomAsync(teacherID);
+            
+            var classroomResponseDtos = classrooms.Select(classroom => new ClassroomResponseDTO
+            {
+                ClassName = classroom.ClassName,
+                CreatedAt = classroom.CreatedAt,
+                TeacherID = classroom.TeacherId,
+                ClassCode = classroom.ClassCode,
+                Section = classroom.Section,
+                Description = classroom.Description
+            }).ToList();
+
+            return classroomResponseDtos;
         }
     }
 

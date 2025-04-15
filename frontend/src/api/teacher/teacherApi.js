@@ -9,8 +9,19 @@ const createClassroom = async (classroomData) => {
   }
 };
 
-// const fetchClassroomList;
+const fetchClassroomList = async (id) => {
+  try {
+    const response = await apiService.get("/classroom", {
+      params: { id }
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+};
 
 export const teacherApi = {
   createClassroom,
+  fetchClassroomList
 };
