@@ -10,7 +10,7 @@ const JoinClassModal = ({ isOpen, onClose, title }) => {
  
   const validationSchema = Yup.object({
     classCode: Yup.string()
-      .matches(/^[A-Z0-9]{3}-[A-Z0-9]{3}-[A-Z0-9]{3}$/, 'Invalid code format (e.g., XXX-XXX-XXX)')
+      .matches(/^[A-Z0-9]{6}$/, 'Invalid code format (e.g., XXX-XXX-XXX)')
       .required('Class code is required'),
   });
 

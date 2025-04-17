@@ -33,10 +33,10 @@ const CreateClassModal = ({ isOpen, onClose, title, user }) => {
   
   return (
     <div className="fixed inset-0 modal-overlay flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full relative">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full relative border">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-xl"
         >
           ×
         </button>
@@ -48,7 +48,7 @@ const CreateClassModal = ({ isOpen, onClose, title, user }) => {
           <h2 className="text-2xl font-bold">{title}</h2>
         </div>
         
-        <p className="text-gray-600 mb-6 text-center">
+        <p className="text-gray-600 mb-6 text-center text-sm">
           Create a new class for your students. Fill in the details below to get started.
         </p>
         
@@ -67,8 +67,8 @@ const CreateClassModal = ({ isOpen, onClose, title, user }) => {
                   id="className"
                   name="className"
                   type="text"
-                  placeholder="CS-132"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+                  placeholder="Enter class name (e.g. CS-132, CSIT-122..)"
+                  className="mt-1 px-2 py-1 text-sm border block w-full rounded-md border-gray-300 focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
                 />
                 <ErrorMessage name="className" component="div" className="text-red-500 text-sm mt-1" />
               </div>
@@ -82,7 +82,7 @@ const CreateClassModal = ({ isOpen, onClose, title, user }) => {
                   name="section"
                   type="text"
                   placeholder="Enter section (e.g. F1, F2, F3..)"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+                  className="mt-1 px-2 py-1 text-sm border block w-full rounded-sm border-gray-300 focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
                 />
                 <ErrorMessage name="section" component="div" className="text-red-500 text-sm mt-1" />
               </div>
@@ -97,7 +97,7 @@ const CreateClassModal = ({ isOpen, onClose, title, user }) => {
                   as="textarea"
                   rows="3"
                   placeholder="Enter class description"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
+                  className="mt-1 px-2 py-1 text-sm border block w-full rounded-sm border-gray-300 focus:border-purple-500 focus:ring focus:ring-purple-500 focus:ring-opacity-50"
                 />
                 <ErrorMessage name="description" component="div" className="text-red-500 text-sm mt-1" />
               </div>
