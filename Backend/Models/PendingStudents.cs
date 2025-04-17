@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models
 {
-    public class StudentClassroom
+    public class PendingStudents
     {
         [Key]
-        public int StudentClassroomId { get; set; }
+        public int PendingId {get; set;}
 
         [Required]
         [ForeignKey("Student")]
@@ -15,8 +15,7 @@ namespace backend.Models
         [Required]
         [ForeignKey("Classroom")]
         public int ClassroomId { get; set; }
-        
-        public string ClassCode { get; set; } = string.Empty;
 
+        public string ClassCode { get; set; }
     }
 }

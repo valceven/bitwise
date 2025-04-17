@@ -1,24 +1,23 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link, useLocation } from "react-router-dom";
-import NavLogo from "../assets/nav-bar-logo-black.svg";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import LogoIcon from "../assets/icon-logo-sidebar.svg";
+import NavLogo from "../assets/nav-bar-logo-black.svg";
 
-import HomeWhite from "../assets/home-icon.svg";
-import HomeBlack from "../assets/home-black.svg";
-import ClassroomIconWhite from "../assets/classroom-icon.svg";
-import StudentReportIconWhite from "../assets/student-report-icon.svg";
-import ClassroomIconBlack from "../assets/classroom-icon-black.svg";
-import StudentReportIconBlack from "../assets/student-report-icon-black.svg";
-import Sidebar from "../assets/bx_sidebar.svg";
 import Bell from "../assets/bell-icon.svg";
-import RightArrow from "../assets/chevron-right-white.svg";
+import Sidebar from "../assets/bx_sidebar.svg";
+import ClassroomIconBlack from "../assets/classroom-icon-black.svg";
+import ClassroomIconWhite from "../assets/classroom-icon.svg";
+import HomeBlack from "../assets/home-black.svg";
+import HomeWhite from "../assets/home-icon.svg";
+import StudentReportIconBlack from "../assets/pie-chart-black.svg";
+import StudentReportIconWhite from "../assets/pie-chart-white.svg";
+import PendingStudentIconBlack from "../assets/student-report-icon-black.svg";
+import PendingStudentIconWhite from "../assets/student-report-icon.svg";
 import { useUser } from "../context/UserContext";
-import Button from "./buttons/PurpleButton";
 
 const DashboardSidebar = (user) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [hovered, setHovered] = useState("");
+  const [setHovered] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   
   const { logoutUser } = useUser();
@@ -51,7 +50,6 @@ const DashboardSidebar = (user) => {
           {/* Home */}
           {(() => {
             const isActive = currentPath === "/app" || currentPath === "/app/";
-            const isHovered = hovered === "home";
             return (
               <Link
                 to="/app"
@@ -59,14 +57,14 @@ const DashboardSidebar = (user) => {
                 onMouseLeave={() => setHovered("")}
                 className={`flex items-center py-2 px-3 rounded-md text-xs whitespace-nowrap overflow-hidden text-ellipsis border-black border-0
                   ${
-                    isHovered || isActive
+                    isActive
                       ? "bg-bluez text-white border-2"
-                      : "hover:bg-bluez hover:text-white hover:border-2"
+                      : "hover:bg-gray-200"
                   }
                 `}
               >
                 <img
-                  src={isHovered || isActive ? HomeWhite : HomeBlack}
+                  src={isActive ? HomeWhite : HomeBlack}
                   alt="Home"
                   className="h-5 w-5"
                 />
@@ -78,7 +76,6 @@ const DashboardSidebar = (user) => {
           {/* Classroom */}
           {(() => {
             const isActive = currentPath.includes("/classroom");
-            const isHovered = hovered === "classroom";
             return (
               <Link
                 to="classroom"
@@ -86,15 +83,15 @@ const DashboardSidebar = (user) => {
                 onMouseLeave={() => setHovered("")}
                 className={`flex items-center py-2 px-3 rounded-md text-xs whitespace-nowrap overflow-hidden text-ellipsis border-black border-0
                   ${
-                    isHovered || isActive
+                    isActive
                       ? "bg-bluez text-white border-2"
-                      : "hover:bg-bluez hover:text-white hover:border-2"
+                      : "hover:bg-gray-200"
                   }
                 `}
               >
                 <img
                   src={
-                    isHovered || isActive
+                    isActive
                       ? ClassroomIconWhite
                       : ClassroomIconBlack
                   }
@@ -109,7 +106,6 @@ const DashboardSidebar = (user) => {
           {/* Student Report */}
           {(() => {
             const isActive = currentPath.includes("/student-report");
-            const isHovered = hovered === "student-report";
             return (
               <Link
                 to="student-report"
@@ -117,15 +113,15 @@ const DashboardSidebar = (user) => {
                 onMouseLeave={() => setHovered("")}
                 className={`flex items-center py-2 px-3 rounded-md text-xs whitespace-nowrap overflow-hidden text-ellipsis border-black border-0
                   ${
-                    isHovered || isActive
+                    isActive
                       ? "bg-bluez text-white border-2"
-                      : "hover:bg-bluez hover:text-white hover:border-2"
+                      : "hover:bg-gray-200"
                   }
                 `}
               >
                 <img
                   src={
-                    isHovered || isActive
+                    isActive
                       ? StudentReportIconWhite
                       : StudentReportIconBlack
                   }
@@ -133,6 +129,36 @@ const DashboardSidebar = (user) => {
                   className="h-5 w-5"
                 />
                 {isOpen && <span className="ml-3">Student Report</span>}
+              </Link>
+            );
+          })()}
+
+          {/* Student Pending */}
+          {(() => {
+            const isActive = currentPath.includes("/pending");
+            return (
+              <Link
+                to="pending"
+                onMouseEnter={() => setHovered("pending")}
+                onMouseLeave={() => setHovered("")}
+                className={`flex items-center py-2 px-3 rounded-md text-xs whitespace-nowrap overflow-hidden text-ellipsis border-black border-0
+                  ${
+                    isActive
+                      ? "bg-bluez text-white border-2"
+                      : "hover:bg-gray-200"
+                  }
+                `}
+              >
+                <img
+                  src={
+                    isActive
+                      ? PendingStudentIconWhite
+                      : PendingStudentIconBlack
+                  }
+                  alt="Pending Students"
+                  className="h-5 w-5"
+                />
+                {isOpen && <span className="ml-3">Pending Join</span>}
               </Link>
             );
           })()}

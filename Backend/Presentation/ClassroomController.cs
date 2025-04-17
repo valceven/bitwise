@@ -1,7 +1,6 @@
 namespace backend.Controllers
 {
     using backend.DTOs.Classroom;
-    using backend.Models;
     using backend.Services.Interfaces;
     using Microsoft.AspNetCore.Mvc;
 
