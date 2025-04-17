@@ -1,18 +1,17 @@
 import React from 'react';
 import { Line } from 'rc-progress';
 import Star from '../../assets/Star.svg';
-import LessonCard from '../../components/LessonCard';
+import LessonCard from '../../components/TopicCard';
+import Button from '../../components/buttons/PurpleButton';
 
 const LessonView = () => {
-    return (
-        <div className='h-full pb-16'>
-       
-            <div className='p-4'>
-                <Line percent={5} strokeWidth={1} strokeColor="#27ae60" />
-            </div>
-            
-            <LessonCard></LessonCard>
+    // const { lessonid } = useParams();
 
+    return (
+        <div className='flex-col justify-center items-center h-full pb-16'>
+       
+            
+            <h1>This is the lessonview</h1>
         
         
         </div>
