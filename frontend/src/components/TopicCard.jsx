@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 
-export default function LessonCard() {
+export default function TopicCard() {
   const [isOpen, setIsOpen] = useState(true);
 
   return (

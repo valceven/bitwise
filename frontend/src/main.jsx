@@ -18,6 +18,7 @@ import DashboardLayout from "./components/DashboardLayout.jsx";
 import DashboardPending from "./pages/dashboard/DashboardPending.jsx";
 import ClassroomView from "./pages/dashboard/ClassroomView.jsx";
 import LessonView from "./pages/dashboard/LessonView.jsx";
+import TopicView from "./pages/dashboard/TopicView.jsx";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
       { path: "profile/:userid", element: <ProfilePage /> },
       { path: "classroomview", element: <ClassroomView /> },
       { path: "lessonview", element: <LessonView /> },
+      { path: "topicview", element: <TopicView /> },
     ],
   },
 ]);
