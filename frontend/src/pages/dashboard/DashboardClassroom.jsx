@@ -32,7 +32,7 @@ const DashboardClassroom = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center w-full space-y-6">
+      <div className="flex flex-col items-center w-full space-y-6">
         {user.userType === 2 ? (
           <>
             {/* Header for Teachers */}
