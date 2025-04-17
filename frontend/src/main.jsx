@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { UserProvider } from "./context/UserContext";
-import "./styles/index.css"; 
+import "./styles/index.css";
 
 import Layout from "./components/Layout.jsx";
 import HomePage from "./pages/Home.jsx";
@@ -13,8 +13,9 @@ import SignupPage from "./pages/SignupPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
 import DashboardClassroom from "./pages/dashboard/DashboardClassroom.jsx";
-import DashboardTopics from "./pages/dashboard/DashboardTopics.jsx";
+import DashboardStudentReport from "./pages/dashboard/DashboardStudentReport.jsx";
 import DashboardLayout from "./components/DashboardLayout.jsx";
+import DashboardPending from "./pages/dashboard/DashboardPending.jsx";
 import ClassroomView from "./pages/dashboard/ClassroomView.jsx";
 import LessonView from "./pages/dashboard/LessonView.jsx";
 
@@ -46,8 +47,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardHome /> },
       { path: "classroom", element: <DashboardClassroom /> },
-      { path: "topics", element: <DashboardTopics /> },
-      { path: "student-report", element: <DashboardTopics /> },
+      { path: "student-report", element: <DashboardStudentReport /> },
+      { path: "pending", element: <DashboardPending /> },
       { path: "profile/:userid", element: <ProfilePage /> },
       { path: "classroomview", element: <ClassroomView /> },
       { path: "lessonview", element: <LessonView /> },
