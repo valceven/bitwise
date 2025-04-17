@@ -10,22 +10,18 @@ const DashboardClassroom = () => {
   const [classrooms, setClassrooms] = useState([]);
   const { user } = useUser();
 
-  console.log(user);
-
   useEffect(() => {
     const fetchClassrooms = async () => {
       try {
-        console.log(user.userID);
         const response = await teacherApi.fetchClassroomList(user.userID);
         setClassrooms(response);
-        console.log(classrooms);
       } catch (error) {
         console.error("Error fetching classrooms:", error.message);
       }
     };
 
     if (user?.userID) fetchClassrooms();
-  }, [user]);
+  }, []);
 
   return (
     <>
