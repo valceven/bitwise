@@ -22,7 +22,19 @@ const fetchClassroomList = async (id) => {
   }
 };
 
+const fetchPendingStudents = async (id) => {
+  try {
+    const response = await apiService.get("teacher", {
+      params: {teacherId : id}
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+}
+
 export const teacherApi = {
   createClassroom,
-  fetchClassroomList
+  fetchClassroomList,
+  fetchPendingStudents
 };

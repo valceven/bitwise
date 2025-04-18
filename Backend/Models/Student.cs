@@ -14,12 +14,6 @@ namespace backend.Models
         [Column(TypeName = "text")]
         public string StudentIdNumber { get; set; }
 
-        // Optional many-to-one relationship: Student may belong to a Classroom
-        public int? ClassroomId { get; set; }
-
-        [ForeignKey("ClassroomId")]
-        public Classroom? Classroom { get; set; }
-
         // Navigation property to User
         public User User { get; set; }
     }

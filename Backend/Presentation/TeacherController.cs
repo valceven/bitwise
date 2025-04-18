@@ -17,7 +17,7 @@ namespace backend.Presentation
         }
 
         [HttpPost("accept-student")]
-       public async Task<IActionResult> AcceptStudent([FromBody] AcceptStudentDto acceptStudentDto)
+        public async Task<IActionResult> AcceptStudent([FromBody] AcceptStudentDto acceptStudentDto)
         {
             if (acceptStudentDto == null)
             {
@@ -57,6 +57,19 @@ namespace backend.Presentation
                     error = ex.Message
                 });
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FetchPendingStudents([FromQuery] FetchPendingStudentsDto fetchPendingStudentsDto)
+        {
+            var result = await _teacherService.FetchPendingStudentsAsync(fetchPendingStudentsDto);
+
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
         }
     }
 }

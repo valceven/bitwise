@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using backend.DTOs.Teacher;
+using backend.Repositories.Interfaces;
 using backend.Services.Interfaces;
 
 namespace backend.Services
@@ -10,9 +7,13 @@ namespace backend.Services
     public class TeacherService : ITeacherService
     {
         private readonly ITeacherRepository _teacherRepository;
-        public TeacherService(ITeacherRepository teacherRepository)
+        private readonly IPendingStudentRepository _pendingStudentRepository;
+        public TeacherService(
+            ITeacherRepository teacherRepository,
+            IPendingStudentRepository pendingStudentRepository)
         {
             _teacherRepository = teacherRepository;
+            _pendingStudentRepository = pendingStudentRepository;
         }
 
         public async Task<bool> AcceptStudentAsync(AcceptStudentDto dto)
@@ -24,5 +25,26 @@ namespace backend.Services
         {
             return await _teacherRepository.RejectStudentAsync(dto);
         }
+
+        public async Task<List<FetchPendingStudentsResponseDto>> FetchPendingStudentsAsync(FetchPendingStudentsDto fetchPendingStudentsDto)
+        {
+            int teacherId = fetchPendingStudentsDto.TeacherId;
+
+            var groupedData = await _pendingStudentRepository.FetchPendingStudentsGroupedByClassroomAsync(teacherId);
+
+            var response = groupedData.Select(group => new FetchPendingStudentsResponseDto
+            {
+                ClassName = group.classroom.ClassName,
+                PendingStudents = group.pending.Select(p => new PendingStudentDto
+                {
+                    StudentId = p.Student.User.UserId,
+                    Name = p.Student.User.Name,
+                    Email = p.Student.User.Email,
+                }).ToList()
+            }).ToList();
+
+            return response;
+        }
+
     }
 }
