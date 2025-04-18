@@ -14,8 +14,6 @@ namespace backend.Models
         [Column(TypeName = "text")]
         public string StudentIdNumber { get; set; }
 
-        public ICollection<StudentClassroom> StudentClassrooms { get; set; } 
-
         // Navigation property to User
         public User User { get; set; }
     }

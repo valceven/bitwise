@@ -33,9 +33,9 @@ const LoginForm = () => {
       const response = await authApi.loginUser(values);
       
       if (response) {
-        console.log("Logging in and navigating to /profile");
+        console.log("Logging in and navigating to profile", response);
         loginUser(response);
-        //navigate("/user/profile/" + response.userID);
+        navigate("/user/profile/" + response.userID);
       }
     } catch (error) {
       console.error("Error during form submission:", error);

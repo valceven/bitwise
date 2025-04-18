@@ -6,5 +6,6 @@ namespace backend.Services.Interfaces
     {
         Task<bool> AcceptStudentAsync(AcceptStudentDto dto);
         Task<bool> RejectStudentAsync(AcceptStudentDto dto);
+        Task<List<FetchPendingStudentsResponseDto>> FetchPendingStudentsAsync(FetchPendingStudentsDto fetchPendingStudentsDto);
     }
 }

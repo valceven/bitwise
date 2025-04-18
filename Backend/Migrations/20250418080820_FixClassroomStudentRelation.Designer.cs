@@ -12,8 +12,8 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    [Migration("20250409185223_Initial Creation")]
-    partial class InitialCreation
+    [Migration("20250418080820_FixClassroomStudentRelation")]
+    partial class FixClassroomStudentRelation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,6 +60,10 @@ namespace backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClassroomID"));
 
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("ClassName")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -68,8 +72,13 @@ namespace backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("TeacherID")
-                        .HasColumnType("integer");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Section")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("TeacherId")
                         .HasColumnType("integer");
@@ -180,12 +189,54 @@ namespace backend.Migrations
                     b.ToTable("Lessons");
                 });
 
-            modelBuilder.Entity("backend.Models.Student", b =>
+            modelBuilder.Entity("backend.Models.PendingStudents", b =>
                 {
+                    b.Property<int>("PendingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PendingId"));
+
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ClassroomId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ClassroomId")
+                    b.HasKey("PendingId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("PendingStudents");
+                });
+
+            modelBuilder.Entity("backend.Models.PendingUser", b =>
+                {
+                    b.Property<int>("PendingUserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PendingUserId"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("VerificationCode")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PendingUserId");
+
+                    b.ToTable("PendingUsers");
+                });
+
+            modelBuilder.Entity("backend.Models.Student", b =>
+                {
+                    b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
                     b.Property<string>("StudentIdNumber")
@@ -195,9 +246,30 @@ namespace backend.Migrations
 
                     b.HasKey("StudentId");
 
-                    b.HasIndex("ClassroomId");
-
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("backend.Models.StudentClassroom", b =>
+                {
+                    b.Property<int>("StudentClassroomId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StudentClassroomId"));
+
+                    b.Property<string>("ClassCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ClassroomId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("StudentClassroomId");
+
+                    b.ToTable("StudentClassrooms");
                 });
 
             modelBuilder.Entity("backend.Models.Teacher", b =>
@@ -288,13 +360,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
-                    b.HasOne("backend.Models.Teacher", "Teacher")
+                    b.HasOne("backend.Models.Teacher", null)
                         .WithMany("Classrooms")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("backend.Models.Lesson", b =>
@@ -306,19 +376,24 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("backend.Models.PendingStudents", b =>
+                {
+                    b.HasOne("backend.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("backend.Models.Student", b =>
                 {
-                    b.HasOne("backend.Models.Classroom", "Classroom")
-                        .WithMany("Students")
-                        .HasForeignKey("ClassroomId");
-
                     b.HasOne("backend.Models.User", "User")
                         .WithOne("Student")
                         .HasForeignKey("backend.Models.Student", "StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Classroom");
 
                     b.Navigation("User");
                 });
@@ -346,8 +421,6 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
                     b.Navigation("Lessons");
-
-                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("backend.Models.Lesson", b =>

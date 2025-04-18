@@ -22,7 +22,39 @@ const fetchClassroomList = async (id) => {
   }
 };
 
+const fetchPendingStudents = async (id) => {
+  try {
+    const response = await apiService.get("teacher", {
+      params: {teacherId : id}
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+}
+
+const acceptPendingStudent = async (data) => {
+  try {
+    const response = await apiService.post("teacher/accept-student", data);
+    console.log(response.data);
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occured";
+  }
+}
+
+const rejectPendingStudent = async (data) => {
+  try {
+    const response = await apiService.post("teacher/reject-student", data);
+    console.log(response.data);
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occured";
+  }
+}
+
 export const teacherApi = {
   createClassroom,
-  fetchClassroomList
+  fetchClassroomList,
+  fetchPendingStudents,
+  acceptPendingStudent,
+  rejectPendingStudent
 };

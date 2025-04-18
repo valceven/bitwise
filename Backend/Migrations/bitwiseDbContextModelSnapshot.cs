@@ -242,6 +242,8 @@ namespace backend.Migrations
 
                     b.HasKey("PendingId");
 
+                    b.HasIndex("StudentId");
+
                     b.ToTable("PendingStudents");
                 });
 
@@ -270,9 +272,12 @@ namespace backend.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
+<<<<<<< HEAD
                     b.Property<int?>("ClassroomID")
                         .HasColumnType("integer");
 
+=======
+>>>>>>> origin/main
                     b.Property<string>("StudentIdNumber")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -280,8 +285,11 @@ namespace backend.Migrations
 
                     b.HasKey("StudentId");
 
+<<<<<<< HEAD
                     b.HasIndex("ClassroomID");
 
+=======
+>>>>>>> origin/main
                     b.ToTable("Students");
                 });
 
@@ -438,12 +446,26 @@ namespace backend.Migrations
                         .HasForeignKey("ClassroomID");
                 });
 
+            modelBuilder.Entity("backend.Models.PendingStudents", b =>
+                {
+                    b.HasOne("backend.Models.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("backend.Models.Student", b =>
                 {
+<<<<<<< HEAD
                     b.HasOne("backend.Models.Classroom", null)
                         .WithMany("Students")
                         .HasForeignKey("ClassroomID");
 
+=======
+>>>>>>> origin/main
                     b.HasOne("backend.Models.User", "User")
                         .WithOne("Student")
                         .HasForeignKey("backend.Models.Student", "StudentId")
@@ -485,8 +507,6 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
                     b.Navigation("Lessons");
-
-                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("backend.Models.Lesson", b =>

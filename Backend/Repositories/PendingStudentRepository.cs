@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using backend.Data;
 using backend.DTOs.Student;
+using backend.DTOs.Teacher;
 using backend.Models;
 using backend.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,7 @@ namespace backend.Repositories
                     };
                 }
 
+
                 pendingStudents.ClassroomId = classroom.ClassroomID;
 
                 await _context.PendingStudents.AddAsync(pendingStudents);
@@ -72,6 +74,29 @@ namespace backend.Repositories
                 };
             }
         }
+
+        public async Task<List<(Classroom classroom, List<PendingStudents> pending)>> FetchPendingStudentsGroupedByClassroomAsync(int teacherId)
+        {
+            var classrooms = await _context.Classrooms
+                .Where(c => c.TeacherId == teacherId)
+                .ToListAsync();
+
+            var result = new List<(Classroom, List<PendingStudents>)>();
+
+            foreach (var classroom in classrooms)
+            {
+                var pendingStudents = await _context.PendingStudents
+                    .Where(p => p.ClassroomId == classroom.ClassroomID)
+                    .Include(p => p.Student)
+                        .ThenInclude(s => s.User)
+                    .ToListAsync();
+
+                result.Add((classroom, pendingStudents));
+            }
+
+            return result;
+        }
+
 
     }
 }
