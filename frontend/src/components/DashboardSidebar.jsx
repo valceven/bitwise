@@ -16,7 +16,7 @@ import PendingStudentIconWhite from "../assets/student-report-icon.svg";
 import { useUser } from "../context/UserContext";
 
 const DashboardSidebar = (user) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [setHovered] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   
@@ -33,7 +33,7 @@ const DashboardSidebar = (user) => {
   const currentPath = location.pathname;
 
   return (
-    <div className="flex">
+    <div className="flex z-50">
       <div className="absolute top-6 left-4 z-20">
         <img
           src={isOpen ? NavLogo : LogoIcon}
@@ -44,7 +44,7 @@ const DashboardSidebar = (user) => {
       <div
         className={`${
           isOpen ? "w-42" : "w-16"
-        } h-screen bg-gray-100 transition-all duration-300 flex flex-col pt-16`}
+        } h-screen  transition-all duration-300 flex flex-col pt-16`}
       >
         <nav className="mt-4 flex flex-col space-y-2 px-2">
           {/* Home */}
@@ -168,13 +168,13 @@ const DashboardSidebar = (user) => {
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative w-10 h-10 text-sm m-2 px-2 py-1 rounded hover:bg-gray-100"
+        className="relative w-10 h-10 text-sm mt-4 px-2 py-1 rounded hover:bg-gray-100 z-50"
       >
         <img src={Sidebar} />
       </button>
 
-      <div className="absolute top-4 right-14 flex items-center space-x-4">
-        <img src={Bell} />
+      <div className="bg-white w-full absolute flex items-center p-4 px-6 space-x-4">
+        <img src={Bell} className="ml-auto"/>
         <div className="h-8 w-8 bg-gray-300 rounded-full"></div>
 
         <div

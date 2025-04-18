@@ -21,7 +21,7 @@ const DashboardLayout = () => {
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar user={user}/>
-      <div className="mt-24 w-full pr-14 flex justify-center">
+      <div className="w-full mt-24 flex justify-center">
       <Outlet />
       </div>
     </div>

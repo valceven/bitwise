@@ -63,7 +63,7 @@ const DashboardPending = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center w-full space-y-6 overflow-y-auto max-h-[80vh] pt-96 px-20">
+    <div className="flex flex-col justify-center w-full px-24 space-y-6 overflow-y-auto max-h-[80vh] pt-96">
       {classrooms.map((cls, classIndex) => {
         const isAllSelected = cls.selectedStudents.length === cls.students.length;
 
