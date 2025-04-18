@@ -2,6 +2,7 @@ using backend.DTOs.Classroom;
 using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.Services.Interfaces;
+using backend.DTOs;
 
 namespace backend.Services
 {
@@ -14,52 +15,36 @@ namespace backend.Services
             _classroomRepository = classroomRepository;
         }
 
-        public async Task<Classroom> CreateClassroomAsync(CreateClassroomDto classroomDto)
+        public async Task<Classroom> CreateClassroomAsync(CreateClassroomDTO classroomDTO)
         {   
             var classroom = new Classroom
             {
-                ClassName = classroomDto.ClassName,
-                TeacherId = classroomDto.TeacherID,
+                ClassName = classroomDTO.ClassName,
+                TeacherId = classroomDTO.TeacherID,
+                Section = classroomDTO.Section,
+                Description = classroomDTO.Description,
                 ClassCode = CodeGenerator.GenerateClassCode(), // Generate a random class code
             };
 
             return await _classroomRepository.CreateClassroomAsync(classroom);
         }
 
-        public async Task<string> RequestToJoinClassroomAsync(int studentId, string classCode)
+        public async Task<List<ClassroomResponseDTO>> GetClassroomAsync(int teacherID)
         {
-            var classroom = await _classroomRepository.GetClassroomByIdAsync(classCode);
-        if (classroom == null)
-            return "Classroom not found.";
+            var classrooms = await _classroomRepository.GetClassroomAsync(teacherID);
+            
+            var classroomResponseDtos = classrooms.Select(classroom => new ClassroomResponseDTO
+            {
+                ClassName = classroom.ClassName,
+                CreatedAt = classroom.CreatedAt,
+                TeacherID = classroom.TeacherId,
+                ClassCode = classroom.ClassCode,
+                Section = classroom.Section,
+                Description = classroom.Description
+            }).ToList();
 
-        var user = await _classroomRepository.GetUserByIdAsync(studentId);
-        if (user == null)
-            return "Student not found.";
-
-        // Check if already joined or pending
-        var alreadyRequested = classroom.StudentClassrooms?
-            .FirstOrDefault(sc => sc.StudentId == studentId);
-
-        if (alreadyRequested != null)
-        {
-            return $"You already {(alreadyRequested.Status == JoinStatus.Pending ? "requested" : "joined")} this classroom.";
+            return classroomResponseDtos;
         }
-
-        var joinRequest = new StudentClassroom
-        {
-            StudentId = studentId,
-            ClassroomId = classroom.ClassroomID,
-            Status = JoinStatus.Pending
-        };
-
-        classroom.StudentClassrooms ??= new List<StudentClassroom>();
-        classroom.StudentClassrooms.Add(joinRequest);
-
-        await _classroomRepository.SaveAsync();
-
-        return "Join request submitted successfully and is pending approval.";
-        }
-        
     }
 
     // just a little helper class to generate a random class code

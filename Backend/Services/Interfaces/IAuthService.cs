@@ -1,6 +1,5 @@
 using backend.DTOs.User;
 using backend.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Services.Interfaces
 {

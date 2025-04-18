@@ -1,13 +1,19 @@
 import React from 'react';
+import { Line } from 'rc-progress';
+import Star from '../../assets/Star.svg';
+import LessonCard from '../../components/TopicCard';
+import Button from '../../components/buttons/PurpleButton';
 
 const LessonView = () => {
+    // const { lessonid } = useParams();
+
     return (
-        <div>
-            <h1>Lesson View</h1>
-            <p>Welcome to the Lesson View page!</p>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quaerat possimus rem ipsum provident quia exercitationem excepturi dolor earum ex animi aspernatur ad, minus nostrum nesciunt, similique quisquam quam adipisci mollitia?
-            </p>
+        <div className='flex-col justify-center items-center h-full pb-16'>
+       
+            
+            <h1>This is the lessonview</h1>
+        
+        
         </div>
     );
 };

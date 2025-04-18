@@ -8,24 +8,21 @@ namespace backend.Models
         [Key]
         public int ClassroomID { get; set; }
 
-        public int TeacherId { get; set; }
         [Required]
         [ForeignKey("TeacherId")]
-        public Teacher Teacher { get; set; } // Navigation property to Teacher
+        public int TeacherId { get; set; }
 
         [Required]
         [StringLength(25)]
         [Column(TypeName = "text")]
         public string ClassName { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
+        public string Section { get; set; }
+        public string Description { get; set; }
         public string ClassCode { get; set; } = string.Empty;
-
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         // One-to-many: Classroom has many Students
-        public ICollection<StudentClassroom>? StudentClassrooms { get; set; }
-
+        public List<Student>? Students { get; set; } = new List<Student>();
         // One-to-many: Classroom has many Lessons (assuming Lesson model exists)
-        public List<Lesson>? Lessons { get; set; }
+        public List<Lesson>? Lessons { get; set; } = new List<Lesson>();
     }
 }

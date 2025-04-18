@@ -16,34 +16,23 @@ namespace backend.Controllers
         }
 
         [HttpPost("createClassroom")]
-        public async Task<IActionResult> CreateClassroom([FromBody] CreateClassroomDto classroomDto)
+        public async Task<IActionResult> CreateClassroom([FromBody] CreateClassroomDTO classroomDTO)
         {
-            if (classroomDto == null)
+            if (classroomDTO == null)
             {
                 return BadRequest("Invalid data.");
             }
 
-            var classroom = await _classroomService.CreateClassroomAsync(classroomDto); 
+            var classroom = await _classroomService.CreateClassroomAsync(classroomDTO);
             return CreatedAtAction(nameof(CreateClassroom), new { id = classroom.ClassroomID }, classroom);
         }
 
-        [HttpPost("requestToJoinClassroom")]
-        public async Task<IActionResult> RequestToJoinClassroom([FromBody] JoinClassroomDto joinClassroomDto)
+        [HttpGet("classroom")]
+        public async Task<ActionResult<List<ClassroomResponseDTO>>> GetClassroom(int teacherID)
         {
-            if (joinClassroomDto == null)
-            {
-                return BadRequest("Invalid data.");
-            }
+            var classroom = await _classroomService.GetClassroomAsync(teacherID);
 
-            try{
-                var result = await _classroomService.RequestToJoinClassroomAsync(joinClassroomDto.StudentId, joinClassroomDto.ClassCode);
-                return Ok(result);
-            } 
-            catch (Exception ex)
-            {
-                return BadRequest("Unable to join classroom. " + ex.Message);   
-            }
-            
+            return Ok(classroom);
         }
     }
 }
