@@ -1,9 +1,9 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import Button from '../buttons/PurpleButton';
-import Star from '../../assets/Star.svg'; // Adjust if needed
-import { studentApi } from '../../api/student/studentApi';
+import Button from "../components/buttons/PurpleButton";
+import Star from '../assets/Star.svg'; // Adjust if needed
+import { studentApi } from '../api/student/studentApi'; // Adjust if needed
 
 const JoinClass = ({ title = "Join a Class", user}) => {
   const validationSchema = Yup.object({
