@@ -11,16 +11,19 @@ namespace backend.Models
         public int LessonId { get; set; }
 
         [Required]
-        [ForeignKey("ClassroomId")]
-        public int ClassroomId { get; set; }
-
-        [Required]
         [StringLength(25)]
         [Column(TypeName = "text")]
-        public required string LessonName { get; set; }
+        public required string Title { get; set; }
+        public string Description { get; set; } 
+
+        [ForeignKey("CreatedById")]
+        public int? CreatedBy { get; set; } // null if created by admin
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public List<Topic> Topics { get; set; } = new List<Topic>();
+        public ICollection<Topic> Topics { get; set; } = new List<Topic>();
+        public ICollection<ClassroomLesson> ClassroomLessons { get; set; } = new List<ClassroomLesson>();
     }
 }
