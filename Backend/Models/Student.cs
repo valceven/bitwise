@@ -16,5 +16,6 @@ namespace backend.Models
 
         // Navigation property to User
         public User User { get; set; }
+        public ICollection<StudentClassroom> StudentClassrooms { get; set; }
     }
 }

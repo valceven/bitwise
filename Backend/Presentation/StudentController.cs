@@ -27,5 +27,17 @@ namespace backend.Presentation
             return BadRequest(new { message = result.Message });
         }
 
+        [HttpGet("fetch-classroom")]
+        public async Task<IActionResult> FetchClassroom([FromQuery] int StudentId)
+        {
+            var result = await _studentService.FetchClassroomAsync(StudentId);
+
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest("No Classroom Found.");
+        }
     }
 }

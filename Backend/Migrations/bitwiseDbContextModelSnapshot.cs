@@ -77,10 +77,15 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("StudentId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TeacherId")
                         .HasColumnType("integer");
 
                     b.HasKey("ClassroomID");
+
+                    b.HasIndex("StudentId");
 
                     b.HasIndex("TeacherId");
 
@@ -272,12 +277,6 @@ namespace backend.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
-<<<<<<< HEAD
-                    b.Property<int?>("ClassroomID")
-                        .HasColumnType("integer");
-
-=======
->>>>>>> origin/main
                     b.Property<string>("StudentIdNumber")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -285,11 +284,6 @@ namespace backend.Migrations
 
                     b.HasKey("StudentId");
 
-<<<<<<< HEAD
-                    b.HasIndex("ClassroomID");
-
-=======
->>>>>>> origin/main
                     b.ToTable("Students");
                 });
 
@@ -313,7 +307,7 @@ namespace backend.Migrations
 
                     b.HasKey("StudentClassroomId");
 
-                    b.HasIndex("StudentId");
+                    b.HasIndex("ClassroomId");
 
                     b.ToTable("StudentClassrooms");
                 });
@@ -413,6 +407,10 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
+                    b.HasOne("backend.Models.Student", null)
+                        .WithMany("Classrooms")
+                        .HasForeignKey("StudentId");
+
                     b.HasOne("backend.Models.Teacher", null)
                         .WithMany("Classrooms")
                         .HasForeignKey("TeacherId")
@@ -459,13 +457,6 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Student", b =>
                 {
-<<<<<<< HEAD
-                    b.HasOne("backend.Models.Classroom", null)
-                        .WithMany("Students")
-                        .HasForeignKey("ClassroomID");
-
-=======
->>>>>>> origin/main
                     b.HasOne("backend.Models.User", "User")
                         .WithOne("Student")
                         .HasForeignKey("backend.Models.Student", "StudentId")
@@ -477,9 +468,9 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.StudentClassroom", b =>
                 {
-                    b.HasOne("backend.Models.Student", null)
+                    b.HasOne("backend.Models.Classroom", null)
                         .WithMany("StudentClassrooms")
-                        .HasForeignKey("StudentId")
+                        .HasForeignKey("ClassroomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -507,6 +498,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
                     b.Navigation("Lessons");
+
+                    b.Navigation("StudentClassrooms");
                 });
 
             modelBuilder.Entity("backend.Models.Lesson", b =>
@@ -518,7 +511,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Student", b =>
                 {
-                    b.Navigation("StudentClassrooms");
+                    b.Navigation("Classrooms");
                 });
 
             modelBuilder.Entity("backend.Models.Teacher", b =>

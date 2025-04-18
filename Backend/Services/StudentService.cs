@@ -16,7 +16,21 @@ namespace backend.Services
         {
             _studentRepository = studentRepository;
             _pendingStudentRepository = pendingStudentRepository;
-        } 
+        }
+
+        public async Task<FetchClassroomResponseDto> FetchClassroomAsync(int StudentId)
+        {
+            var classroom = await _studentRepository.FetchClassroomAsync(StudentId);
+
+            var fetchClassroomResponseDto = new FetchClassroomResponseDto {
+                ClassName = classroom.ClassName,
+                Section = classroom.Section,
+                Description = classroom.Description
+            };
+
+            return fetchClassroomResponseDto;
+        }
+
         public async Task<JoinClassroomResultDto> JoinClassroomAsync(JoinClassroomDto joinClassroomDto)
         {
             if (joinClassroomDto.UserType == 2)
