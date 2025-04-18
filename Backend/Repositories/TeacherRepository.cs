@@ -35,7 +35,8 @@ namespace backend.Repositories
                         var studentClassroom = new StudentClassroom
                         {
                             StudentId = dto.StudentId,
-                            ClassroomId = dto.ClassroomId
+                            ClassroomId = dto.ClassroomId,
+                            ClassCode = dto.ClassCode
                         };
                         _context.StudentClassrooms.Add(studentClassroom);
                     } else {

@@ -14,11 +14,13 @@ const DashboardPending = () => {
         // Transform the response data to match our component structure
         const transformedClassrooms = response.map(classroom => ({
           name: classroom.className,
+          classCode: classroom.classCode,
+          classroomId: classroom.classroomId,
           students: classroom.pendingStudents.map(student => ({
             name: student.name,
             email: student.email,
             studentId: student.studentId,
-            verified: 'No'
+            verified: student.isVerified || 'Yes', 
           })),
           selectedStudents: []
         })).filter(classroom => classroom.students.length > 0); // Only show classrooms with pending students
@@ -55,27 +57,51 @@ const DashboardPending = () => {
     );
   };
 
-  const handleAccept = (classIndex, studentIndex) => {
-    // Add your accept logic here
-    console.log(`Accept student ${studentIndex} from class ${classIndex}`);
+  const handleAccept = async (classIndex, studentIndex) => {
+    try {
+      const classroom = classrooms[classIndex];
+      const student = classroom.students[studentIndex];
+
+      const data = {
+        status: true,
+        studentId: student.studentId,
+        classroomId: classroom.classroomId,
+        classCode: classroom.classCode
+      }; 
+
+      console.log(data);
+
+      const response = await teacherApi.acceptPendingStudent(data);
+      console.log(response);
+    } catch (error) {
+      console.error(error.response?.data || error.message || "An unknown error occured.");
+    }
   };
 
-  const handleReject = (classIndex, studentIndex) => {
-    // Add your reject logic here
-    console.log(`Reject student ${studentIndex} from class ${classIndex}`);
+  const handleReject = async (classIndex, studentIndex) => {
+    try {
+      const classroom = classrooms[classIndex];
+      const student = classroom.students[studentIndex];
+
+      const data = {
+        status: true,
+        studentId: student.studentId,
+        classroomId: classroom.classroomId,
+        classCode: classroom.classCode
+      };
+
+      const response = await teacherApi.rejectPendingStudent(data);
+      console.log(response);
+    } catch (error) {
+      console.error(error.response?.data || error.message || "An unknown error occured.");
+    }
   };
 
   return (
-<<<<<<< HEAD
-    <div className="flex flex-col justify-center w-full space-y-6 overflow-y-auto max-h-[80vh] pt-96 px-20">
+        <div className="flex flex-col justify-center w-full px-24 space-y-6 overflow-y-auto max-h-[80vh] pt-96">
       {classrooms.length > 0 ? (
         classrooms.map((cls, classIndex) => {
           const isAllSelected = cls.selectedStudents.length === cls.students.length;
-=======
-    <div className="flex flex-col justify-center w-full px-24 space-y-6 overflow-y-auto max-h-[80vh] pt-96">
-      {classrooms.map((cls, classIndex) => {
-        const isAllSelected = cls.selectedStudents.length === cls.students.length;
->>>>>>> 1f67fc4f015556a3313c9258b898d37c2ab51718
 
           return (
             <div key={classIndex} className="space-y-2">
@@ -127,14 +153,20 @@ const DashboardPending = () => {
                           <a 
                             href="#" 
                             className="font-medium text-blue-600 hover:underline"
-                            onClick={() => handleAccept(classIndex, studentIndex)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleAccept(classIndex, studentIndex);
+                            }}
                           >
                             Accept
                           </a>
                           <a 
                             href="#" 
                             className="font-medium text-red-600 hover:underline"
-                            onClick={() => handleReject(classIndex, studentIndex)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleReject(classIndex, studentIndex);
+                            }}
                           >
                             Reject
                           </a>

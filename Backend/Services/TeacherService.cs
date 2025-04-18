@@ -35,6 +35,8 @@ namespace backend.Services
             var response = groupedData.Select(group => new FetchPendingStudentsResponseDto
             {
                 ClassName = group.classroom.ClassName,
+                ClassCode = group.classroom.ClassCode,
+                ClassroomId = group.classroom.ClassroomID,
                 PendingStudents = group.pending.Select(p => new PendingStudentDto
                 {
                     StudentId = p.Student.User.UserId,

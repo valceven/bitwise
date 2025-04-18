@@ -33,8 +33,28 @@ const fetchPendingStudents = async (id) => {
   }
 }
 
+const acceptPendingStudent = async (data) => {
+  try {
+    const response = await apiService.post("teacher/accept-student", data);
+    console.log(response.data);
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occured";
+  }
+}
+
+const rejectPendingStudent = async (data) => {
+  try {
+    const response = await apiService.post("teacher/reject-student", data);
+    console.log(response.data);
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occured";
+  }
+}
+
 export const teacherApi = {
   createClassroom,
   fetchClassroomList,
-  fetchPendingStudents
+  fetchPendingStudents,
+  acceptPendingStudent,
+  rejectPendingStudent
 };

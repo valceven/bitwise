@@ -15,6 +15,8 @@ const DashboardClassroom = () => {
   const [classrooms, setClassrooms] = useState([]);
   const { user } = useUser();
 
+  console.log(user);
+
   useEffect(() => {
     const fetchClassrooms = async () => {
       try {
@@ -32,7 +34,7 @@ const DashboardClassroom = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center w-full px-24 pb-20 space-y-6 overflow-y-auto max-h-[80vh]">
+      <div className="flex flex-col items-center w-full space-y-6">
         {user.userType === 2 ? (
           <>
             {/* Header for Teachers */}
