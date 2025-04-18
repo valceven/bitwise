@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    partial class bitwiseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250418132212_LessonTableUpdate")]
+    partial class LessonTableUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,8 +245,6 @@ namespace backend.Migrations
 
                     b.HasKey("PendingId");
 
-                    b.HasIndex("StudentId");
-
                     b.ToTable("PendingStudents");
                 });
 
@@ -272,12 +273,9 @@ namespace backend.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
-<<<<<<< HEAD
                     b.Property<int?>("ClassroomID")
                         .HasColumnType("integer");
 
-=======
->>>>>>> origin/main
                     b.Property<string>("StudentIdNumber")
                         .IsRequired()
                         .HasMaxLength(25)
@@ -285,11 +283,8 @@ namespace backend.Migrations
 
                     b.HasKey("StudentId");
 
-<<<<<<< HEAD
                     b.HasIndex("ClassroomID");
 
-=======
->>>>>>> origin/main
                     b.ToTable("Students");
                 });
 
@@ -446,26 +441,12 @@ namespace backend.Migrations
                         .HasForeignKey("ClassroomID");
                 });
 
-            modelBuilder.Entity("backend.Models.PendingStudents", b =>
-                {
-                    b.HasOne("backend.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("backend.Models.Student", b =>
                 {
-<<<<<<< HEAD
                     b.HasOne("backend.Models.Classroom", null)
                         .WithMany("Students")
                         .HasForeignKey("ClassroomID");
 
-=======
->>>>>>> origin/main
                     b.HasOne("backend.Models.User", "User")
                         .WithOne("Student")
                         .HasForeignKey("backend.Models.Student", "StudentId")
@@ -507,6 +488,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
                     b.Navigation("Lessons");
+
+                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("backend.Models.Lesson", b =>
