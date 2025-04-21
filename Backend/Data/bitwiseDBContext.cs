@@ -22,5 +22,6 @@ namespace backend.Data
         public DbSet<Models.PendingUser> PendingUsers { get; set; }
         public DbSet<Models.PendingStudents> PendingStudents { get; set; }
         public DbSet<Models.StudentClassroom> StudentClassrooms { get; set; }
+        public DbSet<Models.ClassroomLesson> ClassroomLessons { get; set; }
     }
 }

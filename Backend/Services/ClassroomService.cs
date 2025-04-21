@@ -45,6 +45,29 @@ namespace backend.Services
 
             return classroomResponseDtos;
         }
+
+       public async Task<ViewClassroomResponseDto> ViewClassroomAsync(ViewClassroomDto viewClassroomDto)
+        {
+            int classroomId = viewClassroomDto.ClassroomId;
+
+            var classroom = await _classroomRepository.ViewClassroomAsync(classroomId);
+            if (classroom == null)
+                return null;
+
+            var lessons = await _classroomRepository.GetLessonsByClassroomIdAsync(classroomId);
+
+            var response = new ViewClassroomResponseDto
+            {
+                ClassroomId = classroom.ClassroomID,
+                ClassName = classroom.ClassName,
+                TeacherId = classroom.TeacherId,
+                Section = classroom.Section,
+                Description = classroom.Description,
+                Lessons = lessons
+            };
+
+            return response;
+        }
     }
 
     // just a little helper class to generate a random class code
