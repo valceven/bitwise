@@ -65,12 +65,11 @@ export const UserProvider = ({ children }) => {
 
     const logoutUser = async (email) => {
         try {
-          const response = await authApi.logoutUser( {email} ); // Call the logout API
+          await authApi.logoutUser( {email} ); // Call the logout API
           setUser(null);
           localStorage.removeItem('user');
           localStorage.removeItem('accessToken');
           localStorage.removeItem('accessTokenExpiration');
-          console.log(response)
         } catch (error) {
           console.error('Logout Error: ', error);
         }

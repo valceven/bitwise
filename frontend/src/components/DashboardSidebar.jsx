@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import LogoIcon from "../assets/icon-logo-sidebar.svg";
 import NavLogo from "../assets/nav-bar-logo-black.svg";
 
@@ -22,12 +22,10 @@ const DashboardSidebar = (user) => {
   
   const { logoutUser } = useUser();
   const location = useLocation();
-  const navigate = useNavigate();
 
-  const handleLogout = (email) => {
-    console.log("Logging out user:", email);
-    logoutUser(email);
-    navigate("/login");
+  const handleLogout = async (email) => {
+    await logoutUser(email);
+    window.location.href = "/login"; 
   }
 
   const currentPath = location.pathname;
@@ -212,7 +210,7 @@ const DashboardSidebar = (user) => {
               >
                 <li>
                   <Link
-                    to="/profile"
+                    to="/app/profile"
                     className="block px-4 py-2 hover:bg-gray-100"
                   >
                     Profile

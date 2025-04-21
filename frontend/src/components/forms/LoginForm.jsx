@@ -5,12 +5,10 @@ import InputField from "../fields/InputField";
 import Button from "../buttons/PurpleButton";
 import { authApi } from "../../api/auth/authApi";
 import { useUser } from "../../context/UserContext";
-import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
 
   const { loginUser } = useUser();
-  const navigate = useNavigate();
 
   const initialValues = {
     email: "",
@@ -35,7 +33,6 @@ const LoginForm = () => {
       if (response) {
         console.log("Logging in and navigating to profile", response);
         loginUser(response);
-        navigate("/user/profile/" + response.userID);
       }
     } catch (error) {
       console.error("Error during form submission:", error);

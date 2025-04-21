@@ -50,7 +50,7 @@ const router = createBrowserRouter([
       { path: "classroom", element: <DashboardClassroom /> },
       { path: "student-report", element: <DashboardStudentReport /> },
       { path: "pending", element: <DashboardPending /> },
-      { path: "profile/:userid", element: <ProfilePage /> },
+      { path: "profile", element: <ProfilePage /> },
       { path: "classroomview", element: <ClassroomView /> },
       { path: "lessonview", element: <LessonView /> },
       { path: "topicview", element: <TopicView /> },

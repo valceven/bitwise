@@ -5,21 +5,26 @@ import logo from "../assets/logo.svg";
 import Background from "../components/Background";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import MuLoading from "../components/MuLoading";
 
 
 function LoginPage() {
 
   const navigate = useNavigate();
-  const { accessToken, user } = useUser();
+  const { accessToken } = useUser();
+
+  useEffect(() => {
+    if (accessToken) {
+      const timer = setTimeout(() => {
+        navigate("/app/profile");
+      }, 2000);
+      return () => clearTimeout(timer); // Clean up
+    }
+  }, [accessToken, navigate]);
 
   if (accessToken) {
-    setTimeout(() => {
-      navigate(`app/profile/${user.userID}`);
-    }, 2000);
-    return (
-        <MuLoading text={"You are already logged in. Redirecting to profile..."}/>
-    );
+    return <MuLoading text={"You are already logged in. Redirecting to profile..."} />;
   }
 
   return (
