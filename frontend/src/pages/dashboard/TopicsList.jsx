@@ -7,7 +7,7 @@ const TopicsList = ({ topics, lessonId, onBack, onSelectTopic }) => (
          Topics for <span className="capitalize">{lessonId}</span>
       </h2>
       <button
-        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition text-sm"
+        className="bg-greenz2 text-white px-6 py-2 joinclass-shadow text-sm font-semibold flex items-center space-x-4"
         onClick={onBack}
       >
         <ArrowLeft size={16} />
