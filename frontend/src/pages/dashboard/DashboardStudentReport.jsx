@@ -83,7 +83,7 @@ const DashboardStudentReport = () => {
                   Section: <span className="font-medium">{classroom.section}</span>
                 </p>
                 <p className="text-sm text-gray-500">
-                  No. of Students: <span className="font-medium">{20}</span>
+                  No. of Students: <span className="font-medium">{classroom.students.length}</span>
                 </p>
               </div>
 

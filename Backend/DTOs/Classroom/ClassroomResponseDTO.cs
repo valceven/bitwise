@@ -13,5 +13,6 @@ namespace backend.DTOs.Classroom
         public string ClassCode {get; set;}
         public string Section {get; set;}
         public string Description {get; set;}
+        public List<StudentInClassroomDto> Students {get; set; }
     }
 }

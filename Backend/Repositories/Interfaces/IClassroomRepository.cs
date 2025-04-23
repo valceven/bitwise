@@ -10,5 +10,6 @@ namespace backend.Repositories.Interfaces
         Task<List<Classroom>> GetClassroomAsync(int TeacherID);
         Task<Classroom> ViewClassroomAsync(int classroomId);
         Task<List<ViewLessonFromClassroomDto>> GetLessonsByClassroomIdAsync(int classroomId);
+        Task<List<Student>> GetStudentsByClassroomIdAsync(int classroomId);
     }
 }

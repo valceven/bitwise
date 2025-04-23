@@ -32,16 +32,31 @@ namespace backend.Services
         public async Task<List<ClassroomResponseDTO>> GetClassroomAsync(int teacherID)
         {
             var classrooms = await _classroomRepository.GetClassroomAsync(teacherID);
-            
-            var classroomResponseDtos = classrooms.Select(classroom => new ClassroomResponseDTO
+            var classroomResponseDtos = new List<ClassroomResponseDTO>();
+
+            foreach (var classroom in classrooms)
             {
-                ClassName = classroom.ClassName,
-                CreatedAt = classroom.CreatedAt,
-                TeacherID = classroom.TeacherId,
-                ClassCode = classroom.ClassCode,
-                Section = classroom.Section,
-                Description = classroom.Description
-            }).ToList();
+                var students = await _classroomRepository.GetStudentsByClassroomIdAsync(classroom.ClassroomID);
+
+                var studentDtos = students.Select(s => new StudentInClassroomDto
+                {
+                    StudentId = s.StudentId,
+                    StudentIdNumber = s.StudentIdNumber,
+                    Name = s.User.Name,
+                    Email = s.User.Email
+                }).ToList();
+
+                classroomResponseDtos.Add(new ClassroomResponseDTO
+                {
+                    ClassName = classroom.ClassName,
+                    CreatedAt = classroom.CreatedAt,
+                    TeacherID = classroom.TeacherId,
+                    ClassCode = classroom.ClassCode,
+                    Section = classroom.Section,
+                    Description = classroom.Description,
+                    Students = studentDtos
+                });
+            }
 
             return classroomResponseDtos;
         }

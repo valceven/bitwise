@@ -89,5 +89,15 @@ namespace backend.Repositories
                 throw new Exception("An error occurred while fetching the lessons");
             }
         }
+
+        public async Task<List<Student>> GetStudentsByClassroomIdAsync(int classroomId)
+        {
+            return await _context.StudentClassrooms
+                .Where(sc => sc.ClassroomId == classroomId)
+                .Include(sc => sc.Student)
+                    .ThenInclude(s => s.User)
+                .Select(sc => sc.Student)
+                .ToListAsync();
+        }
     }
 }
