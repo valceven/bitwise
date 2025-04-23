@@ -24,10 +24,16 @@ const DashboardClassroomStudent = () => {
   }, [user, navigate]);
 
   return (
-    <div>
+    <div className="w-full p-8 pb-0 h-full">
       {classroom ? (
-        <div>
-          <h1>You have a classroom: {classroom.className}</h1>
+        <div className="">
+          <div className="border rounded-lg p-6 w-1/4">
+            <h1 className="text-3xl font-bold mb-4">{classroom.className}</h1>
+            <p className="text-gray-700 mb-6">
+              Welcome to the Classroom {classroom.className}!
+            </p>
+          </div>
+
           <ClassroomView />
         </div>
       ) : (
