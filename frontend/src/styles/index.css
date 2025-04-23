@@ -144,3 +144,17 @@ h6 {
       transform: rotate(360deg);
   }
 }
+
+.thin-scrollbar::-webkit-scrollbar {
+  height: 6px; /* For horizontal scroll */
+  width: 6px;  /* For vertical scroll */
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 9999px;
+}

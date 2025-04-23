@@ -15,8 +15,9 @@ namespace backend.Models
 
         [Required]
         [Column(TypeName = "text")]
-        public required string ContentName { get; set; }
+        public required string Context { get; set; }
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public int Order {get; set;}
     }
 }

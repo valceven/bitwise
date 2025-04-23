@@ -21,9 +21,14 @@ namespace backend.Models
         public string ClassCode { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         // One-to-many: Classroom has many Lessons (assuming Lesson model exists)
+
         public List<Lesson>? Lessons { get; set; } = new List<Lesson>();
 
         public ICollection<StudentClassroom> StudentClassrooms { get; set; }
+<<<<<<< HEAD
         public Teacher Teacher { get; set; }
+=======
+
+>>>>>>> 555fbb2406e3cbfa3dad44043b85f88517348a1d
     }
 }

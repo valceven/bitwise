@@ -15,8 +15,7 @@ namespace backend.Models
         [Column(TypeName = "text")]
         public required string TopicName { get; set; }
         [Column(TypeName = "text")]
-        public string Content { get; set; }
-        public int Order { get; set; } // for ordering topics within a lesson
+        public ICollection<Content> Contents {get; set;} = new List<Content>(); 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

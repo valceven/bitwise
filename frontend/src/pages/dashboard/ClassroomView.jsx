@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import React, { useState } from 'react';
 
 const ClassroomView = ({ classroom }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const lessons = ['Lesson 1', 'Lesson 2', 'Lesson 3', 'Lesson 4'];
+=======
+import React from "react";
+import AnimatedLessonButton from "../../components/buttons/AnimatedLessonButton.jsx";
+
+const ClassroomView = () => {
+  const lessons = ["Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7"];
+>>>>>>> 555fbb2406e3cbfa3dad44043b85f88517348a1d
 
   console.log(classroom);
   
@@ -17,6 +25,7 @@ const ClassroomView = ({ classroom }) => {
   };
 
   return (
+<<<<<<< HEAD
     <div className="p-8">
       <div className="flex justify-between items-start mb-6">
         <div>
@@ -34,14 +43,17 @@ const ClassroomView = ({ classroom }) => {
       </div>
 
       <div className="space-y-4">
+=======
+    <div className="h-[calc(100vh-14.5rem)]">
+      <div className="w-7/8 flex space-x-24 overflow-x-auto thin-scrollbar h-full items-center">
+>>>>>>> 555fbb2406e3cbfa3dad44043b85f88517348a1d
         {lessons.map((lesson, index) => (
-          <button
-            key={index}
-            className="w-3/4 text-left bg-black hover:bg-gray-600 text-white font-medium py-2 px-4 rounded"
+          <div className="" key={index}>
+          <AnimatedLessonButton
+            lesson={lesson}
             onClick={() => console.log(`${lesson} clicked`)}
-          >
-            {lesson}
-          </button>
+            />
+            </div>
         ))}
       </div>
       
