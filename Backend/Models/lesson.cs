@@ -24,6 +24,6 @@ namespace backend.Models
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Topic> Topics { get; set; } = new List<Topic>();
-        public ICollection<ClassroomLesson> ClassroomLessons { get; set; } = new List<ClassroomLesson>();
+        
     }
 }
