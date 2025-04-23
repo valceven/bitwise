@@ -10,8 +10,21 @@ const joinClassroom = async (data) => {
     }
 }
 
+const fetchClassroom = async (studentId) => {
+    try {
+        const response = await apiService.get("students/fetch-classroom", {
+            params: { studentId: studentId }
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error.resonse?.data || error.message || "An unknown error occured";
+    }
+}
+
 // const fetchClassroom;
 
 export const studentApi = {
-    joinClassroom
+    joinClassroom,
+    fetchClassroom
 };

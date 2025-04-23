@@ -9,14 +9,14 @@ namespace backend.Models
         public int StudentClassroomId { get; set; }
 
         [Required]
-        [ForeignKey("Student")]
         public int StudentId { get; set; }
 
         [Required]
-        [ForeignKey("Classroom")]
         public int ClassroomId { get; set; }
-        
-        public string ClassCode { get; set; } = string.Empty;
 
+        public string ClassCode { get; set; }
+
+        public Student Student { get; set; }
+        public Classroom Classroom { get; set; }
     }
 }

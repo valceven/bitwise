@@ -5,6 +5,7 @@ using backend.Data;
 using backend.Services;
 using backend.DTOs.Classroom;
 using Microsoft.EntityFrameworkCore;
+using backend.DTOs.Lesson;
 
 namespace backend.Repositories
 {
@@ -47,6 +48,56 @@ namespace backend.Repositories
                 Console.WriteLine($"Error fetching classroom: {ex.Message}");
                 throw new Exception("An error occured while creating the classroom.", ex);
             }
+        }
+
+        public async Task<Classroom> ViewClassroomAsync(int classroomId)
+        {
+            try
+            {
+                // Fetch classroom only (no direct nav to lessons)
+                var classroom = await _context.Classrooms
+                    .FirstOrDefaultAsync(c => c.ClassroomID == classroomId);
+
+                return classroom;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error Fetching classroom: {ex.Message}");
+                throw new Exception("An error occurred while fetching the classroom");
+            }
+        }
+
+        public async Task<List<ViewLessonFromClassroomDto>> GetLessonsByClassroomIdAsync(int classroomId)
+        {
+            try
+            {
+                var lessonDtos = await _context.ClassroomLessons
+                    .Where(cl => cl.ClassroomId == classroomId)
+                    .Include(cl => cl.Lesson)
+                    .Select(cl => new ViewLessonFromClassroomDto
+                    {
+                        Title = cl.Lesson.Title,
+                        Description = cl.Lesson.Description
+                    })
+                    .ToListAsync();
+
+                return lessonDtos;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error Fetching lessons: {ex.Message}");
+                throw new Exception("An error occurred while fetching the lessons");
+            }
+        }
+
+        public async Task<List<Student>> GetStudentsByClassroomIdAsync(int classroomId)
+        {
+            return await _context.StudentClassrooms
+                .Where(sc => sc.ClassroomId == classroomId)
+                .Include(sc => sc.Student)
+                    .ThenInclude(s => s.User)
+                .Select(sc => sc.Student)
+                .ToListAsync();
         }
     }
 }

@@ -110,7 +110,7 @@ namespace backend.Migrations
 
                     b.HasIndex("LessonId");
 
-                    b.ToTable("ClassroomLesson");
+                    b.ToTable("ClassroomLessons");
                 });
 
             modelBuilder.Entity("backend.Models.Content", b =>
@@ -302,6 +302,8 @@ namespace backend.Migrations
 
                     b.HasKey("StudentClassroomId");
 
+                    b.HasIndex("ClassroomId");
+
                     b.HasIndex("StudentId");
 
                     b.ToTable("StudentClassrooms");
@@ -459,6 +461,12 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.StudentClassroom", b =>
                 {
+                    b.HasOne("backend.Models.Classroom", null)
+                        .WithMany("StudentClassrooms")
+                        .HasForeignKey("ClassroomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("backend.Models.Student", null)
                         .WithMany("StudentClassrooms")
                         .HasForeignKey("StudentId")
@@ -489,6 +497,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
                     b.Navigation("Lessons");
+
+                    b.Navigation("StudentClassrooms");
                 });
 
             modelBuilder.Entity("backend.Models.Lesson", b =>

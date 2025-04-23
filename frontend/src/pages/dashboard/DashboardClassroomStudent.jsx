@@ -1,44 +1,39 @@
 import React, { useState, useEffect } from "react";
 import JoinClass from "../../components/JoinClass";
 import { useUser } from "../../context/UserContext";
-import 'react-toastify/dist/ReactToastify.css';
-import ClassroomView from "./ClassroomView";
 import { useNavigate } from "react-router-dom";
-
+import { studentApi } from "../../api/student/studentApi";
+import ClassroomView from "./ClassroomView";
 
 const DashboardClassroomStudent = () => {
-    const [studentClassroom, setStudentClassroom] = useState(null); 
-    const { user } = useUser();
-    const navigate = useNavigate();
-
-  console.log(user);
+  const [classroom, setClassroom] = useState(null);
+  const { user } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClassroom = async () => {
       try {
-        
-        const Classroom = { id: "abc123" }; // replace with API call
-        setStudentClassroom(Classroom);
-
-        navigate(`/classroom/${Classroom.id}`);
+        const response = await studentApi.fetchClassroom(user.userID);
+        setClassroom(response);
       } catch (error) {
         console.error("Error fetching classroom:", error.message);
       }
     };
 
-    if (user?.student?.id) {
-      fetchClassroom();
-    }
+    fetchClassroom();
   }, [user, navigate]);
 
   return (
-    <>
-      <div className="flex flex-col items-center w-full space-y-6">
-        {!studentClassroom && <JoinClass user={user} />}
-
-      </div>
-
-    </>
+    <div>
+      {classroom ? (
+        <div>
+          <h1>You have a classroom: {classroom.className}</h1>
+          <ClassroomView />
+        </div>
+      ) : (
+        <JoinClass user={user} />
+      )}
+    </div>
   );
 };
 
