@@ -7,5 +7,6 @@ namespace backend.Repositories.Interfaces
     {
         Task<JoinClassroomResultDto> JoinClassroomAsync(PendingStudents pendingStudents);
         Task<List<(Classroom classroom, List<PendingStudents> pending)>> FetchPendingStudentsGroupedByClassroomAsync(int teacherId);
+        Task<bool> RemovePendingStudentAsync(int PendingId);
     }
 }

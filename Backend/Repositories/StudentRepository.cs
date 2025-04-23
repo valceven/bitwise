@@ -26,30 +26,30 @@ namespace backend.Repositories
 
         }
 
-       public async Task<Classroom> FetchClassroomAsync(int StudentId)
+        public async Task<PendingStudents?> CheckPendingStatusAsync(int StudentId)
         {
-            try
-            {
-                var studentClassroom = await _context.StudentClassrooms
-                    .FirstOrDefaultAsync(sc => sc.StudentId == StudentId);
-
-                if (studentClassroom == null)
-                    return null;
-
-                var classroom = await _context.Classrooms
-                    .FirstOrDefaultAsync(c => c.ClassroomID == studentClassroom.ClassroomId);
-
-                if (classroom == null)
-                    return null;
-                
-                return classroom;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An error occurred while fetching the classroom.", ex);
+            try {
+                return await _context.PendingStudents
+                .Include(ps => ps.Classroom)
+                    .ThenInclude(c => c.Teacher)
+                        .ThenInclude(t => t.User)
+                .FirstOrDefaultAsync(sc => sc.StudentId == StudentId);
+            } catch (Exception ex) {
+                Console.Write($"Error Finding Pending Student: {ex.Message}");
+                throw new Exception("An error occurred while fetching pending student.", ex);
             }
         }
 
+        public async Task<Classroom?> FetchClassroomAsync(int studentId)
+        {
+            var studentClassroom = await _context.StudentClassrooms
+                .Include(sc => sc.Classroom)
+                    .ThenInclude(c => c.Teacher)
+                        .ThenInclude(t => t.User)
+                .FirstOrDefaultAsync(sc => sc.StudentId == studentId);
+
+            return studentClassroom?.Classroom;
+        }
         public async Task<Student?> GetByUserIdAsync(int userId)
         {
             return await _context.Students.FirstOrDefaultAsync(s => s.StudentId == userId);

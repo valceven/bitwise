@@ -2,8 +2,8 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import Button from "../components/buttons/PurpleButton";
-import Star from '../assets/Star.svg'; // Adjust if needed
-import { studentApi } from '../api/student/studentApi'; // Adjust if needed
+import Star from '../assets/Star.svg';
+import { studentApi } from '../api/student/studentApi';
 
 const JoinClass = ({ title = "Join a Class", user}) => {
   const validationSchema = Yup.object({
@@ -12,14 +12,19 @@ const JoinClass = ({ title = "Join a Class", user}) => {
       .required('Class code is required'),
   });
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       values.userType = user.userType;
       values.studentId = user.userID;
       const response = await studentApi.joinClassroom(values);
       alert(response.message);
+      resetForm();
+      window.location.reload();
     } catch (error) {
-      console.error('Error creating class: ', error);
+      console.error('Error joining class: ', error);
+      alert(`Failed to join class: ${error.message || 'Unknown error'}`);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -46,8 +51,11 @@ const JoinClass = ({ title = "Join a Class", user}) => {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ isSubmitting }) => (
-              <Form>
+            {({ isSubmitting, handleSubmit }) => (
+              <Form onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit(e);
+              }}>
                 <div className="mb-6">
                   <Field
                     name="classCode"
@@ -67,7 +75,7 @@ const JoinClass = ({ title = "Join a Class", user}) => {
                   disabled={isSubmitting}
                   className="bg-bluez btn-shadow text-white w-full px-6 py-3 rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                  Join
+                  {isSubmitting ? 'Joining...' : 'Join'}
                 </Button>
               </Form>
             )}

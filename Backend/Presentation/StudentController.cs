@@ -39,5 +39,29 @@ namespace backend.Presentation
 
             return BadRequest("No Classroom Found.");
         }
+
+        [HttpGet("check-pending-status")]
+        public async Task<IActionResult> CheckPendingStatus([FromQuery] int StudentId)
+        {
+            var result = await _studentService.CheckPendingStatusAsync(StudentId);
+
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest("No pending student error");
+        }
+
+        [HttpDelete("remove-pending-status")]
+        public async Task<IActionResult> RemovePendingStatus([FromQuery] int pendingId)
+        {
+            var result = await _studentService.RemovePendingStatusAsync(pendingId);
+
+            if (result == "Removed Pending Request Successfully")
+                return Ok(result);
+
+            return BadRequest(result);
+        }
     }
 }
