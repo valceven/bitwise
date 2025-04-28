@@ -67,25 +67,12 @@ const DashboardClassroomStudent = () => {
   return (
     <div className="w-full p-8 pb-0 h-full">
       {classroom ? (
-<<<<<<< HEAD
         <ClassroomView classroom={classroom} />
       ) : pendingRequest ? (
         <PendingClassRequest 
           pendingRequest={pendingRequest} 
           onCancelRequest={handleCancelRequest} 
         />
-=======
-        <div className="">
-          <div className="border rounded-lg p-6 w-1/4">
-            <h1 className="text-3xl font-bold mb-4">{classroom.className}</h1>
-            <p className="text-gray-700 mb-6">
-              Welcome to the Classroom {classroom.className}!
-            </p>
-          </div>
-
-          <ClassroomView />
-        </div>
->>>>>>> 555fbb2406e3cbfa3dad44043b85f88517348a1d
       ) : (
         <JoinClass user={user} />
       )}

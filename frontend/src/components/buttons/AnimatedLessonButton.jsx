@@ -1,11 +1,11 @@
-// src/components/AnimatedLessonButton.jsx
 import React, { useState, useRef } from 'react';
 import Lottie from 'lottie-react';
 import defaultAnimation from "../../assets/roadmap-button.json";
 import hoverAnimation from "../../assets/hover-roadmap-button.json";
 import pressedAnimation from "../../assets/pressed-roadmap-button.json";
+import RobotLevel from "../../assets/robot-level.json";
 
-const AnimatedLessonButton = ({ lesson, onClick }) => {
+const AnimatedLessonButton = ({ lesson, onClick, isSelected }) => {
   const [state, setState] = useState('default');
   const animationRef = useRef();
 
@@ -29,17 +29,25 @@ const AnimatedLessonButton = ({ lesson, onClick }) => {
     setState('pressed');
     setTimeout(() => {
       setState('default');
-      onClick();
+      onClick(); // This will update the selected lesson
     }, 500);
   };
 
   return (
     <div
-      className="w-32 cursor-pointer"
+      className="w-32 cursor-pointer flex flex-col items-center"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
     >
+      {isSelected && (
+        <div className="absolute w-20 h-20 -mt-0 z-10">
+          <Lottie
+            animationData={RobotLevel}
+            loop
+          />
+        </div>
+      )}
       <Lottie
         key={state}
         lottieRef={animationRef}

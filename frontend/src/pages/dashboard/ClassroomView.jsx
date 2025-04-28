@@ -1,16 +1,11 @@
-<<<<<<< HEAD
 import React, { useState } from 'react';
+import AnimatedLessonButton from "../../components/buttons/AnimatedLessonButton.jsx";
 
 const ClassroomView = ({ classroom }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const lessons = ['Lesson 1', 'Lesson 2', 'Lesson 3', 'Lesson 4'];
-=======
-import React from "react";
-import AnimatedLessonButton from "../../components/buttons/AnimatedLessonButton.jsx";
+  const [selectedLesson, setSelectedLesson] = useState("Lesson 1"); // Default selected
 
-const ClassroomView = () => {
   const lessons = ["Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7"];
->>>>>>> 555fbb2406e3cbfa3dad44043b85f88517348a1d
 
   console.log(classroom);
   
@@ -25,38 +20,34 @@ const ClassroomView = () => {
   };
 
   return (
-<<<<<<< HEAD
-    <div className="p-8">
-      <div className="flex justify-between items-start mb-6">
+    <div className="flex w-full">
+      <div className="w-1/2 flex space-x-auto overflow-x-auto thin-scrollbar h-full border p-8 rounded-xl">
         <div>
-          <h1 className="text-3xl font-bold mb-4">Classroom View</h1>
+          <h1 className="text-3xl font-bold mb-4">{classroom.className}</h1>
           <p className="text-gray-700 mb-2">Welcome to the Classroom View page of {classroom.className}!</p>
           <p className="text-lg text-gray-600">Teacher: {classroom.teacherName}</p>
           <p className="text-gray-600 mb-6">{classroom.description}</p>
         </div>
         <button 
           onClick={handleLeaveClassroom}
-          className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded transition-colors"
+          className="bg-red-500 hover:bg-red-600 text-white font-medium text-sm py-2 px-4 mt-auto ml-auto rounded transition-colors h-12"
         >
           Leave Classroom
         </button>
       </div>
 
-      <div className="space-y-4">
-=======
-    <div className="h-[calc(100vh-14.5rem)]">
-      <div className="w-7/8 flex space-x-24 overflow-x-auto thin-scrollbar h-full items-center">
->>>>>>> 555fbb2406e3cbfa3dad44043b85f88517348a1d
+      <div className="w-170 space-y-12 flex flex-col justify-center">
         {lessons.map((lesson, index) => (
-          <div className="" key={index}>
-          <AnimatedLessonButton
-            lesson={lesson}
-            onClick={() => console.log(`${lesson} clicked`)}
+          <div className="flex justify-center" key={index}>
+            <AnimatedLessonButton
+              lesson={lesson}
+              onClick={() => setSelectedLesson(lesson)}
+              isSelected={selectedLesson === lesson}
             />
-            </div>
+          </div>
         ))}
       </div>
-      
+
       {showConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg max-w-md w-full">
