@@ -15,6 +15,14 @@ namespace backend.Repositories
 
         public async Task<Topic> CreateTopicAsync(Topic topic)
         {
+            var lesson = await _context.Lessons.FindAsync(topic.LessonId);
+            if (lesson == null)
+            {
+                throw new ArgumentException("Lesson not found");
+            }
+            // Add topic to lesson list
+            lesson.Topics.Add(topic);
+    
             _context.Topics.Add(topic);
             await _context.SaveChangesAsync();
             return topic;

@@ -17,6 +17,18 @@ namespace backend.Repositories
 
         public async Task<Lesson> CreateLessonAsync(Lesson lesson)
         {
+            // automatically add lessons to all classrooms
+            var classrooms = await _context.Classrooms.ToListAsync();
+            foreach (var classroom in classrooms)
+            {
+                var classroomLesson = new ClassroomLesson
+                {
+                    ClassroomId = classroom.ClassroomID,
+                    LessonId = lesson.LessonId
+                };
+                _context.ClassroomLessons.Add(classroomLesson);
+            }
+
             _context.Lessons.Add(lesson);
             await _context.SaveChangesAsync();
             return lesson;

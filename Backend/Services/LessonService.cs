@@ -20,7 +20,7 @@ namespace backend.Services
             {
                 Title = lessonDto.Title,
                 Description = lessonDto.Description,
-            
+                Order = lessonDto.Order,    
             };
 
             return await _lessonRepository.CreateLessonAsync(lesson);

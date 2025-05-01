@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using backend.DTOs.Content;
 
 namespace backend.Presentation{
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [Route("api/content")]
     [ApiController]
     public class ContentController : ControllerBase
