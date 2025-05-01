@@ -22,7 +22,7 @@ namespace backend.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         // One-to-many: Classroom has many Lessons (assuming Lesson model exists)
 
-        public List<Lesson>? Lessons { get; set; } = new List<Lesson>();
+        public List<ClassroomLesson>? Lessons { get; set; } = new List<ClassroomLesson>();
 
         public ICollection<StudentClassroom> StudentClassrooms { get; set; }
         public Teacher Teacher { get; set; }

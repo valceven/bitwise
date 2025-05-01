@@ -13,9 +13,11 @@ namespace backend.Models
         [ForeignKey("TopicId")]
         public int TopicId { get; set; }
 
+        public string? ContentTitle { get; set; }
+
         [Required]
         [Column(TypeName = "text")]
-        public required string Context { get; set; }
+        public required string ContentBody { get; set; }
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public int Order {get; set;}

@@ -33,6 +33,19 @@ namespace backend.Repositories
             _context.Lessons.Update(lesson);
             return await _context.SaveChangesAsync() > 0;
         }
+        public async Task<List<Lesson>> GetLessonByClassroomIdAsync(int classroomId)
+        {
+            var classroomLessons = await _context.ClassroomLessons.ToListAsync();
+            return classroomLessons
+                .Where(cl => cl.ClassroomId == classroomId)
+                .Select(cl => cl.Lesson)
+                .ToList();
+        }
+
+        public async Task<List<Lesson>> GetAllLessons()
+        {
+            return await _context.Lessons.ToListAsync();
+        }
 
         public async Task<bool> DeleteLessonAsync(int lessonId)
         {
