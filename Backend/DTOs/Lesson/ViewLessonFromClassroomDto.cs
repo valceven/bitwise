@@ -7,6 +7,7 @@ namespace backend.DTOs.Lesson
 {
     public class ViewLessonFromClassroomDto
     {
+        public int LessonId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
     }

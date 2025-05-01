@@ -2,16 +2,18 @@ using backend.DTOs.Classroom;
 using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.Services.Interfaces;
-using backend.DTOs;
+
 
 namespace backend.Services
 {
     public class ClassroomService : IClassroomService
     {
         private readonly IClassroomRepository _classroomRepository;
+        private readonly ILessonRepository _lessonRepository;
 
-        public ClassroomService(IClassroomRepository classroomRepository)
+        public ClassroomService(IClassroomRepository classroomRepository, ILessonRepository lessonRepository)
         {
+            _lessonRepository = lessonRepository;
             _classroomRepository = classroomRepository;
         }
 
@@ -25,7 +27,6 @@ namespace backend.Services
                 Description = classroomDTO.Description,
                 ClassCode = CodeGenerator.GenerateClassCode(), // Generate a random class code
             };
-
             return await _classroomRepository.CreateClassroomAsync(classroom);
         }
 

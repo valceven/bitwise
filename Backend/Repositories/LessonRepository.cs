@@ -34,6 +34,11 @@ namespace backend.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<List<Lesson>> GetAllLessons()
+        {
+            return await _context.Lessons.ToListAsync();
+        }
+
         public async Task<bool> DeleteLessonAsync(int lessonId)
         {
             var lesson = await _context.Lessons.FindAsync(lessonId);

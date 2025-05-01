@@ -17,8 +17,7 @@ namespace backend.Repositories
             _context = context;
         }
         public async Task<Classroom> CreateClassroomAsync(Classroom classroom)
-        {  
-            
+        {
             try
             {
                 // ensure that the classcode is unique
@@ -26,8 +25,19 @@ namespace backend.Repositories
                 {
                     classroom.ClassCode = CodeGenerator.GenerateClassCode();
                 }
+                
                 _context.Classrooms.Add(classroom);
                 await _context.SaveChangesAsync();
+
+                var classroomLessons = _context.Lessons.Select(cl => new ClassroomLesson
+                {
+                    LessonId = cl.LessonId,
+                    ClassroomId = classroom.ClassroomID,
+                    IsVisibleToStudents = true
+                }).ToList();
+                _context.ClassroomLessons.AddRange(classroomLessons);
+                await _context.SaveChangesAsync();
+
                 return classroom;
             }
             catch (Exception ex)
@@ -40,11 +50,14 @@ namespace backend.Repositories
         public async Task<List<Classroom>> GetClassroomAsync(int teacherID)
         {
 
-            try {
+            try
+            {
                 return await _context.Classrooms
                 .Where(c => c.TeacherId == teacherID)
                 .ToListAsync();
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine($"Error fetching classroom: {ex.Message}");
                 throw new Exception("An error occured while creating the classroom.", ex);
             }
