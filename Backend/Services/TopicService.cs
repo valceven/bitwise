@@ -19,7 +19,7 @@ namespace backend.Services
             var topic = new Topic
             {
                 TopicName = topicDto.TopicName,
-                LessonId = topicDto.LessonId
+                LessonId = topicDto.LessonId,
             };
 
             return await _topicRepository.CreateTopicAsync(topic);

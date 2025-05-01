@@ -9,8 +9,7 @@ namespace backend.Models
     {
         public int LessonTopicId { get; set; }
         public int LessonId { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public Lesson Lesson { get; set; }
+        public int TopicId { get; set; }
+        public Topic Topic { get; set; }
     }
 }

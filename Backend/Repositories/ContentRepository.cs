@@ -1,12 +1,59 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using backend.Data;
+using backend.Models;
+using backend.DTOs.Content;
+using backend.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories
 {
-    public class ContentRepository
+    public class ContentRepository : IContentRepository
     {
-        
+        private readonly bitwiseDbContext _context;
+        public ContentRepository(bitwiseDbContext context)
+        {
+            _context = context;
+        }
+         public Task<IEnumerable<Content>> GetAllContentAsync(){
+            var contents = _context.Contents.ToList();
+            return Task.FromResult<IEnumerable<Content>>(contents);
+         }
+        public async Task<Content> CreateContentAsync(Content content){
+            _context.Contents.Add(content);
+            await _context.SaveChangesAsync();
+            return content;
+        }
+        public async Task<Content> GetContentByIdAsync(int id){
+            var content = await _context.Contents.FindAsync(id);
+            if (content == null)
+            {
+                throw new Exception("Content not found");
+            }
+            return content;
+        }
+        public async Task<Content> UpdateContentAsync(UpdateContentDto updateContentDto){
+            var content = await _context.Contents.FindAsync(updateContentDto.TopicId);
+            if (content == null)
+            {
+                throw new Exception("Content not found");
+            }
+            return content;
+        }
+        public async Task<bool> DeleteContentAsync(int id){
+            var content = await _context.Contents.FindAsync(id);
+            if (content == null)
+            {
+                throw new Exception("Content not found");
+            }
+            _context.Contents.Remove(content);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<List<Content>> GetContentsByTopicId(int topicId)
+        {
+            var contents = await _context.Contents
+                .Where(c => c.TopicId == topicId)
+                .ToListAsync();
+            return contents;
+        }
     }
 }

@@ -35,12 +35,15 @@ namespace backend.Services
         {
             var existingLesson = await _lessonRepository.GetLessonByIdAsync(updatedLessonDto.LessonId);
             if (existingLesson == null) return false;
-
-            // existingLesson.Title = updatedLessonDto.Title;
-            // existingLesson.Content = updatedLessonDto.Content;
-            // existingLesson.TopicId = updatedLessonDto.TopicId;
-
+            existingLesson.Title = updatedLessonDto.Title;
+            existingLesson.Description = updatedLessonDto.Description;
             return await _lessonRepository.UpdateLessonAsync(existingLesson);
+        }
+
+        public async Task<List<Lesson>> GetLessonByClassroomIdAsync(int classroomId)
+        {
+            var lessons = await _lessonRepository.GetLessonByClassroomIdAsync(classroomId);
+            return lessons.ToList();
         }
 
         public async Task<bool> DeleteLessonAsync(int lessonId)
