@@ -22,9 +22,36 @@ const fetchClassroom = async (studentId) => {
     }
 }
 
+const checkPendingStatus = async (studentId) => {
+    try {
+        const response = await apiService.get("students/check-pending-status", {
+            params: { studentId: studentId }
+        })
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error.response?.data || error.message || "An uknown error occured"
+    }
+}
+
+const cancelPendingRequest = async (pendingId) => {
+    console.log(pendingId);
+    try {
+        const response = await apiService.delete("students/remove-pending-status", {
+            params : { pendingId }
+        })
+        return response.data;
+    } catch (error) {
+        console.error("Failed to cancel pending request:", error);
+        throw error.response?.data || error.message || "An uknown error occured"
+    }
+}
+
 // const fetchClassroom;
 
 export const studentApi = {
     joinClassroom,
-    fetchClassroom
+    fetchClassroom,
+    checkPendingStatus,
+    cancelPendingRequest
 };

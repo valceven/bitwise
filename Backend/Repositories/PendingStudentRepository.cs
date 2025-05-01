@@ -97,6 +97,19 @@ namespace backend.Repositories
             return result;
         }
 
+        public async Task<bool> RemovePendingStudentAsync(int PendingId)
+        {
+            var pendingStudent = await _context.PendingStudents.FindAsync(PendingId);
 
+            if (pendingStudent == null)
+            {   
+                return false;
+            }
+
+            _context.PendingStudents.Remove(pendingStudent);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

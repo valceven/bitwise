@@ -25,6 +25,6 @@ namespace backend.Models
         public List<ClassroomLesson>? Lessons { get; set; } = new List<ClassroomLesson>();
 
         public ICollection<StudentClassroom> StudentClassrooms { get; set; }
-
+        public Teacher Teacher { get; set; }
     }
 }

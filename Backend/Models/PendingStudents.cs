@@ -19,5 +19,6 @@ namespace backend.Models
         public string ClassCode { get; set; }
 
         public Student Student { get; set;}
+        public Classroom Classroom { get; set; }
     }
 }

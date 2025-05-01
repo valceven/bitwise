@@ -70,7 +70,7 @@ const DashboardStudentReport = () => {
           filteredClassrooms.map((classroom, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 shadow-md rounded-xl p-6"
+              className="bg-white border border-gray-200 shadow-md rounded-xl p-8"
             >
               <div className="mb-4">
                 <h2 className="text-2xl font-bold text-gray-800">
@@ -89,16 +89,16 @@ const DashboardStudentReport = () => {
 
               <div>
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Lessons</h3>
-                <div className="max-h-48 overflow-y-auto custom-scrollbar bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <div className="max-h-96 overflow-y-auto custom-scrollbar bg-gray-50 border border-gray-200 rounded-lg p-6">
                   <ul className="space-y-2">
                     {lessons.map((lesson) => (
                       <li
                         key={lesson.id}
-                        className="bg-white p-3 rounded-lg border hover:bg-lightpurple transition"
+                        className="bg-white p-3 rounded-lg border hover:bg-lightpurple transition my-2"
                       >
                         <button
                           onClick={() => setSelectedLesson(lesson.id)}
-                          className="w-full text-left font-medium focus:outline-none"
+                          className="w-full text-left font-medium focus:outline-none "
                         >
                           {lesson.text}
                         </button>

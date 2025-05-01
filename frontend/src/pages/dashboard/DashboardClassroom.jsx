@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useUser } from "../../context/UserContext";
 import 'react-toastify/dist/ReactToastify.css';
 import DashboardClassroomStudent from "./DashboardClassroomStudent";
@@ -13,7 +13,7 @@ const DashboardClassroom = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center w-full space-y-6">
+      <div className="h-full flex flex-col items-center w-full space-y-6">
         {user.userType === 2 ? (
           <DashboardClassroomTeacher/>
         ) : ( <DashboardClassroomStudent/> )}

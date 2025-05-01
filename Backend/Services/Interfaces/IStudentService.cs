@@ -6,5 +6,7 @@ namespace backend.Services.Interfaces
     {
         Task<JoinClassroomResultDto> JoinClassroomAsync(JoinClassroomDto joinClassroomDto);
         Task<FetchClassroomResponseDto> FetchClassroomAsync(int StudentId);
+        Task<CheckPendingStatusResponseDto> CheckPendingStatusAsync(int StudentId);
+        Task<string> RemovePendingStatusAsync(int PendingId);
     }
 }

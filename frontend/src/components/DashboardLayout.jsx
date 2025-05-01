@@ -19,7 +19,7 @@ const DashboardLayout = () => {
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen overflow-x-hidden">
       <DashboardSidebar user={user}/>
       <div className="w-full mt-24 flex justify-center">
       <Outlet />
