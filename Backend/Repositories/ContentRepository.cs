@@ -18,6 +18,13 @@ namespace backend.Repositories
             return Task.FromResult<IEnumerable<Content>>(contents);
          }
         public async Task<Content> CreateContentAsync(Content content){
+            var topic = await _context.Topics.FindAsync(content.TopicId);
+            if (topic == null)
+            {
+                throw new ArgumentException("Topic not found");
+            }
+            // Add content to topic list
+            topic.Contents.Add(content);
             _context.Contents.Add(content);
             await _context.SaveChangesAsync();
             return content;

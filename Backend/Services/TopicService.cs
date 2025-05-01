@@ -20,6 +20,7 @@ namespace backend.Services
             {
                 TopicName = topicDto.TopicName,
                 LessonId = topicDto.LessonId,
+                Order = topicDto.Order,
             };
 
             return await _topicRepository.CreateTopicAsync(topic);

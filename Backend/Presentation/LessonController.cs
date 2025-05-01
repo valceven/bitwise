@@ -5,7 +5,7 @@ using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 namespace backend.Presentation
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     [Route("api/lessons")]
     [ApiController]
     public class LessonController : ControllerBase

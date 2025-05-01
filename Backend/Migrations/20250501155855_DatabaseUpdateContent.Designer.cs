@@ -12,8 +12,8 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    [Migration("20250501083038_ContentTableUpdate")]
-    partial class ContentTableUpdate
+    [Migration("20250501155855_DatabaseUpdateContent")]
+    partial class DatabaseUpdateContent
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -341,6 +341,9 @@ namespace backend.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TopicId"));
 
                     b.Property<int>("LessonId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Order")
                         .HasColumnType("integer");
 
                     b.Property<string>("TopicName")

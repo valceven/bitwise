@@ -16,14 +16,10 @@ namespace backend.Services
 
         public async Task<bool> CreateContent(CreateContentDto contentDto)
         {
-            var existingContents = await _contentRepository.GetContentsByTopicId(contentDto.TopicId);
-            
-            int nextOrder = existingContents.Any()
-            ? existingContents.Max(c => c.Order) + 1 : 1;
             var content = new Content
             {
                 TopicId = contentDto.TopicId,
-                Order = nextOrder,
+                Order = contentDto.Order,
                 ContentTitle = contentDto.ContentTitle,
                 ContentBody = contentDto.ContentBody
             };

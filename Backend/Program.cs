@@ -40,6 +40,7 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IClassroomService, ClassroomService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
+builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.Configure<backend.EmailSettings>(builder.Configuration.GetSection("EmailSettings")); // Configure MailSettings from appsettings.json
 builder.Services.AddTransient<backend.Services.Interfaces.IEmailService, backend.Services.EmailService>(); // Register the email service
 
@@ -51,6 +52,7 @@ builder.Services.AddScoped<IPendingStudentRepository, PendingStudentRepository>(
 builder.Services.AddScoped<IClassroomRepository, ClassroomRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ITopicRepository, TopicRepository>();
+builder.Services.AddScoped<IContentRepository, ContentRepository>();
 // Add authentication using JWT Bearer tokens
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
