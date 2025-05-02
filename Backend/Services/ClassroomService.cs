@@ -84,6 +84,20 @@ namespace backend.Services
 
             return response;
         }
+
+        public async Task<bool> LeaveClassroomAsync(int studentId)
+        {
+            var removed = await _classroomRepository.LeaveClassroomAsync(studentId);
+
+            if (removed)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Exception("Failed to remove student from classroom.");
+            }
+        }
     }
 
     // just a little helper class to generate a random class code
@@ -98,5 +112,7 @@ namespace backend.Services
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
+
+    
 
 }

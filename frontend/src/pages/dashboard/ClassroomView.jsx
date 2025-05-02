@@ -1,23 +1,31 @@
 import React, { useState } from 'react';
 import AnimatedLessonButton from "../../components/buttons/AnimatedLessonButton.jsx";
+import { studentApi } from '../../api/student/studentApi.js';
 
-const ClassroomView = ({ classroom }) => {
+const ClassroomView = ({ classroom , user }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState("Lesson 1"); // Default selected
 
   const lessons = ["Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7"];
-
-  console.log(classroom);
   
   const handleLeaveClassroom = () => {
-    setShowConfirmation(true);
+    setShowConfirmation(true); // Just show the confirmation modal
   };
-
-  const confirmLeave = () => {
-    console.log("Student left the classroom");
-    setShowConfirmation(false);
-    // In a real app, you would navigate away or update enrollment status
+  
+  const confirmLeave = async () => {
+    try {
+      console.log("Leaving classroom with ID:", user);
+      const response = await studentApi.leaveClassroom(user.userID);
+      if (response) {
+        console.log("Successfully left the classroom:", response);
+        setShowConfirmation(false);
+        // You could also redirect or update the UI here
+      }
+    } catch (error) {
+      console.error("Error leaving classroom:", error.message);
+    }
   };
+  
 
   return (
     <div className="flex w-full">

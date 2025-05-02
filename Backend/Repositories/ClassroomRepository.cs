@@ -112,5 +112,27 @@ namespace backend.Repositories
                 .Select(sc => sc.Student)
                 .ToListAsync();
         }
+
+        public async Task<bool> LeaveClassroomAsync(int studentId)
+        {
+            try
+            {
+                var studentClassroom = await _context.StudentClassrooms
+                    .FirstOrDefaultAsync(sc => sc.StudentId == studentId);
+
+                if (studentClassroom != null)
+                {
+                    _context.StudentClassrooms.Remove(studentClassroom);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error leaving classroom: {ex.Message}");
+                throw new Exception("An error occurred while leaving the classroom.", ex);
+            }
+        }
     }
 }
