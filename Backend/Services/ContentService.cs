@@ -49,9 +49,9 @@ namespace backend.Services
             return await _contentRepository.GetContentByIdAsync(contentId);
         }
 
-        public async Task<List<Content>> GetContentsByTopicId(int topicId)
+        public async Task<IEnumerable<Content>> GetContentsByTopicId(int topicId)
         {
-            return new List<Content> { await _contentRepository.GetContentByIdAsync(topicId) };
+            return await _contentRepository.GetContentsByTopicIdAsync(topicId);
         }
     }
 }

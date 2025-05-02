@@ -10,6 +10,6 @@ namespace backend.Services.Interfaces
         Task<bool> DeleteContent(int contentId);
         Task<List<Content>> GetAllContents();
         Task<Content?> GetContentById(int contentId);
-        Task<List<Content>> GetContentsByTopicId(int topicId);
+        Task<IEnumerable<Content>> GetContentsByTopicId(int topicId);
     }
 }

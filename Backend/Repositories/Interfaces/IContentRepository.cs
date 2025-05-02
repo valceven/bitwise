@@ -10,6 +10,6 @@ namespace backend.Repositories.Interfaces
         Task<Content> GetContentByIdAsync(int id);
         Task<Content> UpdateContentAsync(UpdateContentDto updateContentDto);
         Task<bool> DeleteContentAsync(int id);
-        Task<List<Content>> GetContentsByTopicId(int topicId);
+        Task<IEnumerable<Content>> GetContentsByTopicIdAsync(int topicId);
     }
 }
