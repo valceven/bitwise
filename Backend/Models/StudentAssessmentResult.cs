@@ -1,17 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models
 {
     public class StudentAssessmentResult
     {
-        public int Id { get; set; }
+        [Key]
+        public int StudentAssessmentResultId { get; set; }
+        [Required]
+        [ForeignKey("Student")]
         public int StudentId { get; set; }
-        public int LessonAssessmentId { get; set; }
-        public string SubmittedAnswer { get; set; }
-        public bool IsCorrect { get; set; }
+        [Required]
+        [ForeignKey("Assessment")]
+        public int AssessmentId { get; set; }
+
+        public double Score { get; set; }
         public DateTime SubmittedAt { get; set; }
     }
 }

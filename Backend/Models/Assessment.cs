@@ -11,14 +11,9 @@ namespace backend.Models
         [Required]
         [ForeignKey("TopicId")]
         public int TopicId { get; set; }
+        public ICollection<StudentAssessmentResult> StudentAssessmentResults { get; set; } = new List<StudentAssessmentResult>();
 
-        [Column(TypeName = "text")]
-        public required string Title { get; set; }
-
-        public DateTime DueDate { get; set; }
-
-        [Column(TypeName = "text")]
-        public required string Type { get; set; } // e.g., "Quiz", "Test", "Assignment"
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     }
 }
