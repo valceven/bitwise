@@ -17,6 +17,8 @@ namespace backend.Repositories
 
         public async Task<Lesson> CreateLessonAsync(Lesson lesson)
         {
+            _context.Lessons.Add(lesson);
+            await _context.SaveChangesAsync();
             // automatically add lessons to all classrooms
             var classrooms = await _context.Classrooms.ToListAsync();
             foreach (var classroom in classrooms)
@@ -29,7 +31,6 @@ namespace backend.Repositories
                 _context.ClassroomLessons.Add(classroomLesson);
             }
 
-            _context.Lessons.Add(lesson);
             await _context.SaveChangesAsync();
             return lesson;
         }
@@ -47,11 +48,12 @@ namespace backend.Repositories
         }
         public async Task<List<Lesson>> GetLessonByClassroomIdAsync(int classroomId)
         {
-            var classroomLessons = await _context.ClassroomLessons.ToListAsync();
-            return classroomLessons
+            var lessons = await _context.ClassroomLessons
                 .Where(cl => cl.ClassroomId == classroomId)
+                .Include(cl => cl.Lesson)
                 .Select(cl => cl.Lesson)
-                .ToList();
+                .ToListAsync();
+            return lessons;
         }
 
         public async Task<List<Lesson>> GetAllLessons()

@@ -12,8 +12,8 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    [Migration("20250502154802_InitialUpdateToAssessment")]
-    partial class InitialUpdateToAssessment
+    [Migration("20250502164848_UpdatedAssessmentModel")]
+    partial class UpdatedAssessmentModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
