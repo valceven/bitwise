@@ -45,7 +45,7 @@ namespace backend.Presentation{
         {
             var contents = await _contentService.GetContentsByTopicId(topicId);
 
-            if (contents != null && contents.Count > 0)
+            if (contents != null && contents?.Count() > 0)
             {
                 return Ok(new { contents });
             }

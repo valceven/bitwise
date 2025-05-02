@@ -55,7 +55,7 @@ namespace backend.Repositories
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<List<Content>> GetContentsByTopicId(int topicId)
+        public async Task<IEnumerable<Content>> GetContentsByTopicIdAsync(int topicId)
         {
             var contents = await _context.Contents
                 .Where(c => c.TopicId == topicId)
