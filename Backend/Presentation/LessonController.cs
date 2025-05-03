@@ -45,10 +45,9 @@ namespace backend.Presentation
         public async Task<IActionResult> GetLessonsByClassroomId([FromQuery] int classroomId)
         {
             var lessons = await _lessonService.GetLessonByClassroomIdAsync(classroomId);
-
             if (lessons != null && lessons.Count > 0)
             {
-                return Ok(new { lessons });
+                return Ok(new {lessons});
             }
 
             return NotFound(new { message = "No lessons found for this classroom" });

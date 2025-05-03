@@ -4,7 +4,7 @@ namespace backend.Controllers
     using backend.Services.Interfaces;
     using Microsoft.AspNetCore.Mvc;
 
-    [Route("api/")]
+    [Route("api/classroom")]
     [ApiController]
     public class ClassroomController : ControllerBase
     {
@@ -46,6 +46,17 @@ namespace backend.Controllers
             }
 
             return BadRequest("Unkown Error");
+        }
+
+        [HttpDelete("leave-classroom")]
+        public async Task<IActionResult> LeaveClassroom([FromQuery] int studentId)
+        {
+            var result = await _classroomService.LeaveClassroomAsync(studentId);
+
+            if (result)
+                return Ok(result);
+
+            return BadRequest(result);
         }
     }
 }

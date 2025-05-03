@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CreateClassModal from "../../components/modals/CreateClassModal";
 import plus_join from "../../assets/plus-join.svg";
-import { useUser } from "../../context/UserContext";
 import { teacherApi } from "../../api/teacher/teacherApi";
 import { FiCopy } from 'react-icons/fi';
 import { toast, ToastContainer } from 'react-toastify';
@@ -10,10 +9,9 @@ import { Link } from "react-router-dom";
 
 
 
-const DashboardClassroomTeacher = () => {
+const DashboardClassroomTeacher = ({ user }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [classrooms, setClassrooms] = useState([]);
-  const { user } = useUser();
 
   console.log(user);
 

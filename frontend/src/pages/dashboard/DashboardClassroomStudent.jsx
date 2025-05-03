@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import JoinClass from "../../components/JoinClass";
 import PendingClassRequest from "../../components/PendingRequest";
-import { useUser } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { studentApi } from "../../api/student/studentApi";
 import ClassroomView from "./ClassroomView";
 
-const DashboardClassroomStudent = () => {
+const DashboardClassroomStudent = ({ user }) => {
   const [classroom, setClassroom] = useState(null);
   const [pendingRequest, setPendingRequest] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -67,7 +65,7 @@ const DashboardClassroomStudent = () => {
   return (
     <div className="w-full p-8 pb-0 h-full">
       {classroom ? (
-        <ClassroomView classroom={classroom} />
+        <ClassroomView classroom={classroom} user={user} />
       ) : pendingRequest ? (
         <PendingClassRequest 
           pendingRequest={pendingRequest} 
