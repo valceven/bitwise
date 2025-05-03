@@ -55,8 +55,7 @@ namespace backend.Services
                     ClassCode = classroom.ClassCode,
                     Section = classroom.Section,
                     Description = classroom.Description,
-                    Students = studentDtos,
-                    ClassroomId = classroom.ClassroomID
+                    Students = studentDtos
                 });
             }
 
@@ -98,6 +97,33 @@ namespace backend.Services
             {
                 throw new Exception("Failed to remove student from classroom.");
             }
+        }
+
+        public async Task<ClassroomResponseDTO> GetClassroomByClassCodeAsync(string classCode)
+        {
+            var classroom = await _classroomRepository.GetClassroomByClassCodeAsync(classCode);
+            var students = await _classroomRepository.GetStudentsByClassroomIdAsync(classroom.ClassroomID);
+
+            var studentDtos = students.Select(s => new StudentInClassroomDto
+            {
+                StudentId = s.StudentId,
+                StudentIdNumber = s.StudentIdNumber,
+                Name = s.User.Name,
+                Email = s.User.Email
+            }).ToList();
+
+            var classroomResponseDto = new ClassroomResponseDTO
+            {
+                ClassName = classroom.ClassName,
+                CreatedAt = classroom.CreatedAt,
+                TeacherID = classroom.TeacherId,
+                ClassCode = classroom.ClassCode,
+                Section = classroom.Section,
+                Description = classroom.Description,
+                Students = studentDtos
+            };
+
+            return classroomResponseDto;
         }
     }
 

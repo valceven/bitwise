@@ -35,6 +35,20 @@ namespace backend.Controllers
             return Ok(classroom);
         }
 
+        [HttpGet("classroom-by-classcode")]
+        public async Task<ActionResult<ClassroomResponseDTO>> GetClassroomByClassCode([FromQuery] string classCode)
+        {
+            var classroom = await _classroomService.GetClassroomByClassCodeAsync(classCode);
+
+            if (classroom != null)
+            {
+                return Ok(classroom);
+            }
+
+            return NotFound("Classroom not found.");
+        }
+
+
         [HttpGet("classroom-view")]
         public async Task<ActionResult<ViewClassroomResponseDto>> ViewClassroom([FromQuery] ViewClassroomDto viewClassroomDto)
         {

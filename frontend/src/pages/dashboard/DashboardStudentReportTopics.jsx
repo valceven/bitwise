@@ -23,6 +23,8 @@ const studentsData = {
 const DashboardStudentReportTopics = ({ lessonId, onBack }) => {
   const [selectedTopic, setSelectedTopic] = useState(null);
 
+  console.log(lessonId)
+
   return (
     <div className="space-y-6">
       {!selectedTopic ? (

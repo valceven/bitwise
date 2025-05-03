@@ -4,7 +4,7 @@ import LessonCard from "../../components/TopicCard";
 import TopicCard from "../../components/TopicCard";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/buttons/PurpleButton";
-import TopicRoadmap from "../../components/TopicRoadmap";
+//import TopicRoadmap from "../../components/TopicRoadmap";
 
 
 const LessonView = () => {

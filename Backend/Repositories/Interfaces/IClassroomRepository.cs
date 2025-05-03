@@ -12,5 +12,6 @@ namespace backend.Repositories.Interfaces
         Task<List<ViewLessonFromClassroomDto>> GetLessonsByClassroomIdAsync(int classroomId);
         Task<List<Student>> GetStudentsByClassroomIdAsync(int classroomId);
         Task<bool> LeaveClassroomAsync(int studentId);
+        Task<Classroom> GetClassroomByClassCodeAsync(string classCode);
     }
 }

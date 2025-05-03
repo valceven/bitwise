@@ -134,5 +134,20 @@ namespace backend.Repositories
                 throw new Exception("An error occurred while leaving the classroom.", ex);
             }
         }
+
+        public async Task<Classroom> GetClassroomByClassCodeAsync(string classCode)
+        {
+            try
+            {
+                return await _context.Classrooms
+                .Where(c => c.ClassCode == classCode)
+                .FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching classroom: {ex.Message}");
+                throw new Exception("An error occured while creating the classroom.", ex);
+            }
+        }
     }
 }

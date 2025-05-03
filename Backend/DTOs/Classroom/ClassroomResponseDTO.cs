@@ -14,6 +14,5 @@ namespace backend.DTOs.Classroom
         public string Section {get; set;}
         public string Description {get; set;}
         public List<StudentInClassroomDto> Students {get; set; }
-        public int ClassroomId {get; set;}
     }
 }
