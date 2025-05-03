@@ -1,102 +1,85 @@
-import { Button } from "@mui/material";
-import React from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm"; // important!!
+import React, { useState } from "react";
+import AnimatedTopicButton from "../../components/buttons/AnimatedTopicButton";
+import LessonCard from "../../components/TopicCard";
+import TopicCard from "../../components/TopicCard";
+import { useNavigate } from "react-router-dom";
+import Button from "../../components/buttons/PurpleButton";
+import TopicRoadmap from "../../components/TopicRoadmap";
+
 
 const LessonView = () => {
-  const logicGatesLesson = {
-    title: "Logic Gates 101",
-    content: `
-# Introduction to Logic Gates
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState("Topic 1");
+  const navigate = useNavigate(); 
 
-Logic gates are the basic building blocks of digital circuits.  
-They perform basic logical functions that are essential for digital computing.
+  const topics = [
+    "Topic 1", "Topic 2", "Topic 3", 
+    "Topic 4", "Topic 5", "Topic 6", "Topic 7"
+  ];
 
----
+  const handleTopicClick = (topic) => {
+    setSelectedTopic(topic);
+    setShowConfirmation(false);
+   
 
-## Common Logic Gates
-
-### 1. AND Gate
-- The output is \`1\` only if **both inputs** are \`1\`.
-- Otherwise, the output is \`0\`.
-
-| Input A | Input B | Output |
-| :-----: | :-----: | :----: |
-| 0       | 0       | 0      |
-| 0       | 1       | 0      |
-| 1       | 0       | 0      |
-| 1       | 1       | 1      |
-
-
----
-
-### 2. OR Gate
-- The output is \`1\` if **at least one input** is \`1\`.
-- Otherwise, the output is \`0\` if both inputs are \`0\`.
-
-| Input A | Input B | Output |
-| :-----: | :-----: | :----: |
-| 0       | 0       | 0      |
-| 0       | 1       | 1      |
-| 1       | 0       | 1      |
-| 1       | 1       | 1      |
-
----
-
-### 3. NOT Gate
-- Also called an **Inverter**.
-- It **reverses** the input:
-  - If input is \`1\`, output is \`0\`
-  - If input is \`0\`, output is \`1\`
-
-| Input | Output |
-| :---: | :----: |
-| 0     | 1      |
-| 1     | 0      |
-
-
----
-
-## Summary
-
-| Gate | Function |
-| :--: | :------: |
-| AND  | Output \`1\` if both inputs are \`1\` |
-| OR   | Output \`1\` if at least one input is \`1\` |
-| NOT  | Inverts the input |  
-
----
-
-## Fun Fact!
-
-Logic gates are usually built using **transistors**.  
-These tiny switches control the flow of electricity in computers and are part of why modern computers are so powerful!
-    `,
   };
 
+  const handleProceedTopic = (topic) => {
+    navigate(`/app/topicview?topic=${encodeURIComponent(topic)}`);
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center h-full pb-16 px-6 w-full">
-      <div className="w-full max-w-3xl">
-        <h1 className="text-4xl font-bold mb-8 addinter">
-          {logicGatesLesson.title}
-        </h1>
-        <div className="prose prose-lg max-w-none addinter text-lg font-medium text-gray-500">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {logicGatesLesson.content}
-          </ReactMarkdown>
+    <div className="flex gap-4 justify-center">
+      
+      {!showConfirmation && (
+        <div className="max-w-xl h-min mx-auto mt-10 p-6 bg-white rounded-3xl shadow-[4px_4px_0px_#0b1e2d] border border-gray-200 ">
+        {/* Lesson Header */}
+        <div>
+          <h1 className="text-2xl font-bold">Basic Boolean Algebra</h1>
+          <h2 className="text-xl font-bold">{selectedTopic}</h2>
+          <p className="text-gray-600 mt-2">
+          Boolean Algebra is a mathematical structure used to analyze and simplify logical statements. It is the backbone of all digital systems — from the simplest calculators to the most complex supercomputers. But before we dive into how it works, it's important to know where it all began.
+          </p>
+        </div>
+      
+      
+        <div className="mt-6 border border-gray-300 rounded-md p-4 bg-gray-50">
+          <h2 className="font-semibold mb-4">Laws of Boolean Algebra:</h2>
+          <div className="grid grid-cols-2 gap-y-2 text-sm text-gray-700">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span className="text-green-600">✔️</span>
+                <span>Feature text goes here</span>
+              </div>
+            ))}
+          </div>
+         
+        </div>
+
+        <div className="flex justify-end mt-4">
+          <Button className='bg-bluez btn-shadow items-end'
+           onClick={() => handleProceedTopic(selectedTopic)} 
+          >Proceed to Topic</Button>
         </div>
       </div>
-      <div className="flex justify-end mt-20 w-full max-w-3xl">
-      <button
-        className="bg-gray-500 hover:bg-gray-600 btn-shadow addgrotesk p-3 px-4 mr-auto"
-      >
-        Previous
-      </button>
-      <button
-        className="bg-bluez btn-shadow addgrotesk p-3 px-4"
-      >Next
-      </button>
+      
+      )}
+
+
+      <div className="flex flex-wrap gap-4 justify-center mt-10">
+      {topics.map((topic) => (
+        <AnimatedTopicButton
+          key={topic}
+          topic={topic}
+          isSelected={selectedTopic === topic}
+          onClick={() => handleTopicClick(topic)}
+         
+        />
+      ))}
       </div>
+  
+      
+      
     </div>
   );
 };
