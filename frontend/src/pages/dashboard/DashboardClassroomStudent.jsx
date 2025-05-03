@@ -11,8 +11,6 @@ const DashboardClassroomStudent = ({ user }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  console.log("USER FROM DASHBOARDCLASSROOM", user);
-
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
