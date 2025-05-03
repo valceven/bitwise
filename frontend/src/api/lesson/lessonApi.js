@@ -1,6 +1,7 @@
 import apiService from "../apiService";
 
 const fetchLessons = async (classroomId) => {
+    console.log("Fetching lessons for classroom ID:", classroomId);
     try {
         const response = await apiService.get("lessons/get-lessons-by-classroom", {
             params: { classroomId: classroomId }

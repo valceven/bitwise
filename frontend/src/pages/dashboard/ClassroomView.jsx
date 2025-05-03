@@ -13,8 +13,8 @@ const ClassroomView = ({ classroom , user }) => {
     const fetchLessons = async () => {
       try {
         const response = await lessonApi.fetchLessons(classroom.classroomId);
-        setLessons(response);
         console.log("Fetched lessons:", response);
+        setLessons(response); 
       } catch (error) {
         console.error("Error fetching lessons:", error.message);
       } finally {
@@ -31,7 +31,6 @@ const ClassroomView = ({ classroom , user }) => {
   
   const confirmLeave = async () => {
     try {
-      console.log("Leaving classroom with ID:", user);
       const response = await studentApi.leaveClassroom(user.userID);
       if (response) {
         console.log("Successfully left the classroom:", response);

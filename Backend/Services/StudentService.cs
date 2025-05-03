@@ -54,6 +54,7 @@ namespace backend.Services
             var fetchClassroomResponseDto = new FetchClassroomResponseDto
             {
                 ClassName = classroom.ClassName,
+                ClassroomId = classroom.ClassroomID,
                 Section = classroom.Section,
                 Description = classroom.Description,
                 TeacherName = classroom.Teacher.User.Name,

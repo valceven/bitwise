@@ -55,7 +55,8 @@ namespace backend.Services
                     ClassCode = classroom.ClassCode,
                     Section = classroom.Section,
                     Description = classroom.Description,
-                    Students = studentDtos
+                    Students = studentDtos,
+                    ClassroomId = classroom.ClassroomID
                 });
             }
 
