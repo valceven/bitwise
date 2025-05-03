@@ -3,7 +3,12 @@ import { useState } from "react";
 export default function TopicCard({ topic }) {
   const [isOpen, setIsOpen] = useState(true);
 
+  if (!topic) {
+    return <div className="text-red-500">No topic data available.</div>;
+  }
+
   return (
+    
     <div className="w-full mx-auto mt-10 p-6 bg-white rounded-3xl shadow-[4px_4px_0px_#0b1e2d] border border-gray-200 ">
       {/* Topic Header */}
       <div>
