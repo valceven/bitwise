@@ -4,17 +4,20 @@ import LessonCard from "../../components/TopicCard";
 import TopicCard from "../../components/TopicCard";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/buttons/PurpleButton";
+<<<<<<< HEAD
 //import TopicRoadmap from "../../components/TopicRoadmap";
+=======
+
+>>>>>>> 4e297dd119f19b717ac19e760ec83845d24da4a0
 
 
 const LessonView = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedTopic, setSelectedTopic] = useState("Topic 1");
+  const [selectedTopic, setSelectedTopic] = useState(1);
   const navigate = useNavigate(); 
 
   const topics = [
-    "Topic 1", "Topic 2", "Topic 3", 
-    "Topic 4", "Topic 5", "Topic 6", "Topic 7"
+    1,2,3,4,5,6
   ];
 
   const handleTopicClick = (topic) => {
@@ -24,9 +27,10 @@ const LessonView = () => {
 
   };
 
-  const handleProceedTopic = (topic) => {
-    navigate(`/app/topicview?topic=${encodeURIComponent(topic)}`);
-  }
+  const handleProceedTopic = (topicId) => {
+    navigate(`/app/topicview/${topicId}`);
+  };
+  
 
   return (
     <div className="flex gap-4 justify-center">
