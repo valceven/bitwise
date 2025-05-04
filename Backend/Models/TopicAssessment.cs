@@ -10,8 +10,10 @@ namespace backend.Models
         [Required]
         [ForeignKey("Assessment")]
         public int AssessmentId { get; set; }
+        public Assessment Assessment { get; set; }
         [Required]
         [ForeignKey("Topic")]
         public int TopicId { get; set; }
+        public Topic Topic { get; set; }
     }
 }
