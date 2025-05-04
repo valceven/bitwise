@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 namespace backend.Repositories.Interfaces
 {
 
-    public interface IAssessmentStudentRepository
+    public interface IStudentAssessmentRepository
     {
-        Task<List<StudentAssessmentResult>> GetAllAssessmentStudents();
-        Task<StudentAssessmentResult> GetStudentScoreById(int assessmentStudentId);
-        Task<bool> AddAssessmentStudent(StudentAssessmentResult assessmentStudent);
-        Task<bool> UpdateAssessmentStudent(StudentAssessmentResult assessmentStudent);
-        Task<bool> DeleteAssessmentStudent(int assessmentStudentId);
+        Task<ICollection<StudentAssessment>> GetAllAssessmentStudents();
+        Task<StudentAssessment> GetStudentScoreById(int assessmentStudentId);
+        Task<bool> AddtudentAssessment(StudentAssessment assessmentStudent);
+        Task<bool> UpdateStudentAssessment(StudentAssessment assessmentStudent);
+        Task<bool> DeleteStudentAssessment(int assessmentStudentId);
     }
 }

@@ -3,16 +3,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models
 {
-    public class Assessment
+    public class TopicAssessment
     {
         [Key]
-        public int AssessmentId { get; set; }
-
+        public int TopicAssessmentId { get; set; }
         [Required]
-        [ForeignKey("TopicId")]
+        [ForeignKey("Assessment")]
+        public int AssessmentId { get; set; }
+        [Required]
+        [ForeignKey("Topic")]
         public int TopicId { get; set; }
-    
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
     }
 }
