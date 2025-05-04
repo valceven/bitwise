@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    partial class bitwiseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250504125335_AddedNavigationToTables")]
+    partial class AddedNavigationToTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,29 +223,6 @@ namespace backend.Migrations
                     b.ToTable("Lessons");
                 });
 
-            modelBuilder.Entity("backend.Models.LessonTopic", b =>
-                {
-                    b.Property<int>("LessonTopicId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LessonTopicId"));
-
-                    b.Property<int>("LessonId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TopicId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("LessonTopicId");
-
-                    b.HasIndex("LessonId");
-
-                    b.HasIndex("TopicId");
-
-                    b.ToTable("LessonTopics");
-                });
-
             modelBuilder.Entity("backend.Models.PendingStudents", b =>
                 {
                     b.Property<int>("PendingId")
@@ -305,35 +285,6 @@ namespace backend.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("backend.Models.StudentAssessment", b =>
-                {
-                    b.Property<int>("StudentAssessmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StudentAssessmentId"));
-
-                    b.Property<int>("AssessmentId")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("Score")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("SubmittedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("StudentAssessmentId");
-
-                    b.HasIndex("AssessmentId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("StudentAssessments");
-                });
-
             modelBuilder.Entity("backend.Models.StudentClassroom", b =>
                 {
                     b.Property<int>("StudentClassroomId")
@@ -359,41 +310,6 @@ namespace backend.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("StudentClassrooms");
-                });
-
-            modelBuilder.Entity("backend.Models.StudentTopic", b =>
-                {
-                    b.Property<int>("StudentTopicId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StudentTopicId"));
-
-                    b.Property<DateTime>("CompletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsViewed")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TopicId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("ViewedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("StudentTopicId");
-
-                    b.HasIndex("StudentId");
-
-                    b.HasIndex("TopicId");
-
-                    b.ToTable("StudentTopics");
                 });
 
             modelBuilder.Entity("backend.Models.Teacher", b =>
@@ -437,25 +353,6 @@ namespace backend.Migrations
                     b.HasIndex("LessonId");
 
                     b.ToTable("Topics");
-                });
-
-            modelBuilder.Entity("backend.Models.TopicAssessment", b =>
-                {
-                    b.Property<int>("TopicAssessmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TopicAssessmentId"));
-
-                    b.Property<int>("AssessmentId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TopicId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("TopicAssessmentId");
-
-                    b.ToTable("TopicAssessments");
                 });
 
             modelBuilder.Entity("backend.Models.User", b =>
@@ -541,25 +438,6 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Models.LessonTopic", b =>
-                {
-                    b.HasOne("backend.Models.Lesson", "Lesson")
-                        .WithMany()
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("backend.Models.Topic", "Topic")
-                        .WithMany()
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("Topic");
-                });
-
             modelBuilder.Entity("backend.Models.PendingStudents", b =>
                 {
                     b.HasOne("backend.Models.Classroom", "Classroom")
@@ -590,25 +468,6 @@ namespace backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("backend.Models.StudentAssessment", b =>
-                {
-                    b.HasOne("backend.Models.Assessment", "Assessment")
-                        .WithMany()
-                        .HasForeignKey("AssessmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("backend.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Assessment");
-
-                    b.Navigation("Student");
-                });
-
             modelBuilder.Entity("backend.Models.StudentClassroom", b =>
                 {
                     b.HasOne("backend.Models.Classroom", "Classroom")
@@ -626,25 +485,6 @@ namespace backend.Migrations
                     b.Navigation("Classroom");
 
                     b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("backend.Models.StudentTopic", b =>
-                {
-                    b.HasOne("backend.Models.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("backend.Models.Topic", "Topic")
-                        .WithMany()
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-
-                    b.Navigation("Topic");
                 });
 
             modelBuilder.Entity("backend.Models.Teacher", b =>
