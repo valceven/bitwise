@@ -4,11 +4,6 @@ import LessonCard from "../../components/TopicCard";
 import TopicCard from "../../components/TopicCard";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/buttons/PurpleButton";
-<<<<<<< HEAD
-//import TopicRoadmap from "../../components/TopicRoadmap";
-=======
-
->>>>>>> 4e297dd119f19b717ac19e760ec83845d24da4a0
 
 
 const LessonView = () => {
