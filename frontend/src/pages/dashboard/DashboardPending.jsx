@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { teacherApi } from "../../api/teacher/teacherApi";
 import { useUser } from "../../context/UserContext";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const DashboardPending = () => {
   const [classrooms, setClassrooms] = useState([]);
   const { user } = useUser();
 
   useEffect(() => {
+    let intervalId;
     const fetchPending = async () => {
       try {
         const response = await teacherApi.fetchPendingStudents(user.userID);
@@ -26,12 +29,15 @@ const DashboardPending = () => {
         })).filter(classroom => classroom.students.length > 0); // Only show classrooms with pending students
         
         setClassrooms(transformedClassrooms);
+       
       } catch (error) {
         console.error(error.response?.data || error.message || "An unknown error occurred");
       }
     };
   
     fetchPending();
+    intervalId = setInterval(fetchPending, 1000);
+    return () => clearInterval(intervalId); 
   }, [user.userID]);
 
   const toggleSelectAll = (classIndex, checked) => {
@@ -73,6 +79,7 @@ const DashboardPending = () => {
 
       const response = await teacherApi.acceptPendingStudent(data);
       console.log(response);
+      
     } catch (error) {
       console.error(error.response?.data || error.message || "An unknown error occured.");
     }
@@ -92,6 +99,8 @@ const DashboardPending = () => {
 
       const response = await teacherApi.rejectPendingStudent(data);
       console.log(response);
+      
+
     } catch (error) {
       console.error(error.response?.data || error.message || "An unknown error occured.");
     }
@@ -156,6 +165,10 @@ const DashboardPending = () => {
                             onClick={(e) => {
                               e.preventDefault();
                               handleAccept(classIndex, studentIndex);
+                              toast.success("Student successfully added to classroom", {
+                                position: "bottom-right",
+                                autoClose: 1500,
+                              });
                             }}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
@@ -168,6 +181,10 @@ const DashboardPending = () => {
                             onClick={(e) => {
                               e.preventDefault();
                               handleReject(classIndex, studentIndex);
+                              toast.error("Student rejected", {
+                                position: "bottom-right",
+                                autoClose: 1500,
+                              });
                             }}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
@@ -189,6 +206,7 @@ const DashboardPending = () => {
           <p className="text-lg text-gray-500">No pending student requests available.</p>
         </div>
       )}
+      <ToastContainer toastClassName="border shadow-none text-black" bodyClassName="text-xs font-medium" />
     </div>
   );
 };

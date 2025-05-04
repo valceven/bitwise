@@ -4,6 +4,8 @@ import * as Yup from 'yup';
 import Button from "../components/buttons/PurpleButton";
 import Star from '../assets/Star.svg';
 import { studentApi } from '../api/student/studentApi';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const JoinClass = ({ title = "Join a Class", user}) => {
   const validationSchema = Yup.object({
@@ -17,12 +19,19 @@ const JoinClass = ({ title = "Join a Class", user}) => {
       values.userType = user.userType;
       values.studentId = user.userID;
       const response = await studentApi.joinClassroom(values);
-      alert(response.message);
+      console.log('Join class response:', response.status);
+      toast.info(response.message, {
+        position: "bottom-right",
+        autoClose: 1500,
+      });
       resetForm();
-      window.location.reload();
     } catch (error) {
       console.error('Error joining class: ', error);
-      alert(`Failed to join class: ${error.message || 'Unknown error'}`);
+     
+      toast.error("Failed to join class", {
+        position: "bottom-right",
+        autoClose: 1500,
+    });
     } finally {
       setSubmitting(false);
     }
@@ -82,6 +91,7 @@ const JoinClass = ({ title = "Join a Class", user}) => {
           </Formik>
         </div>
       </div>
+      <ToastContainer toastClassName="border shadow-none text-black" bodyClassName="text-xs font-medium" />
     </div>
   );
 };

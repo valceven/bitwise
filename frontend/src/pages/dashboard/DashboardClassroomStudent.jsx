@@ -6,6 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { studentApi } from "../../api/student/studentApi";
 import ClassroomView from "./ClassroomView";
 
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const DashboardClassroomStudent = () => {
   const [classroom, setClassroom] = useState(null);
   const [pendingRequest, setPendingRequest] = useState(null);
@@ -14,8 +17,9 @@ const DashboardClassroomStudent = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let intervalId;
     const fetchData = async () => {
-      setIsLoading(true);
+      
       
       let hasClassroom = false;
       
@@ -24,6 +28,7 @@ const DashboardClassroomStudent = () => {
         if (classroomResponse) {
           setClassroom(classroomResponse);
           hasClassroom = true;
+          clearInterval(intervalId);
         }
       } catch (error) {
         console.error("Error fetching classroom:", error.message);
@@ -34,23 +39,32 @@ const DashboardClassroomStudent = () => {
           const pendingResponse = await studentApi.checkPendingStatus(user.userID);
           if (pendingResponse != null) {
             setPendingRequest(pendingResponse);
+          }else{
+            setPendingRequest(null);
           }
         } catch (error) {
           console.error("Error checking pending status:", error.message);
+          setPendingRequest(null);
         }
       }
       
       setIsLoading(false);
     };
 
+
     fetchData();
+
+    intervalId = setInterval(fetchData, 2000);
+    return () => clearInterval(intervalId); 
   }, [user, navigate]);
+
+  
 
   const handleCancelRequest = async () => {
     try {
       await studentApi.cancelPendingRequest(pendingRequest.pendingId);
       setPendingRequest(null);
-      alert("Request cancelled successfully");
+      
     } catch (error) {
       console.error('Error cancelling request:', error);
     }
@@ -76,6 +90,7 @@ const DashboardClassroomStudent = () => {
       ) : (
         <JoinClass user={user} />
       )}
+      <ToastContainer toastClassName="border shadow-none text-black" bodyClassName="text-xs font-medium" />
     </div>
   );
 };

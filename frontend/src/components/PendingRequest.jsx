@@ -1,5 +1,7 @@
 import React from 'react';
 import Star from '../assets/Star.svg';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PendingClassRequest = ({ pendingRequest, onCancelRequest }) => {
   
