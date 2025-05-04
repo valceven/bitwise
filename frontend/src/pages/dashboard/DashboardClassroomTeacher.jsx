@@ -113,7 +113,7 @@ const DashboardClassroomTeacher = ({ user }) => {
                 onClick={() => navigateToStudentReport(classroom.classCode)}
                 className="mt-2 text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 text-sm rounded shadow"
               >
-                Analytics
+                View Classroom
               </button>
             
               <ToastContainer toastClassName="border shadow-none text-black" bodyClassName="text-xs font-medium" />

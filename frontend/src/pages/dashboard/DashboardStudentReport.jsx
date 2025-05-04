@@ -6,6 +6,7 @@ import DashboardStudentReportTopics from "./DashboardStudentReportTopics";
 import ClassRecord from "./ClassRecord";
 import { classroomApi } from "../../api/classroom/classroomApi";
 import { useParams } from "react-router-dom";
+import { teacherApi } from "../../api/teacher/teacherApi";
 
 const DashboardStudentReport = () => {
   const [classroom, setClassroom] = useState(null);
@@ -19,7 +20,6 @@ const DashboardStudentReport = () => {
     const fetchClassroomByClassCode = async () => {
       try {
         const response = await classroomApi.fetchClassroomByClassCode(classCode);
-        console.log(response);
         setClassroom(response);
       } catch (error) {
         console.error("Error fetching classrooms:", error.message);
@@ -37,15 +37,15 @@ const DashboardStudentReport = () => {
     { text: "Lesson 4", id: "lesson4" },
   ];
 
-  const handleRemoveStudent = async (studentId) => {
+  const handleRemoveStudent = async (studentId, classroomId) => {
     try {
-      await classroomApi.removeStudentFromClassroom(classCode, studentId);
+      console.log("Removing student:", studentId, "from classroom:", classroomId);
+      await teacherApi.removeStudentFromClassroom(studentId, classroomId);
       
       setClassroom(prev => ({
         ...prev,
         students: prev.students.filter(student => student.id !== studentId)
       }));
-      
       toast.success("Student removed successfully");
     } catch (error) {
       console.error("Error removing student:", error.message);

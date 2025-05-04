@@ -50,6 +50,7 @@ namespace backend.Services
                 classroomResponseDtos.Add(new ClassroomResponseDTO
                 {
                     ClassName = classroom.ClassName,
+                    ClassroomId = classroom.ClassroomID,
                     CreatedAt = classroom.CreatedAt,
                     TeacherID = classroom.TeacherId,
                     ClassCode = classroom.ClassCode,
@@ -115,6 +116,7 @@ namespace backend.Services
             var classroomResponseDto = new ClassroomResponseDTO
             {
                 ClassName = classroom.ClassName,
+                ClassroomId = classroom.ClassroomID,
                 CreatedAt = classroom.CreatedAt,
                 TeacherID = classroom.TeacherId,
                 ClassCode = classroom.ClassCode,

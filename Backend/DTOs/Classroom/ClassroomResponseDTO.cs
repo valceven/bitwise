@@ -8,6 +8,7 @@ namespace backend.DTOs.Classroom
     public class ClassroomResponseDTO
     {
         public string ClassName {get; set;}
+        public int ClassroomId {get; set;}
         public DateTime CreatedAt {get; set;}
         public int TeacherID {get; set;}
         public string ClassCode {get; set;}

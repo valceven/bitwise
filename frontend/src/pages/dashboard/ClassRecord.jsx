@@ -11,7 +11,7 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
 
   const handleRemoveClick = (student) => {
     if (window.confirm(`Are you sure you want to remove ${student.name} from this class?`)) {
-      onRemoveStudent(student.studentId);
+      onRemoveStudent(student.studentId, classroom.classroomId);
     }
   };
 
