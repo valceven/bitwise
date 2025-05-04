@@ -18,7 +18,11 @@ import DashboardLayout from "./components/DashboardLayout.jsx";
 import DashboardPending from "./pages/dashboard/DashboardPending.jsx";
 import LessonView from "./pages/dashboard/LessonView.jsx";
 import TopicView from "./pages/dashboard/TopicView.jsx";
+<<<<<<< HEAD
+//import TopicRoadmap from "./components/TopicRoadmap.jsx";
+=======
 
+>>>>>>> 4e297dd119f19b717ac19e760ec83845d24da4a0
 
 const router = createBrowserRouter([
   {
@@ -47,13 +51,18 @@ const router = createBrowserRouter([
     errorElement: <PageNotFound />,
     children: [
       { index: true, element: <DashboardHome /> },
-      { path: "classroom", element: <DashboardClassroom /> },
-      { path: "student-report", element: <DashboardStudentReport /> },
+      { path: "classroom", element: <DashboardClassroom />},
+      { path: "classroom/:classCode", element: <DashboardStudentReport /> },
       { path: "pending", element: <DashboardPending /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "lessonview", element: <LessonView /> },
+<<<<<<< HEAD
+      { path: "topicview", element: <TopicView /> },
+      //{path: "topicroadmap", element: <TopicRoadmap />},
+=======
       { path: "topicview/:topicId", element: <TopicView /> },
      
+>>>>>>> 4e297dd119f19b717ac19e760ec83845d24da4a0
       
     ],
   },

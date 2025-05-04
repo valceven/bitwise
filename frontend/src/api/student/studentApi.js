@@ -47,11 +47,26 @@ const cancelPendingRequest = async (pendingId) => {
     }
 }
 
+const leaveClassroom = async (studentId) => {
+    console.log(studentId);
+    try {
+        const response = await apiService.delete("classroom/leave-classroom", {
+            params: { studentId }
+        });
+        console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error("Failed to leave classroom:", error);
+        throw error.response?.data || error.message || "An unknown error occurred";
+    }
+}
+
 // const fetchClassroom;
 
 export const studentApi = {
     joinClassroom,
     fetchClassroom,
     checkPendingStatus,
-    cancelPendingRequest
+    cancelPendingRequest,
+    leaveClassroom,
 };

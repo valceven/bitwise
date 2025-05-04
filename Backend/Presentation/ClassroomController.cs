@@ -4,7 +4,7 @@ namespace backend.Controllers
     using backend.Services.Interfaces;
     using Microsoft.AspNetCore.Mvc;
 
-    [Route("api/")]
+    [Route("api/classroom")]
     [ApiController]
     public class ClassroomController : ControllerBase
     {
@@ -35,6 +35,20 @@ namespace backend.Controllers
             return Ok(classroom);
         }
 
+        [HttpGet("classroom-by-classcode")]
+        public async Task<ActionResult<ClassroomResponseDTO>> GetClassroomByClassCode([FromQuery] string classCode)
+        {
+            var classroom = await _classroomService.GetClassroomByClassCodeAsync(classCode);
+
+            if (classroom != null)
+            {
+                return Ok(classroom);
+            }
+
+            return NotFound("Classroom not found.");
+        }
+
+
         [HttpGet("classroom-view")]
         public async Task<ActionResult<ViewClassroomResponseDto>> ViewClassroom([FromQuery] ViewClassroomDto viewClassroomDto)
         {
@@ -46,6 +60,17 @@ namespace backend.Controllers
             }
 
             return BadRequest("Unkown Error");
+        }
+
+        [HttpDelete("leave-classroom")]
+        public async Task<IActionResult> LeaveClassroom([FromQuery] int studentId)
+        {
+            var result = await _classroomService.LeaveClassroomAsync(studentId);
+
+            if (result)
+                return Ok(result);
+
+            return BadRequest(result);
         }
     }
 }

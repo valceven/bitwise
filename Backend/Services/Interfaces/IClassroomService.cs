@@ -6,6 +6,8 @@ namespace backend.Services.Interfaces
     {
         Task<Classroom> CreateClassroomAsync(CreateClassroomDTO classroomDTO);
         Task<List<ClassroomResponseDTO>> GetClassroomAsync(int teacherID);
+        Task<ClassroomResponseDTO> GetClassroomByClassCodeAsync(string classCode);
         Task<ViewClassroomResponseDto> ViewClassroomAsync(ViewClassroomDto viewClassroomDto);
+        Task<bool> LeaveClassroomAsync(int StudentId);
     }
 }

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { studentApi } from "../../api/student/studentApi";
 import ClassroomView from "./ClassroomView";
 
+
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -15,6 +16,8 @@ const DashboardClassroomStudent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useUser();
   const navigate = useNavigate();
+
+  console.log(classroom);
 
   useEffect(() => {
     let intervalId;
@@ -81,7 +84,7 @@ const DashboardClassroomStudent = () => {
   return (
     <div className="w-full p-8 pb-0 h-full">
       {classroom ? (
-        <ClassroomView classroom={classroom} />
+        <ClassroomView classroom={classroom} user={user} />
       ) : pendingRequest ? (
         <PendingClassRequest 
           pendingRequest={pendingRequest} 

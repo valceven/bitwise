@@ -13,6 +13,7 @@ const DashboardPending = () => {
     const fetchPending = async () => {
       try {
         const response = await teacherApi.fetchPendingStudents(user.userID);
+        console.log(response);
         
         // Transform the response data to match our component structure
         const transformedClassrooms = response.map(classroom => ({
@@ -29,7 +30,6 @@ const DashboardPending = () => {
         })).filter(classroom => classroom.students.length > 0); // Only show classrooms with pending students
         
         setClassrooms(transformedClassrooms);
-       
       } catch (error) {
         console.error(error.response?.data || error.message || "An unknown error occurred");
       }
@@ -39,6 +39,7 @@ const DashboardPending = () => {
     intervalId = setInterval(fetchPending, 1000);
     return () => clearInterval(intervalId); 
   }, [user.userID]);
+
 
   const toggleSelectAll = (classIndex, checked) => {
     setClassrooms((prev) =>

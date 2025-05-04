@@ -1,23 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AnimatedLessonButton from "../../components/buttons/AnimatedLessonButton.jsx";
+import { studentApi } from '../../api/student/studentApi.js';
+import { lessonApi } from '../../api/lesson/lessonApi.js';
 
-const ClassroomView = ({ classroom }) => {
+const ClassroomView = ({ classroom , user }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedLesson, setSelectedLesson] = useState("Lesson 1"); // Default selected
+  const [selectedLesson, setSelectedLesson] = useState("Lesson 1");
+  const [lessons, setLessons] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const lessons = ["Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7"];
+  useEffect(() => {
+    const fetchLessons = async () => {
+      try {
+        const response = await lessonApi.fetchLessons(classroom.classroomId);
+        console.log("Fetched lessons:", response);
+        setLessons(response); 
+      } catch (error) {
+        console.error("Error fetching lessons:", error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  console.log(classroom);
+    fetchLessons();
+  }, [])
   
   const handleLeaveClassroom = () => {
-    setShowConfirmation(true);
+    setShowConfirmation(true); // Just show the confirmation modal
   };
-
-  const confirmLeave = () => {
-    console.log("Student left the classroom");
-    setShowConfirmation(false);
-    // In a real app, you would navigate away or update enrollment status
+  
+  const confirmLeave = async () => {
+    try {
+      const response = await studentApi.leaveClassroom(user.userID);
+      if (response) {
+        console.log("Successfully left the classroom:", response);
+        setShowConfirmation(false);
+        // You could also redirect or update the UI here
+      }
+    } catch (error) {
+      console.error("Error leaving classroom:", error.message);
+    }
   };
+  
 
   return (
     <div className="flex w-full">
