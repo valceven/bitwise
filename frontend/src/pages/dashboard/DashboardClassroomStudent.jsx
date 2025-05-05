@@ -17,8 +17,6 @@ const DashboardClassroomStudent = () => {
   const { user } = useUser();
   const navigate = useNavigate();
 
-  console.log(classroom);
-
   useEffect(() => {
     let intervalId;
     const fetchData = async () => {
