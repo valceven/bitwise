@@ -82,7 +82,7 @@ const DashboardClassroomStudent = () => {
   }
 
   return (
-    <div className="w-full p-8 pb-0 h-full">
+    <div className="w-full pb-0 h-full">
       {classroom ? (
         <ClassroomView classroom={classroom} user={user} />
       ) : pendingRequest ? (

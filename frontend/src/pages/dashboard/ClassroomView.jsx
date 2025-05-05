@@ -58,7 +58,7 @@ const ClassroomView = ({ classroom, user }) => {
 
   return (
     <div
-      className="flex w-full h-screen justify-between"
+      className="flex w-full h-screen justify-between p-8"
       style={{
         backgroundImage: `url(${gridBox})`,
         backgroundRepeat: "repeat",
@@ -75,10 +75,7 @@ const ClassroomView = ({ classroom, user }) => {
           </p>
           <p className="text-gray-600 text-sm">{classroom.description}</p>
         </div>
-        <button
-          onClick={handleLeaveClassroom}
-          className="mb-auto ml-auto"
-        >
+        <button onClick={handleLeaveClassroom} className="mb-auto ml-auto">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -96,15 +93,15 @@ const ClassroomView = ({ classroom, user }) => {
         </button>
       </div>
 
-      <div className="w-180 flex flex-col z-0 pt-7">
+      <div className="w-150 flex flex-col z-0 pt-7 mr-20">
         {isLoading ? (
           <div className="text-center text-gray-500">Loading lessons...</div>
         ) : (
           lessons.map((lesson, index) => (
             <div
               key={lesson.lessonId}
-              className={`w-2/5 flex mx-auto ${
-                index % 2 === 0 ? "justify-start" : "justify-end"
+              className={`w-3/5 flex mx-auto ${
+                index % 2 === 0 ? "justify-start" : "justify-end pr-7"
               }`}
             >
               <AnimatedLessonButton
@@ -112,6 +109,7 @@ const ClassroomView = ({ classroom, user }) => {
                 onClick={() => setSelectedLesson(lesson.lessonId)}
                 isSelected={selectedLesson === lesson.lessonId}
                 className="w-full"
+                locked={index !== 0} // Only the first is unlocked
               />
             </div>
           ))

@@ -58,6 +58,9 @@ builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ITopicRepository, TopicRepository>();
 builder.Services.AddScoped<IContentRepository, ContentRepository>();
 builder.Services.AddScoped<IStudentClassroomRepository, StudentClassroomRepository>();
+builder.Services.AddScoped<IStudentAssessmentRepository, StudentAssessmentRepository>();
+builder.Services.AddScoped<IStudentTopicRepository, StudentTopicRepository>();
+
 // Add authentication using JWT Bearer tokens
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
