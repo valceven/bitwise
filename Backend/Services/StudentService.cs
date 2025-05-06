@@ -9,13 +9,16 @@ namespace backend.Services
     {
         private readonly IStudentRepository _studentRepository;
         private readonly IPendingStudentRepository _pendingStudentRepository;
+        private readonly IClassroomRepository _classroomRepository;
 
         public StudentService(
             IStudentRepository studentRepository,
-            IPendingStudentRepository pendingStudentRepository)
+            IPendingStudentRepository pendingStudentRepository,
+            IClassroomRepository classroomRepository)
         {
             _studentRepository = studentRepository;
             _pendingStudentRepository = pendingStudentRepository;
+            _classroomRepository = classroomRepository;
         }
 
         public async Task<CheckPendingStatusResponseDto> CheckPendingStatusAsync(int StudentId)
@@ -51,6 +54,7 @@ namespace backend.Services
             var fetchClassroomResponseDto = new FetchClassroomResponseDto
             {
                 ClassName = classroom.ClassName,
+                ClassroomId = classroom.ClassroomID,
                 Section = classroom.Section,
                 Description = classroom.Description,
                 TeacherName = classroom.Teacher.User.Name,

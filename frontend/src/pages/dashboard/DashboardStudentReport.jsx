@@ -1,32 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext";
-import { teacherApi } from "../../api/teacher/teacherApi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DashboardStudentReportTopics from "./DashboardStudentReportTopics";
-import { Filter } from "lucide-react";
+import ClassRecord from "./ClassRecord";
+import { classroomApi } from "../../api/classroom/classroomApi";
+import { useParams } from "react-router-dom";
+import { teacherApi } from "../../api/teacher/teacherApi";
 
 const DashboardStudentReport = () => {
-  const [classrooms, setClassrooms] = useState([]);
+  const [classroom, setClassroom] = useState(null);
   const [selectedLesson, setSelectedLesson] = useState(null);
+  const [showingClassRecord, setShowingClassRecord] = useState(false);
   const { user } = useUser();
-  const [filter, setFilter] = useState("all");
+
+  const { classCode } = useParams();
 
   useEffect(() => {
-    const fetchClassrooms = async () => {
+    const fetchClassroomByClassCode = async () => {
       try {
-        const response = await teacherApi.fetchClassroomList(user.userID);
-        setClassrooms(response);
+        const response = await classroomApi.fetchClassroomByClassCode(classCode);
+        setClassroom(response);
       } catch (error) {
         console.error("Error fetching classrooms:", error.message);
         toast.error("Failed to fetch classrooms");
       }
     };
 
-    if (user.userID && user.userType === 2) {
-      fetchClassrooms();
-    }
-  }, [user]);
+    fetchClassroomByClassCode();
+  }, [user, classCode]);
 
   const lessons = [
     { text: "Lesson 1", id: "lesson1" },
@@ -35,81 +37,94 @@ const DashboardStudentReport = () => {
     { text: "Lesson 4", id: "lesson4" },
   ];
 
-  // Get unique sections for dropdown
-  const sections = Array.from(new Set(classrooms.map(c => c.section)));
-  const filteredClassrooms =
-    filter === "all" ? classrooms : classrooms.filter(c => c.section === filter);
+  const handleRemoveStudent = async (studentId, classroomId) => {
+    try {
+      console.log("Removing student:", studentId, "from classroom:", classroomId);
+      await teacherApi.removeStudentFromClassroom(studentId, classroomId);
+      
+      setClassroom(prev => ({
+        ...prev,
+        students: prev.students.filter(student => student.id !== studentId)
+      }));
+      toast.success("Student removed successfully");
+    } catch (error) {
+      console.error("Error removing student:", error.message);
+      toast.error("Failed to remove student");
+    }
+  };
+
+  const renderContent = () => {
+    if (showingClassRecord) {
+      return (
+        <ClassRecord 
+          classroom={classroom} 
+          onBack={() => setShowingClassRecord(false)}
+          onRemoveStudent={handleRemoveStudent}
+        />
+      );
+    }
+    
+    if (selectedLesson) {
+      return (
+        <DashboardStudentReportTopics
+          lessonId={selectedLesson}
+          onBack={() => setSelectedLesson(null)}
+        />
+      );
+    }
+
+    return classroom && (
+      <div className="bg-white border border-gray-200 shadow-md rounded-xl p-8">
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-gray-800">
+            {classroom.className}
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Class Code: <span className="font-medium">{classroom.classCode}</span>
+          </p>
+          <p className="text-sm text-gray-500">
+            Section: <span className="font-medium">{classroom.section}</span>
+          </p>
+          <p className="text-sm text-gray-500">
+            No. of Students: <span className="font-medium">{classroom.students?.length}</span>
+          </p>
+        </div>
+
+        <div className="flex justify-between mb-6">
+          <h3 className="text-lg font-semibold text-gray-700">Lessons</h3>
+          <button
+            onClick={() => setShowingClassRecord(true)}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+          >
+            View Class Record
+          </button>
+        </div>
+
+        <div className="max-h-96 overflow-y-auto custom-scrollbar bg-gray-50 border border-gray-200 rounded-lg p-6">
+          <ul className="space-y-2">
+            {lessons.map((lesson) => (
+              <li
+                key={lesson.id}
+                className="bg-white p-3 rounded-lg border hover:bg-lightpurple transition my-2"
+              >
+                <button
+                  onClick={() => setSelectedLesson(lesson.id)}
+                  className="w-full text-left font-medium focus:outline-none"
+                >
+                  {lesson.text}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="w-full p-6 h-130 overflow-y-auto">
       <div className="max-w-5xl mx-auto space-y-6">
-        {/* Section Filter */}
-        <div className="flex items-center gap-2">
-          <Filter size={16} className="text-gray-500" />
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="border border-gray-300 rounded-md p-1 text-sm"
-          >
-            <option value="all">All Sections</option>
-            {sections.map((section, idx) => (
-              <option key={idx} value={section}>
-                {section}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Render Lessons or Topics */}
-        {selectedLesson ? (
-          <DashboardStudentReportTopics
-            lessonId={selectedLesson}
-            onBack={() => setSelectedLesson(null)}
-          />
-        ) : (
-          filteredClassrooms.map((classroom, index) => (
-            <div
-              key={index}
-              className="bg-white border border-gray-200 shadow-md rounded-xl p-8"
-            >
-              <div className="mb-4">
-                <h2 className="text-2xl font-bold text-gray-800">
-                  {classroom.className || `Classroom ${index + 1}`}
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Class Code: <span className="font-medium">{classroom.classCode}</span>
-                </p>
-                <p className="text-sm text-gray-500">
-                  Section: <span className="font-medium">{classroom.section}</span>
-                </p>
-                <p className="text-sm text-gray-500">
-                  No. of Students: <span className="font-medium">{classroom.students.length}</span>
-                </p>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Lessons</h3>
-                <div className="max-h-96 overflow-y-auto custom-scrollbar bg-gray-50 border border-gray-200 rounded-lg p-6">
-                  <ul className="space-y-2">
-                    {lessons.map((lesson) => (
-                      <li
-                        key={lesson.id}
-                        className="bg-white p-3 rounded-lg border hover:bg-lightpurple transition my-2"
-                      >
-                        <button
-                          onClick={() => setSelectedLesson(lesson.id)}
-                          className="w-full text-left font-medium focus:outline-none "
-                        >
-                          {lesson.text}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
+        {renderContent()}
       </div>
       <ToastContainer />
     </div>

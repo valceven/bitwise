@@ -19,6 +19,7 @@ import DashboardPending from "./pages/dashboard/DashboardPending.jsx";
 import LessonView from "./pages/dashboard/LessonView.jsx";
 import TopicView from "./pages/dashboard/TopicView.jsx";
 
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -46,12 +47,18 @@ const router = createBrowserRouter([
     errorElement: <PageNotFound />,
     children: [
       { index: true, element: <DashboardHome /> },
-      { path: "classroom", element: <DashboardClassroom /> },
-      { path: "student-report", element: <DashboardStudentReport /> },
+      { path: "classroom", element: <DashboardClassroom />},
+      { path: "classroom/:classCode", element: <DashboardStudentReport /> },
       { path: "pending", element: <DashboardPending /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "lessonview", element: <LessonView /> },
+
       { path: "topicview", element: <TopicView /> },
+      //{path: "topicroadmap", element: <TopicRoadmap />},
+
+      { path: "topicview/:topicId", element: <TopicView /> },
+
+      
     ],
   },
 ]);

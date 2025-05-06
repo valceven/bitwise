@@ -40,6 +40,7 @@ builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IClassroomService, ClassroomService>();
 builder.Services.AddScoped<ILessonService, LessonService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
+builder.Services.AddScoped<IStudentClassroomService, StudentClassroomService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<IStudentAssessmentService, StudentAssessmentService>();
 builder.Services.AddScoped<IStudentTopicService, StudentTopicService>();
@@ -56,8 +57,10 @@ builder.Services.AddScoped<IClassroomRepository, ClassroomRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<ITopicRepository, TopicRepository>();
 builder.Services.AddScoped<IContentRepository, ContentRepository>();
-builder.Services.AddScoped<IStudentTopicRepository, StudentTopicRepository>();
+builder.Services.AddScoped<IStudentClassroomRepository, StudentClassroomRepository>();
 builder.Services.AddScoped<IStudentAssessmentRepository, StudentAssessmentRepository>();
+builder.Services.AddScoped<IStudentTopicRepository, StudentTopicRepository>();
+
 // Add authentication using JWT Bearer tokens
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

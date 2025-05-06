@@ -12,7 +12,7 @@ const createClassroom = async (classroomData) => {
 const fetchClassroomList = async (id) => {
   try {
     console.log("User ID used for fetch:", id);
-    const response = await apiService.get("/classroom", {
+    const response = await apiService.get("/classroom/classroom", {
       params: { teacherID: id }
     });
     console.log("gikan sa repsponse fetch classroom", response.data);
@@ -51,10 +51,23 @@ const rejectPendingStudent = async (data) => {
   }
 }
 
+const removeStudentFromClassroom = async (studentId, classroomID) => {
+  try {
+    const response = await apiService.delete(`/studentClassroom/remove-student-from-classroom`, 
+      { params: { studentId, classroomID } }
+    );
+    console.log("Student removed successfully:", response);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+}
+
 export const teacherApi = {
   createClassroom,
   fetchClassroomList,
   fetchPendingStudents,
   acceptPendingStudent,
-  rejectPendingStudent
+  rejectPendingStudent,
+  removeStudentFromClassroom,
 };
