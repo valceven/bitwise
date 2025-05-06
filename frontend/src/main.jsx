@@ -18,6 +18,7 @@ import DashboardLayout from "./components/DashboardLayout.jsx";
 import DashboardPending from "./pages/dashboard/DashboardPending.jsx";
 import LessonView from "./pages/dashboard/LessonView.jsx";
 import TopicView from "./pages/dashboard/TopicView.jsx";
+import TruthTable from "./components/TruthTable.jsx";
 
 
 const router = createBrowserRouter([
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
       //{path: "topicroadmap", element: <TopicRoadmap />},
 
       { path: "topicview/:topicId", element: <TopicView /> },
+      {path: "truthtable", element: <TruthTable />}, 
 
       
     ],

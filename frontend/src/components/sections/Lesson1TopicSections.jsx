@@ -1,5 +1,5 @@
 import React from 'react'
-
+import TruthTable from '../TruthTable'
 
  export const topic1Sections = [
     {
@@ -230,13 +230,171 @@ import React from 'react'
       
   ];
 
- export const topic2Sections = [{
+ export const topic2Sections = [
+  {
     title: "Topic 2",
     content: (
-        <p>
-            Content for Topic 2
+      <div className="max-w-3xl mx-auto p-6  from-blue-50 to-indigo-50 rounded-xl ">
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold text-indigo-800 flex items-center">
+          <span className="text-3xl mr-2">🧠</span> 
+          What are Logical Operators?
+        </h2>
+      </div>
+      
+      <div className="prose prose-indigo max-w-none">
+        <p className="text-lg text-gray-700 leading-relaxed">
+          Logical operators are symbols or words used to connect two or more logical statements 
+          and return a <span className="font-semibold">Boolean result</span> — either 
+          <span className="bg-green-100 px-2 py-1 rounded text-green-800 font-mono">True (1)</span> or 
+          <span className="bg-red-100 px-2 py-1 rounded text-red-800 font-mono">False (0)</span>.
         </p>
+        
+        <p className="text-lg text-gray-700 leading-relaxed mt-4">
+          They are the building blocks of Boolean algebra and digital logic circuits. 
+          You'll see them in:
+        </p>
+        
+        <div className="mt-4 grid grid-cols-3 gap-4">
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-100 flex items-center justify-center">
+            <span className="text-indigo-700 font-medium">Programming</span>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-100 flex items-center justify-center">
+            <span className="text-indigo-700 font-medium">Electronics</span>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-100 flex items-center justify-center">
+            <span className="text-indigo-700 font-medium">Computer Architecture</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    )},
+    {
+      
+    title2: "AND",
+    content:(
+      <div className="max-w-3xl mx-auto p-6  from-blue-50 to-indigo-50 rounded-xl  mt-6">
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold text-indigo-800 flex items-center">
+          <span className="text-3xl mr-2">🧱</span> 
+          Types of Logical Operators
+        </h2>
+      </div>
+      
+      <div className="prose prose-indigo max-w-none">
+        <p className="text-lg text-gray-700 mb-4">
+          Let's break down the most common logical operators:
+        </p>
+        
+        <div className="bg-white p-5 rounded-lg shadow-sm border border-indigo-200">
+          <h3 className="text-xl font-bold text-indigo-700 flex items-center mb-3">
+           
+            AND (A · B or A ∧ B)
+          </h3>
+          
+          <div className="ml-6 space-y-3">
+            <div className="flex flex-col space-y-1">
+              <span className="font-medium text-gray-800">Description:</span>
+              <span className="text-gray-700">Returns 1 only if both inputs are 1.</span>
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <span className="font-medium text-gray-800">Symbol:</span>
+              <span className="text-gray-700 font-mono">· or ∧</span>
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <span className="font-medium text-gray-800">Example:</span>
+              <div className="space-y-2 mt-1">
+                <div className="flex items-center">
+                  <span className="font-mono mr-2">A = 1, B = 1 → A AND B = 1</span>
+                  <span className="text-green-600 text-xl">✅</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="font-mono mr-2">A = 1, B = 0 → A AND B = 0</span>
+                  <span className="text-red-600 text-xl">❌</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <span className="font-medium text-gray-800">Gate Equivalent:</span>
+              <span className="text-gray-700">AND Gate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     )
-}]
+    },
+    {
+      
+      title2: "OR",
+      content:(
+        <div className="max-w-3xl mx-auto p-6  from-blue-50 to-indigo-50 rounded-xl  mt-6">
+        <div className="bg-white p-5 rounded-lg shadow-sm border border-indigo-200">
+          <h3 className="text-xl font-bold text-indigo-700 flex items-center mb-3">
+            
+            OR (A + B or A ∨ B)
+          </h3>
+          
+          <div className="ml-6 space-y-3">
+            <div className="flex flex-col space-y-1">
+              <span className="font-medium text-gray-800">Description:</span>
+              <span className="text-gray-700">Returns 1 if at least one input is 1.</span>
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <span className="font-medium text-gray-800">Symbol:</span>
+              <span className="text-gray-700 font-mono">+ or ∨</span>
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <span className="font-medium text-gray-800">Example:</span>
+              <div className="space-y-2 mt-1">
+                <div className="flex items-center">
+                  <span className="font-mono mr-2">A = 0, B = 1 → A OR B = 1</span>
+                  <span className="text-green-600 text-xl">✅</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="font-mono mr-2">A = 0, B = 0 → A OR B = 0</span>
+                  <span className="text-red-600 text-xl">❌</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col space-y-1">
+              <span className="font-medium text-gray-800">Gate Equivalent:</span>
+              <span className="text-gray-700">OR Gate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      )
+      },
+      {
+      
+        title2: "Truth Table 3",
+        content:(
+          <p>
+             3. NOT (¬A or ~A)
+Description: Flips the input value.
+
+
+If A = 0 → NOT A = 1
+
+
+If A = 1 → NOT A = 0
+
+
+Gate Equivalent: NOT Gate (Inverter)
+
+
+
+          </p>
+        )
+      }
+
+  ]
 
 
