@@ -43,40 +43,30 @@ namespace backend.Repositories
 
         public async Task<StudentAssessment> GetStudentScoreByStudentIdAsync(int studentId, int classroomId)
         {
-            var student = await _context.StudentClassrooms
-                .Include(sc => sc.Student)
-                .FirstOrDefaultAsync(sc => sc.StudentId == studentId && sc.ClassroomId == classroomId);
-            if (student == null)
+            var studentAssessment = await _context.StudentAssessments
+                .Include(sa => sa.Student)
+                .FirstOrDefaultAsync(sa => sa.StudentId == studentId && sa.ClassroomId == classroomId);
+            if (studentAssessment == null)
             {
-                throw new KeyNotFoundException($"Student with ID {studentId} not found in Classroom ID {classroomId}.");
+                throw new KeyNotFoundException($"No student found with ID {studentId} in Classroom ID {classroomId}.");
             }
-            var assessmentStudent = await _context.StudentAssessments
-                .FirstOrDefaultAsync(a => a.StudentId == student.StudentId);
-            if (assessmentStudent == null)
-            {
-                throw new KeyNotFoundException($"Assessment for Student ID {studentId} not found.");
-            }
-            return assessmentStudent;
+            return studentAssessment;
         }
-        public async Task<ICollection<StudentAssessment>> GetStudentScoreByAssessmentId(int topicId, int classroomId)
+        public async Task<ICollection<StudentAssessment>> GetAllStudentScoresByClassroomId(int classroomId)
         {
-            // make sure that the students are in the same classroom
-            var students = await _context.StudentClassrooms
-                .Include(sc => sc.Student)
-                .Where(sc => sc.ClassroomId == classroomId)
-                .Select(sc => sc.Student)
-                .ToListAsync();
-            if (students == null || students.Count == 0)
-            {
-                throw new KeyNotFoundException($"No students found in Classroom ID {classroomId}.");
-            }
-
             var studentAssessments = await _context.StudentAssessments
-                .Where(sa => students.Contains(sa.Student))
-                .Where(sa => sa.TopicId == topicId)
+                .Include(sa => sa.Student)
+                .Where(sa => sa.ClassroomId == classroomId)
                 .ToListAsync();
             return studentAssessments;
         }
-        
+        public async Task<ICollection<StudentAssessment>> GetAllStudentScoreByAssessmentId(int topicId, int classroomId)
+        {
+            var studentAssessments = await _context.StudentAssessments
+                .Include(sa => sa.Student)
+                .Where(sa => sa.TopicId == topicId && sa.ClassroomId == classroomId)
+                .ToListAsync();
+            return studentAssessments;
+        }
     }
 }
