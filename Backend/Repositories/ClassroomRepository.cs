@@ -29,14 +29,15 @@ namespace backend.Repositories
                 _context.Classrooms.Add(classroom);
                 await _context.SaveChangesAsync();
 
-                var classroomLessons = _context.Lessons.Select(cl => new ClassroomLesson
-                {
-                    LessonId = cl.LessonId,
-                    ClassroomId = classroom.ClassroomID,
-                    IsVisibleToStudents = true
-                }).ToList();
-                _context.ClassroomLessons.AddRange(classroomLessons);
-                await _context.SaveChangesAsync();
+                // Commented since no available lessons in the database all lessons are hardcoded
+                // var classroomLessons = _context.Lessons.Select(cl => new ClassroomLesson
+                // {
+                //     LessonId = cl.LessonId,
+                //     ClassroomId = classroom.ClassroomID,
+                //     IsVisibleToStudents = true
+                // }).ToList();
+                // _context.ClassroomLessons.AddRange(classroomLessons);
+                // await _context.SaveChangesAsync();
 
                 return classroom;
             }

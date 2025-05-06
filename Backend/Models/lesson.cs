@@ -5,8 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace backend.Models
 {
     public class Lesson
-    {
-        
+    {        
         [Key]
         public int LessonId { get; set; }
 
