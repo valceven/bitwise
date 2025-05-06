@@ -3,7 +3,8 @@ import { Line } from 'rc-progress';
 import TopicCard from '../../components/TopicCard';
 import Button from '../../components/buttons/PurpleButton';
 import { useParams } from 'react-router-dom';
-import { topic1Sections, topic2Sections } from '../../components/sections/Lesson1TopicSections';
+import { topic1Sections } from '../../components/sections/Lesson1TopicSections';
+import { topic2Sections } from '../../components/sections/topic2/Topic2Sections';
 
 const TopicView = () => {
     const [isOneOpen, setIsOneOpen] = useState(false);
