@@ -3,7 +3,7 @@ import { Typewriter } from 'react-simple-typewriter';
 import { motion } from 'framer-motion';
 import BooleanLaws from './BooleanLaws';
 
-export const topic2Sections = [
+export const lesson2Topic1Sections = [
   {
     title: (<h1 className="ml-2 text-2xl">📘 Laws of Boolean Algebra</h1>),
     content: (

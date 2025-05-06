@@ -52,11 +52,11 @@ const router = createBrowserRouter([
       { path: "pending", element: <DashboardPending /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "lessonview", element: <LessonView /> },
-
+  
       { path: "topicview", element: <TopicView /> },
       //{path: "topicroadmap", element: <TopicRoadmap />},
 
-      { path: "topicview/:topicId", element: <TopicView /> },
+      { path: "lessonview/:lessonid/topicview/:topicId", element: <TopicView /> },
 
       
     ],

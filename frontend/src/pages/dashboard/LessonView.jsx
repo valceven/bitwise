@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import AnimatedTopicButton from "../../components/buttons/AnimatedTopicButton";
 import LessonCard from "../../components/TopicCard";
 import TopicCard from "../../components/TopicCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../components/buttons/PurpleButton";
 
 
@@ -10,6 +10,7 @@ const LessonView = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState(1);
   const navigate = useNavigate(); 
+  const { lessonId } = useParams();
 
   const topics = [
     1,2,3,4,5,6
@@ -18,12 +19,10 @@ const LessonView = () => {
   const handleTopicClick = (topic) => {
     setSelectedTopic(topic);
     setShowConfirmation(false);
-   
-
   };
 
   const handleProceedTopic = (topicId) => {
-    navigate(`/app/topicview/${topicId}`);
+    navigate(`/app/lessonview/${lessonId}/topicview/${topicId}`);
   };
   
 
@@ -63,7 +62,6 @@ const LessonView = () => {
       </div>
       
       )}
-
 
       <div className="flex flex-wrap gap-4 justify-center mt-10">
       {topics.map((topic) => (

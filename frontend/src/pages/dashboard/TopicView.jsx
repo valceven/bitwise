@@ -3,8 +3,9 @@ import { Line } from 'rc-progress';
 import TopicCard from '../../components/TopicCard';
 import Button from '../../components/buttons/PurpleButton';
 import { useParams } from 'react-router-dom';
-import { topic1Sections } from '../../components/sections/Lesson1TopicSections';
-import { topic2Sections } from '../../components/sections/topic2/Topic2Sections';
+import { topic1Sections } from '../../components/sections/lesson1/Lesson1TopicSections';
+import { lesson2Topic1Sections } from '../../components/sections/lesson2/Topic1Sections';
+import { lesson2Topic2Sections } from '../../components/sections/lesson2/Topic2Sections';
 
 const TopicView = () => {
     const [isOneOpen, setIsOneOpen] = useState(false);
@@ -19,24 +20,24 @@ const TopicView = () => {
     },
     {
         id: "2",
-        topicSections: topic2Sections
-    }];
-
-  
+        topicSections: lesson2Topic1Sections
+    },
+    {
+        id: "3",
+        topicSections: lesson2Topic2Sections
+    }
+];
 
     const matchedTopic = topics.find(u => u.id === topicId);
 
     const topicSections = matchedTopic?.topicSections || [];     
     
-
-      const [currentIndex, setCurrentIndex] = useState(() => {
-        const storedIndex = localStorage.getItem('topicIndex');
-        return storedIndex ? parseInt(storedIndex) : 0;
+    const [currentIndex, setCurrentIndex] = useState(() => {
+    const storedIndex = localStorage.getItem('topicIndex');
+    return storedIndex ? parseInt(storedIndex) : 0;
     });
 
     useEffect(() => {
-       
-
         localStorage.setItem('topicIndex', currentIndex);
     }, [currentIndex]);
     
