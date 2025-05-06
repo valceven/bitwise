@@ -9,12 +9,15 @@ namespace backend.Models
         public int LeaderboardId { get; set; }
 
         [Required]
-        [ForeignKey("AssessmentId")]
-        public int AssessmentId { get; set; }
-
+        [ForeignKey("StudentAssessment")]
+        public int StudentAssessmentID {get; set;}
+        public StudentAssessment studentAssessment {get; set;}
         [Required]
-        public int Score { get; set; }
-
+        [ForeignKey("Classroom")]
+        public int ClassroomId {get; set;}
+        public Classroom classroom {get; set;}
+        public int rank {get; set;}
+        public double Score { get; set; }
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;        
     }
 }
