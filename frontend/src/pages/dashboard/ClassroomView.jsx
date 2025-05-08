@@ -58,7 +58,7 @@ const ClassroomView = ({ classroom, user }) => {
 
   return (
     <div
-      className="flex w-full h-screen justify-between p-8"
+      className="flex w-full h-screen justify-between p-8 px-10"
       style={{
         backgroundImage: `url(${gridBox})`,
         backgroundRepeat: "repeat",

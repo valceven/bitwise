@@ -63,20 +63,18 @@ const TopicView = () => {
             </div>
             <div className='flex flex-col justify-center items-end space-y-4 w-full'>
                 <TopicCard topic={topicSections[currentIndex]} />
-                <div className="flex justify-end items-end mt-4 gap-4">
+                <div className="flex justify-end items-end">
                     {currentIndex > 0 && (
                         <Button
-                            className='bg-bluez btn-shadow items-end'
+                            className='fixed bg-bluez btn-shadow items-end bottom-10 mr-22'
                             onClick={handlePrevious}
                             disabled={currentIndex <= 0}
                         >
                             Previous
                         </Button>
                     )}
-                 
-
                     <Button
-                        className='bg-bluez btn-shadow items-end'
+                        className='fixed bg-bluez btn-shadow items-end bottom-10'
                         onClick={handleNext}
                         disabled={currentIndex >= topicSections.length - 1}
                     >
