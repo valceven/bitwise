@@ -15,7 +15,7 @@ namespace backend.Services
 
         public async Task<ICollection<StudentAssessment>> GetAllStudentsAssessmentAsync(int topicId, int classroomId)
         {
-            return await _studentAssessmentRepository.GetStudentScoreByAssessmentId(topicId, classroomId);
+            return await _studentAssessmentRepository.GetAllStudentScoreByAssessmentId(topicId, classroomId);
         }
 
         public async Task<bool> RecordStudentAssessmentAsync(RecordStudentAssessmentDto addStudentAssessment)
@@ -24,7 +24,9 @@ namespace backend.Services
             {
                 StudentId = addStudentAssessment.StudentId,
                 TopicId = addStudentAssessment.TopicId,
+                ClassroomId = addStudentAssessment.ClassroomId,
                 Score = addStudentAssessment.Score,
+
             };
             return await _studentAssessmentRepository.AddtudentAssessmentAsync(studentAssessment);
         }
@@ -41,6 +43,17 @@ namespace backend.Services
         {
             return await _studentAssessmentRepository.DeleteStudentAssessmentAsync(studentId);
         }
-    }
-    
+        public async Task<StudentAssessment> GetStudentScoreByStudentIdAsync(GetStudentScoreByStudentIdDto getStudentScoreByStudentIdDto)
+        {
+            return await _studentAssessmentRepository.GetStudentScoreByStudentIdAsync(getStudentScoreByStudentIdDto.studentId, getStudentScoreByStudentIdDto.classroomId);
+        }
+        public async Task<ICollection<StudentAssessment>> GetAllStudentScoresByClassroomId(int classroomId)
+        {
+            return await _studentAssessmentRepository.GetAllStudentScoresByClassroomId(classroomId);
+        }
+        public async Task<ICollection<StudentAssessment>> GetAllStudentScoreByAssessmentId(GetAllStudentsScoreByAssessmentDto getAllStudentsScoreByAssessmentDto)
+        {
+            return await _studentAssessmentRepository.GetAllStudentScoreByAssessmentId(getAllStudentsScoreByAssessmentDto.topicId, getAllStudentsScoreByAssessmentDto.classroomId);
+        }
+    }  
 }

@@ -9,6 +9,9 @@ namespace backend.Services.Interfaces
         Task<bool> RecordStudentAssessmentAsync(RecordStudentAssessmentDto addStudentAssessment);
         Task<bool> UpdateStudentAssessmentAsync(UpdateStudentScoreDto updateStudentAssessment);
         Task<bool> DeleteStudentAssessmentAsync(int studentId);
+        Task<StudentAssessment> GetStudentScoreByStudentIdAsync(GetStudentScoreByStudentIdDto getStudentScoreByStudentIdDto);
+        Task<ICollection<StudentAssessment>> GetAllStudentScoresByClassroomId(int classroomId);
+        Task<ICollection<StudentAssessment>> GetAllStudentScoreByAssessmentId(GetAllStudentsScoreByAssessmentDto getAllStudentsScoreByAssessmentDto);
         
     }
 }

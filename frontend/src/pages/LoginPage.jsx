@@ -8,30 +8,32 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import MuLoading from "../components/MuLoading";
 
-
 function LoginPage() {
-
   const navigate = useNavigate();
   const { accessToken } = useUser();
 
   useEffect(() => {
     if (accessToken) {
       const timer = setTimeout(() => {
-        navigate("/app/profile");
+        navigate("/app/classroom");
       }, 2000);
       return () => clearTimeout(timer); // Clean up
     }
   }, [accessToken, navigate]);
 
   if (accessToken) {
-    return <MuLoading text={"You are already logged in. Redirecting to profile..."} />;
+    return (
+      <MuLoading
+        text={"You are already logged in. Redirecting to Classroom..."}
+      />
+    );
   }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-offwhite">
-        <Background />
+      <Background />
       <div className="relative z-10 flex flex-col justify-center items-center">
-        <img draggable='false' src={logo} alt="Logo" className="h-8 mb-10" />
+        <img draggable="false" src={logo} alt="Logo" className="h-8 mb-10" />
         <h1 className="text-3xl font-bold text-black-500 mb-4">
           Welcome Back!
         </h1>
@@ -42,9 +44,12 @@ function LoginPage() {
           </Link>
         </h3>
         <LoginForm />
-        <Link to="/forgotpassword" className="underline hover:no-underline text-sm mt-4">
-            Forget password?
-          </Link>
+        <Link
+          to="/forgotpassword"
+          className="underline hover:no-underline text-sm mt-4"
+        >
+          Forget password?
+        </Link>
       </div>
     </div>
   );

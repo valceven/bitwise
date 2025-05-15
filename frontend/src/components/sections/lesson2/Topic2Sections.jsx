@@ -90,7 +90,7 @@ export const lesson2Topic2Sections = [
                 className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 3 }}
+                transition={{ delay: 1 }}
             >
                 <h3 className="text-lg font-bold text-orange-700">🔸 Product of Sums (POS)</h3>
                 <p className="text-gray-800 mt-2">

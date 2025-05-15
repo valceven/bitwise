@@ -10,7 +10,8 @@ namespace backend.Repositories.Interfaces
         Task<bool> AddtudentAssessmentAsync(StudentAssessment assessmentStudent);
         Task<bool> UpdateStudentAssessmentAsync(StudentAssessment assessmentStudent);
         Task<bool> DeleteStudentAssessmentAsync(int assessmentStudentId);
-        Task<StudentAssessment> GetStudentScoreByStudentIdAsync(int studentId, int topicId);
-        Task<ICollection<StudentAssessment>> GetStudentScoreByAssessmentId(int topicId, int classroomId);
+        Task<StudentAssessment> GetStudentScoreByStudentIdAsync(int studentId, int classroomId);
+        Task<ICollection<StudentAssessment>> GetAllStudentScoresByClassroomId(int classroomId);
+        Task<ICollection<StudentAssessment>> GetAllStudentScoreByAssessmentId(int topicId, int classroomId);
     }
 }

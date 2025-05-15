@@ -14,6 +14,7 @@ const DashboardClassroom = () => {
         {user.userType === 2 ? (
           <DashboardClassroomTeacher user={user} />
         ) : ( <DashboardClassroomStudent user={user} /> )}
+        {console.log("user kay", user.userType)}
       </div>
 
     </>

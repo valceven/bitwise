@@ -1,8 +1,8 @@
 namespace backend.DTOs.StudentAssessment
 {
-    public class GetAllStudentsScoreDto
+    public class GetStudentScoreByStudentIdDto
     {
-        public int topicId { get; set; }
+        public int studentId { get; set; }
         public int classroomId { get; set; }
     }
 }
