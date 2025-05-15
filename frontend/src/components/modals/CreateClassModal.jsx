@@ -22,7 +22,6 @@ const CreateClassModal = ({ isOpen, onClose, title, user }) => {
   
   const handleSubmit = async (values) => {
     try {
-        console.log("values ni: ",values);
         const response = await teacherApi.createClassroom(values);
         if (response) alert('Classroom Created Successfully!')
         onClose();

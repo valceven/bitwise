@@ -3,15 +3,14 @@ import { Line } from 'rc-progress';
 import TopicCard from '../../components/TopicCard';
 import Button from '../../components/buttons/PurpleButton';
 import { useParams, useNavigate } from 'react-router-dom';
-import { topic1Sections } from '../../components/sections/topic1/Topic1Sections';
-import { topic2Sections } from '../../components/sections/topic2/Topic2Sections';
+import { topic1Sections } from '../../components/sections/lesson1/topic1/Topic1Sections';
+import { topic4Sections } from '../../components/sections/lesson2/topic4/Topic4Sections';
+import { topic5Sections } from '../../components/sections/lesson2/topic5/Topic5Sections';
 
 const TopicView = () => {
    
     const { topicId } = useParams();
     const navigate = useNavigate();
-
-
 
     //need to check for lesson as well
     const topics = [{
@@ -19,8 +18,12 @@ const TopicView = () => {
         topicSections: topic1Sections
     },
     {
-        id: "2",
-        topicSections: topic2Sections
+        id: "4",
+        topicSections: topic4Sections
+    },
+    {
+        id: "5",
+        topicSections: topic5Sections
     }];
 
     const matchedTopic = topics.find(u => u.id === topicId);

@@ -11,11 +11,9 @@ const createClassroom = async (classroomData) => {
 
 const fetchClassroomList = async (id) => {
   try {
-    console.log("User ID used for fetch:", id);
     const response = await apiService.get("/classroom/classroom", {
       params: { teacherID: id }
     });
-    console.log("gikan sa repsponse fetch classroom", response.data);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message || "An unknown error occurred";
