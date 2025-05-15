@@ -2,14 +2,15 @@ import React, { useState,useEffect } from 'react';
 import { Line } from 'rc-progress';
 import TopicCard from '../../components/TopicCard';
 import Button from '../../components/buttons/PurpleButton';
-import { useParams } from 'react-router-dom';
-import { topic1Sections } from '../../components/sections/Lesson1TopicSections';
+import { useParams, useNavigate } from 'react-router-dom';
+import { topic1Sections } from '../../components/sections/topic1/Topic1Sections';
 import { topic2Sections } from '../../components/sections/topic2/Topic2Sections';
 
 const TopicView = () => {
-    const [isOneOpen, setIsOneOpen] = useState(false);
-    const [isTwoOpen, setIsTwoOpen] = useState(false);
+   
     const { topicId } = useParams();
+    const navigate = useNavigate();
+
 
 
     //need to check for lesson as well
@@ -26,19 +27,26 @@ const TopicView = () => {
 
     const matchedTopic = topics.find(u => u.id === topicId);
 
-    const topicSections = matchedTopic?.topicSections || [];     
+    const topicSections = matchedTopic?.topicSections || [];    
     
+    const [isCompleted, setIsCompleted] = useState(() => {
+    const storedStatus = localStorage.getItem(`topicStatus-${topicId}`);
+    return storedStatus === 'complete';
+    });
 
-      const [currentIndex, setCurrentIndex] = useState(() => {
-        const storedIndex = localStorage.getItem('topicIndex');
-        return storedIndex ? parseInt(storedIndex) : 0;
+
+    
+    const [currentIndex, setCurrentIndex] = useState(() => {
+    const storedIndex = localStorage.getItem(`topicIndex-${topicId}`);
+    return storedIndex ? parseInt(storedIndex) : 0;
     });
 
     useEffect(() => {
-       
+        localStorage.setItem(`topicIndex-${topicId}`, currentIndex);
+    }, [currentIndex, topicId]);
 
-        localStorage.setItem('topicIndex', currentIndex);
-    }, [currentIndex]);
+
+
     
     
 
@@ -53,6 +61,17 @@ const TopicView = () => {
             setCurrentIndex(prev => prev - 1);
         }
     };
+
+    const handleFinish = () => { // handle in backend to set status to complete
+        localStorage.setItem(`topicStatus-${topicId}`, 'complete');
+        setIsCompleted(true);
+        
+        // Redirect to lesson view and send status via state
+        navigate('/app/lessonview', {
+            state: { topicId, status: 'complete' }
+        });
+    };
+
 
     const progress = ((currentIndex + 1) / topicSections.length) * 100;
 
@@ -73,14 +92,25 @@ const TopicView = () => {
                             Previous
                         </Button>
                     )}
-                    <Button
-                        className='fixed bg-bluez btn-shadow items-end bottom-10'
-                        onClick={handleNext}
-                        disabled={currentIndex >= topicSections.length - 1}
-                    >
-                        Next
-                    </Button>
+
+                    {currentIndex >= topicSections.length - 1 ? (
+                        <Button
+                            className='fixed bg-green-600 btn-shadow items-end bottom-10'
+                            onClick={handleFinish}
+                        >
+                            Finish
+                        </Button>
+                    ) : (
+                        <Button
+                            className='fixed bg-bluez btn-shadow items-end bottom-10'
+                            onClick={handleNext}
+                            disabled={currentIndex >= topicSections.length - 1}
+                        >
+                            Next
+                        </Button>
+                    )}
                 </div>
+
             </div>
         </div>
     );

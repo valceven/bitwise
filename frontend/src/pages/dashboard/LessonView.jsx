@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import AnimatedTopicButton from "../../components/buttons/AnimatedTopicButton";
 import LessonCard from "../../components/TopicCard";
 import TopicCard from "../../components/TopicCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Button from "../../components/buttons/PurpleButton";
 import gridBox from "../../assets/gridbox.svg";
 
@@ -10,6 +10,8 @@ const LessonView = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState(1);
   const navigate = useNavigate();
+
+
 
   const topics = [1, 2, 3, 4, 5, 6];
 
