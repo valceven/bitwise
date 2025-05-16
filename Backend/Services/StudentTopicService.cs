@@ -14,21 +14,21 @@ namespace backend.Services
             _studentTopicRepository = studentTopicRepository;
         }
 
-        public async Task<ICollection<StudentTopic>> GetAllStudentsTopicAsync()
+        public async Task<ICollection<StudentTopic>> GetAllStudentsTopicProgressAsync()
         {
             return await _studentTopicRepository.GetAllAssessmentStudents();
         }
 
-        public async Task<bool> AddStudentTopicAsync(AddStudentTopicDto addStudentTopic)
+        public async Task<bool> ViewStudentTopicAsync(ViewStudentTopicDto viewStudentTopic)
         {
             var studentTopic = new StudentTopic
             {
-                StudentId = addStudentTopic.StudentId,
-                TopicId = addStudentTopic.TopicId,
+                StudentId = viewStudentTopic.StudentId,
+                TopicId = viewStudentTopic.TopicId,
                 IsViewed = true
 
             };
-            return await _studentTopicRepository.AddStudentTopicAsync(studentTopic);
+            return await _studentTopicRepository.UpdateStudentTopicAsync(studentTopic);
         }
 
         public async Task<bool> CompleteStudentTopicAsync(CompleteStudentTopicDto completeStudentTopic)
@@ -38,5 +38,6 @@ namespace backend.Services
             studentTopic.IsCompleted = true;
             return await _studentTopicRepository.UpdateStudentTopicAsync(studentTopic);
         }
+
     }
 }

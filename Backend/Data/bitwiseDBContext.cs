@@ -23,6 +23,7 @@ namespace backend.Data
         public DbSet<Models.StudentClassroom> StudentClassrooms { get; set; }
         public DbSet<Models.ClassroomLesson> ClassroomLessons { get; set; }
         public DbSet<Models.StudentTopic> StudentTopics { get; set; }
+        public DbSet<Models.StudentLesson> StudentLessons { get; set; }
         public DbSet<Models.TopicAssessment> TopicAssessments { get; set; }
         public DbSet<Models.LessonTopic> LessonTopics { get; set; }
         public DbSet<Models.StudentAssessment> StudentAssessments { get; set; }

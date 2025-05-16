@@ -38,6 +38,32 @@ namespace backend.Repositories
                             ClassroomId = dto.ClassroomId,
                             ClassCode = dto.ClassCode
                         };
+                        for(int i = 0; i < 4; i++)
+                        {
+                            var studentLesson = new StudentLesson
+                            {
+                                StudentId = dto.StudentId,
+                                LessonId = i,
+                                IsCompleted = false,
+                                IsViewed = false,
+                                ViewedAt = DateTime.MinValue,
+                                CompletedAt = DateTime.MinValue
+                            };
+                        _context.StudentLessons.Add(studentLesson);
+                        }
+                        for(int i = 0; i < 8; i++)
+                        {
+                            var studentTopic = new StudentTopic
+                            {
+                                StudentId = dto.StudentId,
+                                TopicId = i,
+                                IsCompleted = false,
+                                IsViewed = false,
+                                ViewedAt = DateTime.MinValue,
+                                CompletedAt = DateTime.MinValue
+                            };
+                        _context.StudentTopics.Add(studentTopic);
+                        }
                         _context.StudentClassrooms.Add(studentClassroom);
                     } else {
                         return false;
@@ -45,9 +71,7 @@ namespace backend.Repositories
                 } else {
                     return false;
                 }
-
-                // Check if the student is already in the classroom
-
+    
                 await _context.SaveChangesAsync();
                 return true;
             }

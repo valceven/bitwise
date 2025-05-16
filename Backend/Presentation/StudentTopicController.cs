@@ -15,24 +15,11 @@ namespace backend.Presentation
             _studentTopicService = studentTopicService;
         }
 
-        [HttpGet("get-all-students-topic")]
-        public async Task<IActionResult> GetAllStudentsTopic()
-        {
-            var studentsTopics = await _studentTopicService.GetAllStudentsTopicAsync();
-
-            if (studentsTopics != null && studentsTopics.Count > 0)
-            {
-                return Ok(new { studentsTopics });
-            }
-
-            return NotFound(new { message = "No students topics found" });
-        }
-
         // When the student clicks on the topic and then it gets marked as viewed
-        [HttpPost("add-student-topic")]
-        public async Task<IActionResult> AddStudentTopic([FromBody] AddStudentTopicDto addStudentTopicDto)
+        [HttpPost("view-topic")]
+        public async Task<IActionResult> AddStudentTopic([FromBody] ViewStudentTopicDto viewStudentTopicDto)
         {
-            var result = await _studentTopicService.AddStudentTopicAsync(addStudentTopicDto);
+            var result = await _studentTopicService.ViewStudentTopicAsync(viewStudentTopicDto);
 
             if (result)
             {

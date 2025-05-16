@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Models;
+using backend.DTOs.StudentTopic;
 using backend.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 namespace backend.Repositories
@@ -49,6 +50,19 @@ namespace backend.Repositories
             }
             _context.StudentTopics.Remove(studentTopic);
             return await SaveChangesAsync();
+        }
+        public async Task<ICollection<StudentTopic>> GetAllStudentTopicProgressdAsync(StudentProgressByTopicDto studentProgressByTopicDto)
+        {
+            // Get all student topics for the given topic ID and classroom ID
+            // that are associated with the students in the specified classroom
+            var studentTopics = await _context.StudentTopics
+            .Where(st => st.TopicId == studentProgressByTopicDto.TopicId && 
+                        _context.StudentClassrooms
+                            .Any(sc => sc.ClassroomId == studentProgressByTopicDto.ClassroomId && 
+                                        sc.StudentId == st.StudentId))
+            .ToListAsync();
+
+            return studentTopics;
         }
 
         private async Task<bool> SaveChangesAsync()

@@ -1,6 +1,6 @@
 namespace backend.DTOs.StudentTopic
 {
-    public class AddStudentTopicDto
+    public class ViewStudentTopicDto
     {
         public int StudentId { get; set; }
         public int TopicId { get; set; }
