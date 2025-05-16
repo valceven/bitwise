@@ -1,11 +1,11 @@
 import React, { useState,useEffect } from 'react';
 import { Line } from 'rc-progress';
-import TopicCard from '../../components/TopicCard';
-import Button from '../../components/buttons/PurpleButton';
+import TopicCard from '../../../components/TopicCard';
+import Button from '../../../components/buttons/PurpleButton';
 import { useParams, useNavigate } from 'react-router-dom';
-import { topic1Sections } from '../../components/sections/lesson1/topic1/Topic1Sections';
-import { topic4Sections } from '../../components/sections/lesson2/topic4/Topic4Sections';
-import { topic5Sections } from '../../components/sections/lesson2/topic5/Topic5Sections';
+import { topic1Sections } from '../../../components/sections/lesson1/topic1/Topic1Sections';
+import { topic4Sections } from '../../../components/sections/lesson2/topic4/Topic4Sections';
+//import { topic5Sections } from '../../components/sections/lesson2/topic5/Topic5Sections';
 
 const TopicView = () => {
    
@@ -23,7 +23,7 @@ const TopicView = () => {
     },
     {
         id: "5",
-        topicSections: topic5Sections
+       // topicSections: topic5Sections
     }];
 
     const matchedTopic = topics.find(u => u.id === topicId);

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import AnimatedLessonButton from "../../components/buttons/AnimatedLessonButton.jsx";
-import { studentApi } from "../../api/student/studentApi.js";
-import { lessonApi } from "../../api/lesson/lessonApi.js";
-import gridBox from "../../assets/gridbox.svg";
+import AnimatedLessonButton from "../../../components/buttons/AnimatedLessonButton.jsx";
+import { studentApi } from "../../../api/student/studentApi.js";
+import { lessonApi } from "../../../api/lesson/lessonApi.js";
+import gridBox from "../../../assets/gridbox.svg";
 
 const ClassroomView = ({ classroom, user }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);

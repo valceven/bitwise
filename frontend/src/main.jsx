@@ -13,12 +13,14 @@ import SignupPage from "./pages/SignupPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
 import DashboardClassroom from "./pages/dashboard/DashboardClassroom.jsx";
-import DashboardStudentReport from "./pages/dashboard/DashboardStudentReport.jsx";
+import DashboardStudentReport from "./pages/dashboard/teacher/DashboardStudentReport.jsx";
 import DashboardLayout from "./components/DashboardLayout.jsx";
-import DashboardPending from "./pages/dashboard/DashboardPending.jsx";
-import LessonView from "./pages/dashboard/LessonView.jsx";
-import TopicView from "./pages/dashboard/TopicView.jsx";
-
+import DashboardPending from "./pages/dashboard/teacher/DashboardPending.jsx";
+import LessonView from "./pages/dashboard/student/LessonView.jsx";
+import TopicView from "./pages/dashboard/student/TopicView.jsx";
+import TeacherClassroom from "./pages/dashboard/teacher/TeacherClassroom.jsx";
+import StudentClassroom from "./pages/dashboard/student/StudentClassroom.jsx";
+import DashboardStudentReportTopics from "./pages/dashboard/teacher/DashboardStudentReportTopics.jsx";
 
 const router = createBrowserRouter([
   {
@@ -48,13 +50,18 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <DashboardHome /> },
       { path: "classroom", element: <DashboardClassroom />},
-      { path: "classroom/:classCode", element: <DashboardStudentReport /> },
-      { path: "pending", element: <DashboardPending /> },
       { path: "profile", element: <ProfilePage /> },
-      { path: "lessonview", element: <LessonView /> },
-      { path: "topicview", element: <TopicView /> },
-      //{path: "topicroadmap", element: <TopicRoadmap />},
-      { path: "lessonview/:lessonid/topicview/:topicId", element: <TopicView /> },
+      
+      // Teacher routes
+      { path: "teacher/classroom/:classCode", element: <DashboardStudentReport /> },
+      { path: "teacher/classroom/:classCode/lesson/:lessonId", element: <DashboardStudentReportTopics /> },
+      { path: "teacher/classroom/:classCode/lesson/:lessonId/topic/:topicId", element: <DashboardStudentReport /> },
+      { path: "teacher/pending", element: <DashboardPending /> },
+      
+      // Student routes
+      { path: "classroom/student/:classCode", element: <LessonView /> },
+      { path: "classroom/student/:classCode/lesson/:lessonId", element: <LessonView /> },
+      { path: "classroom/student/:classCode/lesson/:lessonId/topic/:topicId", element: <TopicView /> },
     ],
   },
 ]);

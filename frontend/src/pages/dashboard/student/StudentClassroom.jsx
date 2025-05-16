@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import JoinClass from "../../components/JoinClass";
-import PendingClassRequest from "../../components/PendingRequest";
-import { useUser } from "../../context/UserContext";
+import JoinClass from "../../../components/JoinClass";
+import PendingClassRequest from "../../../components/PendingRequest";
+import { useUser } from "../../../context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { studentApi } from "../../api/student/studentApi";
+import { studentApi } from "../../../api/student/studentApi";
 import ClassroomView from "./ClassroomView";
 
 
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const DashboardClassroomStudent = () => {
+const StudentClassroom = () => {
   const [classroom, setClassroom] = useState(null);
   const [pendingRequest, setPendingRequest] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,4 +96,4 @@ const DashboardClassroomStudent = () => {
   );
 };
 
-export default DashboardClassroomStudent;
+export default StudentClassroom;

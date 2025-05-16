@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import AnimatedTopicButton from "../../components/buttons/AnimatedTopicButton";
-import LessonCard from "../../components/TopicCard";
-import TopicCard from "../../components/TopicCard";
+import AnimatedTopicButton from "../../../components/buttons/AnimatedTopicButton";
+import TopicCard from "../../../components/TopicCard";
+//import LessonCard from "../../../components/LessonCard";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
-import Button from "../../components/buttons/PurpleButton";
-import gridBox from "../../assets/gridbox.svg";
+import Button from "../../../components/buttons/PurpleButton";
 
 const LessonView = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);

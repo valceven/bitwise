@@ -1,5 +1,5 @@
 import React from "react";
-import VennDiagramSelectable from "../../components/VennDiagramSelectable.jsx";
+import VennDiagramSelectable from "../../../components/VennDiagramSelectable.jsx";
 
 const VennDiagramView = () => {
   return (
