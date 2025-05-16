@@ -14,7 +14,7 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardHome from "./pages/dashboard/DashboardHome.jsx";
 import DashboardClassroom from "./pages/dashboard/DashboardClassroom.jsx";
 import DashboardStudentReport from "./pages/dashboard/teacher/DashboardStudentReport.jsx";
-import DashboardLayout from "./components/DashboardLayout.jsx";
+import DashboardLayout from "./components/dashboard/DashboardLayout.jsx";
 import DashboardPending from "./pages/dashboard/teacher/DashboardPending.jsx";
 import LessonView from "./pages/dashboard/student/LessonView.jsx";
 import TopicView from "./pages/dashboard/student/TopicView.jsx";

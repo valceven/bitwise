@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import DashboardSidebar from "./DashboardSidebar";
-import { useAuthGuard } from "../hooks/useAuthGuard";
-import MuLoading from "../components/MuLoading";
+import { useAuthGuard } from "../../hooks/useAuthGuard";
+import MuLoading from "../MuLoading";
 
 const DashboardLayout = () => {
   const { user, isRedirecting, isCheckingAuth } = useAuthGuard();

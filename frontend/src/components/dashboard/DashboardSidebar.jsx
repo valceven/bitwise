@@ -1,19 +1,17 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import LogoIcon from "../assets/icon-logo-sidebar.svg";
-import NavLogo from "../assets/nav-bar-logo-black.svg";
+import LogoIcon from "../../assets/icon-logo-sidebar.svg";
+import NavLogo from "../../assets/nav-bar-logo-black.svg";
 
-import Bell from "../assets/bell-icon.svg";
-import Sidebar from "../assets/bx_sidebar.svg";
-import ClassroomIconBlack from "../assets/classroom-icon-black.svg";
-import ClassroomIconWhite from "../assets/classroom-icon.svg";
-import HomeBlack from "../assets/home-black.svg";
-import HomeWhite from "../assets/home-icon.svg";
-import StudentReportIconBlack from "../assets/pie-chart-black.svg";
-import StudentReportIconWhite from "../assets/pie-chart-white.svg";
-import PendingStudentIconBlack from "../assets/student-report-icon-black.svg";
-import PendingStudentIconWhite from "../assets/student-report-icon.svg";
-import { useUser } from "../context/UserContext";
+import Bell from "../../assets/bell-icon.svg";
+import Sidebar from "../../assets/bx_sidebar.svg";
+import ClassroomIconBlack from "../../assets/classroom-icon-black.svg";
+import ClassroomIconWhite from "../../assets/classroom-icon.svg";
+import StudentReportIconBlack from "../../assets/pie-chart-black.svg";
+import StudentReportIconWhite from "../../assets/pie-chart-white.svg";
+import PendingStudentIconBlack from "../../assets/student-report-icon-black.svg";
+import PendingStudentIconWhite from "../../assets/student-report-icon.svg";
+import { useUser } from "../../context/UserContext";
 
 const DashboardSidebar = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -108,11 +106,11 @@ const DashboardSidebar = ({ user }) => {
           {/* Student Pending */}
           {user.userType === 2 &&
             (() => {
-              const isActive = currentPath.includes("/pending");
+              const isActive = currentPath.includes("/teacher/pending");
               return (
                 <Link
-                  to="pending"
-                  onMouseEnter={() => setHovered("pending")}
+                  to="teacher/pending"
+                  onMouseEnter={() => setHovered("/teacher/pending")}
                   onMouseLeave={() => setHovered("")}
                   className={`flex items-center py-2 px-3 rounded-md text-xs whitespace-nowrap overflow-hidden text-ellipsis border-black border-0
                   ${
