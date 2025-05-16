@@ -18,8 +18,8 @@ namespace backend.Models
         public int ClassroomId { get; set; }
 
         public string ClassCode { get; set; }
-
-        public Student Student { get; set;}
+        public string Request { get; set; } 
+        public Student Student { get; set; }
         public Classroom Classroom { get; set; }
     }
 }
