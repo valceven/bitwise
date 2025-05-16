@@ -63,7 +63,6 @@ namespace backend.Services
             return fetchClassroomResponseDto;
         }
 
-
         public async Task<JoinClassroomResultDto> JoinClassroomAsync(JoinClassroomDto joinClassroomDto)
         {
             if (joinClassroomDto.UserType == 2)

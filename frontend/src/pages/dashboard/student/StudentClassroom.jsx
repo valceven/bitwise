@@ -21,7 +21,6 @@ const StudentClassroom = () => {
     let intervalId;
     const fetchData = async () => {
       
-      
       let hasClassroom = false;
       
       try {

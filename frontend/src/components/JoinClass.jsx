@@ -18,6 +18,7 @@ const JoinClass = ({ title = "Join a Class", user}) => {
     try {
       values.userType = user.userType;
       values.studentId = user.userID;
+      values.request = "Join Class";
       const response = await studentApi.joinClassroom(values);
       console.log('Join class response:', response.status);
       toast.info(response.message, {

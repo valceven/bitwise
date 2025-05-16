@@ -10,5 +10,6 @@ namespace backend.DTOs.Student
         public int StudentId { get; set; }
         public int UserType { get; set; }
         public string ClassCode { get; set; }
+        public string Request { get; set;  }
     }
 }

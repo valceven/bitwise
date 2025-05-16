@@ -26,7 +26,7 @@ const DashboardPending = () => {
           name: student.name,
           email: student.email,
           studentId: student.studentId,
-          verified: student.isVerified || 'Yes',
+          request: student.requst,
           joinedAt: new Date().toISOString() // Using current date as placeholder if not available
         })),
         selectedStudents: []
@@ -332,7 +332,7 @@ const DashboardPending = () => {
                           <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Student</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Email</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Student ID</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Verified</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Request</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Date Requested</th>
                           <th className="px-6 py-3 text-center text-xs font-medium text-grayz uppercase tracking-wider">Actions</th>
                         </tr>
@@ -376,9 +376,9 @@ const DashboardPending = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                student.verified === 'Yes' ? 'bg-green-100 text-greenz' : 'bg-yellow-100 text-yellowz'
+                                student.request === 'Join Classroom' ? 'bg-green-100 text-greenz' : 'bg-red-100 text-yellowz'
                               }`}>
-                                {student.verified === 'Yes' ? 'Verified' : 'Unverified'}
+                                {student.request}
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
