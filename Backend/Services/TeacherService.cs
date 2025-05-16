@@ -42,6 +42,7 @@ namespace backend.Services
                     StudentId = p.Student.User.UserId,
                     Name = p.Student.User.Name,
                     Email = p.Student.User.Email,
+                    Request = p.Request
                 }).ToList()
             }).ToList();
 

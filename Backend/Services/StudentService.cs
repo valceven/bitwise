@@ -77,7 +77,8 @@ namespace backend.Services
             var pendingStudent = new PendingStudents
             {
                 StudentId = joinClassroomDto.StudentId,
-                ClassCode = joinClassroomDto.ClassCode
+                ClassCode = joinClassroomDto.ClassCode,
+                Request = joinClassroomDto.Request
             };
 
             return await _pendingStudentRepository.JoinClassroomAsync(pendingStudent);

@@ -16,7 +16,7 @@ const DashboardPending = () => {
     try {
       setRefreshing(true);
       const response = await teacherApi.fetchPendingStudents(user.userID);
-      
+      console.log(response);
       // Transform the response data to match our component structure
       const transformedClassrooms = response.map(classroom => ({
         name: classroom.className,
@@ -26,7 +26,7 @@ const DashboardPending = () => {
           name: student.name,
           email: student.email,
           studentId: student.studentId,
-          request: student.requst,
+          request: student.request,
           joinedAt: new Date().toISOString() // Using current date as placeholder if not available
         })),
         selectedStudents: []
@@ -376,7 +376,7 @@ const DashboardPending = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                student.request === 'Join Classroom' ? 'bg-green-100 text-greenz' : 'bg-red-100 text-yellowz'
+                                student.request === 'Join Class' ? 'bg-green-100 text-greenz' : 'bg-red-100 text-yellowz'
                               }`}>
                                 {student.request}
                               </span>
