@@ -107,7 +107,7 @@ namespace backend.Services
                     {
                         UserResponseDto.StudentInfo = new StudentDto
                         {
-                            StudentIdNumber = student.StudentIdNumber
+                            StudentIdNumber = student.StudentIdNumber,
                         };
                     }
                 }

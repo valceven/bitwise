@@ -203,7 +203,7 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
                   <option value="">All Activity</option>
                   <option value="today">Active Today</option>
                   <option value="this-week">Active This Week</option>
-                  <option value="inactive">Inactive (>2 weeks)</option>
+                  <option value="inactive">Inactive (2 weeks)</option>
                 </select>
               </div>
             </div>

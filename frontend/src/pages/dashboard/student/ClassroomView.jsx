@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AnimatedLessonButton from "../../../components/buttons/AnimatedLessonButton.jsx";
 import { studentApi } from "../../../api/student/studentApi.js";
-import { lessonApi } from "../../../api/lesson/lessonApi.js";
+import { studentLessonApi } from "../../../api/studentLesson/studentLesson.js";
 import gridBox from "../../../assets/gridbox.svg";
 
 const ClassroomView = ({ classroom, user }) => {
@@ -14,21 +14,17 @@ const ClassroomView = ({ classroom, user }) => {
     const fetchData = async () => {
       try {
         const classroomResponse = await studentApi.fetchClassroom(user.userID);
-        console.log("Fetched classroom:", classroomResponse);
 
-        const lessonResponse = await lessonApi.fetchLessons(
-          classroomResponse.classroomId
-        );
-        console.log("Fetched lessons:", lessonResponse);
+        const studentLesson = { classroomId: classroomResponse.classroomId, studentId: user.userID };
 
-        if (Array.isArray(lessonResponse.lessons)) {
-          setLessons(lessonResponse.lessons);
-          if (lessonResponse.lessons.length > 0) {
-            setSelectedLesson(lessonResponse.lessons[0].lessonId); // <-- Set first lesson
-          }
-        } else {
-          console.warn("Unexpected lessons format:", lessonResponse);
+        const lessonResponse = await studentLessonApi.fetchStudentLessons(studentLesson);
+        
+        setLessons(lessonResponse.lessons);
+        if (lessonResponse.lessons.length > 0) {
+          // Set the lessonId of the first lesson as the selected lesson
+          setSelectedLesson(lessonResponse.lessons[0].lessonId.toString());
         }
+
       } catch (error) {
         console.error("Error fetching classroom or lessons:", error.message);
       } finally {
@@ -37,7 +33,8 @@ const ClassroomView = ({ classroom, user }) => {
     };
 
     fetchData();
-  }, []);
+    console.log("Lessons:", lessons);
+}, []); 
 
   const handleLeaveClassroom = () => {
     setShowConfirmation(true); // Just show the confirmation modal
@@ -55,6 +52,16 @@ const ClassroomView = ({ classroom, user }) => {
       console.error("Error leaving classroom:", error.message);
     }
   };
+
+  const handleEnterLesson = async () => {
+    try {
+      const data = { classroomId: 35, studentId: 1, lessonId: 0 }
+      const response = await studentLessonApi.enterLesson(data);
+      console.log(response);
+    } catch (error) {
+      console.error("Error entering lesson:", error.message);
+    }
+  }
 
   return (
     <div
@@ -106,10 +113,10 @@ const ClassroomView = ({ classroom, user }) => {
             >
               <AnimatedLessonButton
                 label={lesson.title}
-                onClick={() => setSelectedLesson(lesson.lessonId)}
+                onClick={() => handleEnterLesson()}
                 isSelected={selectedLesson === lesson.lessonId}
                 className="w-full"
-                locked={index !== 0} // Only the first is unlocked
+                locked={index !== 0}
               />
             </div>
           ))

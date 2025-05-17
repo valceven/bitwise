@@ -18,9 +18,8 @@ import DashboardLayout from "./components/dashboard/DashboardLayout.jsx";
 import DashboardPending from "./pages/dashboard/teacher/DashboardPending.jsx";
 import LessonView from "./pages/dashboard/student/LessonView.jsx";
 import TopicView from "./pages/dashboard/student/TopicView.jsx";
-import TeacherClassroom from "./pages/dashboard/teacher/TeacherClassroom.jsx";
-import StudentClassroom from "./pages/dashboard/student/StudentClassroom.jsx";
 import DashboardStudentReportTopics from "./pages/dashboard/teacher/DashboardStudentReportTopics.jsx";
+import ClassroomView from "./pages/dashboard/student/ClassroomView.jsx";
 
 const router = createBrowserRouter([
   {
@@ -59,7 +58,7 @@ const router = createBrowserRouter([
       { path: "teacher/pending", element: <DashboardPending /> },
       
       // Student routes
-      { path: "classroom/student/:classCode", element: <LessonView /> },
+      { path: "classroom/student/:classCode", element: <ClassroomView /> },
       { path: "classroom/student/:classCode/lesson/:lessonId", element: <LessonView /> },
       { path: "classroom/student/:classCode/lesson/:lessonId/topic/:topicId", element: <TopicView /> },
     ],

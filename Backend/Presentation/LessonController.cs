@@ -3,6 +3,7 @@ using backend.DTOs.Lesson;
 using Microsoft.AspNetCore.Mvc;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using backend.DTOs.StudentLesson;
 namespace backend.Presentation
 {
     //[Authorize(Roles = "Admin")]
@@ -41,10 +42,10 @@ namespace backend.Presentation
 
             return NotFound(new { message = "Lesson not found" });
         }
-        [HttpGet("get-lessons-by-classroom")]
-        public async Task<IActionResult> GetLessonsByClassroomId([FromQuery] int classroomId)
+        [HttpPost("get-lessons-by-student-classroom")]
+        public async Task<IActionResult> GetLessonsByClassroomId([FromBody] GetStudentLessonsDto studentLessonDto)
         {
-            var lessons = await _lessonService.GetLessonByClassroomIdAsync(classroomId);
+            var lessons = await _lessonService.GetLessonByClassroomIdAsync(studentLessonDto);
             if (lessons != null && lessons.Count > 0)
             {
                 return Ok(new {lessons});
