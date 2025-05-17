@@ -81,15 +81,17 @@ namespace backend.Repositories
                 return false;
             }
         }
-
-
+        
         public async Task<Teacher?> AddAsync(Teacher teacher)
         {
-            try {
+            try
+            {
                 _context.Teachers.Add(teacher);
                 await _context.SaveChangesAsync();
                 return teacher;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine($"Error creating student: {ex.Message}");
                 throw new Exception("An error occurred while creating the teacher.", ex);
             }

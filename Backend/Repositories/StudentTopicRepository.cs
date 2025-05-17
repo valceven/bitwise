@@ -3,6 +3,7 @@ using backend.Models;
 using backend.DTOs.StudentTopic;
 using backend.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using backend.DTOs.StudentLesson;
 namespace backend.Repositories
 {
     public class StudentTopicRepository : IStudentTopicRepository
@@ -14,18 +15,16 @@ namespace backend.Repositories
             _context = context;
         }
 
-        public async Task<ICollection<StudentTopic>> GetAllAssessmentStudents()
-        {
-            return await _context.StudentTopics.ToListAsync();
-        }
 
-        public async Task<StudentTopic> GetStudentTopicByStudentIdAsync(int studentId)
+        public async Task<StudentTopic> GetStudentTopicByStudentIdAsync(StudentTopicDto studentTopicDto)
         {
-            var studentTopic = await _context.StudentTopics.FindAsync(studentId);
-            if (studentTopic == null)
-            {
-                throw new KeyNotFoundException($"StudentTopic with ID {studentId} not found.");
-            }
+            var studentTopic = await _context.StudentTopics
+            .Where(st => st.TopicId == studentTopicDto.TopicId && 
+                        _context.StudentClassrooms
+                            .Any(sc => sc.ClassroomId == studentTopicDto.ClassroomId && 
+                                        sc.StudentId == st.StudentId))
+            .FirstOrDefaultAsync();
+
             return studentTopic;
         }
 
@@ -51,20 +50,20 @@ namespace backend.Repositories
             _context.StudentTopics.Remove(studentTopic);
             return await SaveChangesAsync();
         }
-        public async Task<ICollection<StudentTopic>> GetAllStudentTopicProgressdAsync(StudentProgressByTopicDto studentProgressByTopicDto)
+        public async Task<ICollection<StudentTopic>> GetAllStudentTopicProgressdAsync(StudentTopicProgress studentTopicProgress)
         {
             // Get all student topics for the given topic ID and classroom ID
             // that are associated with the students in the specified classroom
             var studentTopics = await _context.StudentTopics
-            .Where(st => st.TopicId == studentProgressByTopicDto.TopicId && 
+            .Where(st => st.TopicId == studentTopicProgress.TopicId && 
                         _context.StudentClassrooms
-                            .Any(sc => sc.ClassroomId == studentProgressByTopicDto.ClassroomId && 
+                            .Any(sc => sc.ClassroomId == studentTopicProgress.ClassroomId && 
                                         sc.StudentId == st.StudentId))
             .ToListAsync();
 
             return studentTopics;
         }
-
+        
         private async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;

@@ -14,27 +14,27 @@ namespace backend.Services
             _studentTopicRepository = studentTopicRepository;
         }
 
-        public async Task<ICollection<StudentTopic>> GetAllStudentsTopicProgressAsync()
+        public async Task<ICollection<StudentTopic>> GetAllStudentsTopicProgressAsync(StudentTopicProgress studentTopicProgress)
         {
-            return await _studentTopicRepository.GetAllAssessmentStudents();
+            return await _studentTopicRepository.GetAllStudentTopicProgressdAsync(studentTopicProgress);
         }
 
-        public async Task<bool> ViewStudentTopicAsync(ViewStudentTopicDto viewStudentTopic)
+        public async Task<bool> ViewStudentTopicAsync(StudentTopicDto studentTopicDto)
         {
-            var studentTopic = new StudentTopic
-            {
-                StudentId = viewStudentTopic.StudentId,
-                TopicId = viewStudentTopic.TopicId,
-                IsViewed = true
+            var studentTopic = await _studentTopicRepository.GetStudentTopicByStudentIdAsync(studentTopicDto);
 
-            };
+            studentTopic.IsViewed = true;
+
             return await _studentTopicRepository.UpdateStudentTopicAsync(studentTopic);
         }
 
-        public async Task<bool> CompleteStudentTopicAsync(CompleteStudentTopicDto completeStudentTopic)
+        public async Task<bool> CompleteStudentTopicAsync(StudentTopicDto studentTopicDto)
         {
-            var studentTopic = await _studentTopicRepository.GetStudentTopicByStudentIdAsync(completeStudentTopic.StudentId);
-
+            var studentTopic = await _studentTopicRepository.GetStudentTopicByStudentIdAsync(studentTopicDto);
+            if (studentTopic == null)
+            {
+                return false;
+            }
             studentTopic.IsCompleted = true;
             return await _studentTopicRepository.UpdateStudentTopicAsync(studentTopic);
         }
