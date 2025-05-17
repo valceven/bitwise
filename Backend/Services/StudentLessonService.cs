@@ -18,14 +18,15 @@ namespace backend.Services
         {
             return await _studentLessonRepository.GetAllStudentLessonProgressAsync(getStudentLessonProgressDto);
         }
-        public async Task<bool> ViewStudentLessonAsync(ViewStudentLessonDto viewStudentLesson)
+        public async Task<bool> ViewStudentLessonAsync(StudentLessonDto studentLessonDto)
         {
-            var studentLesson = new StudentLesson
+            var studentLesson = await _studentLessonRepository.GetStudentLessonAsync(studentLessonDto);
+            if (studentLesson == null)
             {
-                StudentId = viewStudentLesson.StudentId,
-                LessonId = viewStudentLesson.LessonId,
-                IsViewed = true
-            };
+                return false;
+            }
+            studentLesson.IsViewed = true;
+            studentLesson.ViewedAt = DateTime.UtcNow;
             return await _studentLessonRepository.UpdateStudentLessonAsync(studentLesson);
         }
         public async Task<bool> CompleteStudentLessonAsync(StudentLessonDto studentLessonDto)

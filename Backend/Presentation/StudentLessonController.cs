@@ -15,13 +15,13 @@ namespace backend.Presentation
             var result = await studentLessonService.GetAllStudentLessonAsync(getStudentLessonProgressDto);
             return Ok(result);
         }
-        [HttpPost("view-student-lesson")]
-        public async Task<IActionResult> ViewStudentLesson([FromServices] IStudentLessonService studentLessonService, [FromBody] ViewStudentLessonDto viewStudentLessonDto)
+        [HttpPut("view-student-lesson")]
+        public async Task<IActionResult> ViewStudentLesson([FromServices] IStudentLessonService studentLessonService, [FromBody] StudentLessonDto studentLessonDto)
         {
-            var result = await studentLessonService.ViewStudentLessonAsync(viewStudentLessonDto);
+            var result = await studentLessonService.ViewStudentLessonAsync(studentLessonDto);
             return Ok(result);
         }
-        [HttpPost("complete-student-lesson")]
+        [HttpPut("complete-student-lesson")]
         public async Task<IActionResult> CompleteStudentLesson([FromServices] IStudentLessonService studentLessonService, [FromBody] StudentLessonDto studentLessonDto)
         {
             var result = await studentLessonService.CompleteStudentLessonAsync(studentLessonDto);
