@@ -5,9 +5,9 @@ namespace backend.Services.Interfaces
 {
     public interface IStudentTopicService
     {
-        Task<ICollection<StudentTopic>> GetAllStudentsTopicProgressAsync();
-        Task<bool> ViewStudentTopicAsync(ViewStudentTopicDto viewStudentTopic);
-        Task<bool> CompleteStudentTopicAsync(CompleteStudentTopicDto completeStudentTopic);
+        Task<ICollection<StudentTopic>> GetAllStudentsTopicProgressAsync(StudentTopicProgress studentTopicProgress);
+        Task<bool> ViewStudentTopicAsync(StudentTopicDto studentTopicDto);
+        Task<bool> CompleteStudentTopicAsync(StudentTopicDto studentTopicDto);
 
     }
 }

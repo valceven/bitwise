@@ -44,6 +44,7 @@ builder.Services.AddScoped<IStudentClassroomService, StudentClassroomService>();
 builder.Services.AddScoped<IContentService, ContentService>();
 builder.Services.AddScoped<IStudentAssessmentService, StudentAssessmentService>();
 builder.Services.AddScoped<IStudentTopicService, StudentTopicService>();
+builder.Services.AddScoped<IStudentLessonService, StudentLessonService>();
 
 builder.Services.Configure<backend.EmailSettings>(builder.Configuration.GetSection("EmailSettings")); // Configure MailSettings from appsettings.json
 builder.Services.AddTransient<backend.Services.Interfaces.IEmailService, backend.Services.EmailService>(); // Register the email service
@@ -60,6 +61,7 @@ builder.Services.AddScoped<IContentRepository, ContentRepository>();
 builder.Services.AddScoped<IStudentClassroomRepository, StudentClassroomRepository>();
 builder.Services.AddScoped<IStudentAssessmentRepository, StudentAssessmentRepository>();
 builder.Services.AddScoped<IStudentTopicRepository, StudentTopicRepository>();
+builder.Services.AddScoped<IStudentLessonRepository, StudentLessonRepository>();
 
 // Add authentication using JWT Bearer tokens
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
