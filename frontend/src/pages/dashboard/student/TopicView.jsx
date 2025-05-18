@@ -8,6 +8,7 @@ import { topic4Sections } from '../../../components/sections/lesson2/topic4/Topi
 import { topic2Sections } from '../../../components/sections/lesson1/topic2/Topic2Sections';
 import { topic3Sections } from '../../../components/sections/lesson1/topic3/Topic3Sections';
 //import { topic5Sections } from '../../components/sections/lesson2/topic5/Topic5Sections';
+import { topic7Sections } from '../../../components/sections/lesson3/topic7/Topic7Sections';
 
 const TopicView = () => {
    
@@ -34,6 +35,10 @@ const TopicView = () => {
     {
         id: "5",
        // topicSections: topic5Sections
+    },
+    {
+        id: "7",
+        topicSections: topic7Sections
     }];
 
     const matchedTopic = topics.find(u => u.id === topicId);
