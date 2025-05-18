@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Check, X, RotateCw, Key, CreditCard, LogIn, Info } from 'lucide-react';
 
-export default function BooleanLessonExpressions() {
+export default function BooleanAlgebraLessonPart4() {
   const [boolA, setBoolA] = useState(false);
   const [boolB, setBoolB] = useState(false);
   const [flipAnimation, setFlipAnimation] = useState("");
@@ -25,7 +25,7 @@ export default function BooleanLessonExpressions() {
     <div className="max-w-4xl mx-auto p-8 bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-lg">
       {/* Header */}
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-indigo-700  mb-3">Boolean Variables and Expressions</h1>
+        <h1 className="text-3xl font-bold text-bluez mb-3">Boolean Variables and Expressions</h1>
         <div className="w-24 h-1 bg-blue-500 mx-auto rounded-full"></div>
       </div>
       
