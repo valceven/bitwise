@@ -13,6 +13,10 @@ function LoginPage() {
   const { accessToken } = useUser();
 
   useEffect(() => {
+      document.title = "Log in";
+    }, []);
+
+  useEffect(() => {
     if (accessToken) {
       const timer = setTimeout(() => {
         navigate("/app/classroom");

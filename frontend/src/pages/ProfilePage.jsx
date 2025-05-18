@@ -8,9 +8,14 @@ import Zigzag from '../assets/zig-zag.svg';
 import EditBackground from '../components/EditBackgroud';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import MuLoading from '../components/MuLoading';
+import { useEffect } from 'react';
 
 const ProfilePage = () => {
   const { user, isRedirecting, isCheckingAuth } = useAuthGuard();
+
+  useEffect(() => {
+      document.title = user.name;
+    }, []);
   
     if (isCheckingAuth || isRedirecting) {
       return (

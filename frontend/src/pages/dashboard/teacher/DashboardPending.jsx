@@ -13,6 +13,9 @@ const DashboardPending = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("join"); // "join" or "leave"
   const { user } = useUser();
+  useEffect(() => {
+      document.title = "Pending Requests";
+    }, []);
 
   const fetchPending = async () => {
     try {
