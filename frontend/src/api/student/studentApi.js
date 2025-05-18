@@ -47,8 +47,19 @@ const cancelPendingRequest = async (pendingId) => {
     }
 }
 
+const submitLeaveRequest = async (data) => {
+    try {
+        console.log(data);
+        const response = await apiService.post("classroom/submit-leave-request", data);
+        console.log("Submit Leave Request:", response);
+        return response.data;
+    } catch (error) {
+        console.error("Failed To send Leave Request: ", error);
+        throw error.response?.data || error.message || "An unknown error occured";
+    }
+}
+
 const leaveClassroom = async (studentId) => {
-    console.log(studentId);
     try {
         const response = await apiService.delete("classroom/leave-classroom", {
             params: { studentId }
@@ -69,4 +80,5 @@ export const studentApi = {
     checkPendingStatus,
     cancelPendingRequest,
     leaveClassroom,
+    submitLeaveRequest
 };

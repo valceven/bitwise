@@ -1,6 +1,6 @@
 import apiService from "../apiService";
 
-const lessonViewed = async (data) => {
+const enterLesson = async (data) => {
     try {
         const response = await apiService.put("student-lesson/view-student-lesson", data)
         console.log(response)
@@ -26,6 +26,6 @@ const fetchStudentLessons = async (studentLesson) => {
 
 
 export const studentLessonApi = {
-    lessonViewed,
+    enterLesson,
     fetchStudentLessons,
 }

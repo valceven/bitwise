@@ -19,7 +19,7 @@ const ClassroomView = ({ classroom, user }) => {
 
         const lessonResponse = await studentLessonApi.fetchStudentLessons(studentLesson);
         
-        setLessons(lessonResponse.lessons);
+        await setLessons(lessonResponse.lessons);
         if (lessonResponse.lessons.length > 0) {
           // Set the lessonId of the first lesson as the selected lesson
           setSelectedLesson(lessonResponse.lessons[0].lessonId.toString());
@@ -33,7 +33,6 @@ const ClassroomView = ({ classroom, user }) => {
     };
 
     fetchData();
-    console.log("Lessons:", lessons);
 }, []); 
 
   const handleLeaveClassroom = () => {
@@ -42,11 +41,16 @@ const ClassroomView = ({ classroom, user }) => {
 
   const confirmLeave = async () => {
     try {
-      const response = await studentApi.leaveClassroom(user.userID);
+
+      const data = {
+        studentId: user.userID,
+        classroomId: classroom.classroomId,
+      };
+
+      const response = await studentApi.submitLeaveRequest(data);
       if (response) {
-        console.log("Successfully left the classroom:", response);
+        console.log("Submitted Leave Request", response);
         setShowConfirmation(false);
-        // You could also redirect or update the UI here
       }
     } catch (error) {
       console.error("Error leaving classroom:", error.message);
