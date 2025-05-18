@@ -112,6 +112,10 @@ const DashboardStudentReport = () => {
     setShowingClassRecord(false);
   };
 
+  useEffect(() => {
+      document.title = "Classroom " + classCode;
+    }, []);
+
   const renderSkeletonLoader = () => (
     <div className="bg-white border border-gray-200 shadow-md rounded-xl p-8 animate-pulse">
       <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
