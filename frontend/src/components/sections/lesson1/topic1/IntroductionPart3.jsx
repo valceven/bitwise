@@ -41,7 +41,7 @@ const SmartHomeExample = () => {
 
       <div className="mt-6 mb-6">
             <div className="bg-indigo-100 p-4 rounded-lg">
-              <h4 className="font-medium text-indigo-800 mb-2">Boolean Logic Expression:</h4>
+              <h4 className="font-medium text-bluez mb-2">Boolean Logic Expression:</h4>
               <code className="bg-white p-2 rounded block text-indigo-900">
                 LightsOn = Override OR (MotionDetected AND IsDark AND IsNight)
               </code>
@@ -148,7 +148,7 @@ const SmartHomeExample = () => {
 
 
 // Main Component for Boolean Logic in Everyday Life
-export default function BooleanLogicInEverydayLife() {
+export default function BooleanAlgebraLessonPart3() {
   const [activeExample, setActiveExample] = useState(null);
   
   useEffect(() => {
@@ -163,7 +163,7 @@ export default function BooleanLogicInEverydayLife() {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gray-50 rounded-2xl">
       <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-indigo-700 mb-4">Boolean Logic in Everyday Life</h1>
+        <h1 className="text-3xl font-bold text-bluez mb-4">Boolean Logic in Everyday Life</h1>
       
       </div>
       
@@ -196,7 +196,7 @@ export default function BooleanLogicInEverydayLife() {
       
       <FadeIn delay={600}>
         <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
-          <h2 className="text-xl font-bold text-indigo-800 mb-4">Why Boolean Logic Matters</h2>
+          <h2 className="text-xl font-bold text-bluez mb-4">Why Boolean Logic Matters</h2>
           <p className="text-gray-700 mb-3">
             Boolean logic provides a systematic way to make decisions based on multiple conditions. 
             Its simplicity and effectiveness make it the backbone of:
