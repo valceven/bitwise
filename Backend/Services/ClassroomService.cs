@@ -127,6 +127,26 @@ namespace backend.Services
 
             return classroomResponseDto;
         }
+
+        public async Task<bool> SubmitLeaveRequestAsync(ClassroomPendingLeaveDTO classroomPendingLeaveDTO)
+        {
+            var pendingStudent = new PendingStudents
+            {
+                StudentId = classroomPendingLeaveDTO.StudentId,
+                ClassroomId = classroomPendingLeaveDTO.ClassroomId,
+                Request = "Leave Class",
+                Date = DateTime.UtcNow
+            };
+
+            var result = await _classroomRepository.SubmitLeaveRequestAsync(pendingStudent);
+
+            if (result)
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 
     // just a little helper class to generate a random class code

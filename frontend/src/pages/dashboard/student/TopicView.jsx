@@ -5,6 +5,8 @@ import Button from '../../../components/buttons/PurpleButton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { topic1Sections } from '../../../components/sections/lesson1/topic1/Topic1Sections';
 import { topic4Sections } from '../../../components/sections/lesson2/topic4/Topic4Sections';
+import { topic2Sections } from '../../../components/sections/lesson1/topic2/Topic2Sections';
+import { topic3Sections } from '../../../components/sections/lesson1/topic3/Topic3Sections';
 //import { topic5Sections } from '../../components/sections/lesson2/topic5/Topic5Sections';
 
 const TopicView = () => {
@@ -14,8 +16,16 @@ const TopicView = () => {
 
     //need to check for lesson as well
     const topics = [{
-        id: "1", //will be changed depending on the topicID from the back end
+        id: "1", 
         topicSections: topic1Sections
+    },
+    {
+        id: "2",
+        topicSections: topic2Sections
+    },
+    {
+        id: "3", 
+        topicSections: topic3Sections
     },
     {
         id: "4",

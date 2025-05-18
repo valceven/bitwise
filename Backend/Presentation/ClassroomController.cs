@@ -54,7 +54,7 @@ namespace backend.Controllers
         {
             var ClassroomView = await _classroomService.ViewClassroomAsync(viewClassroomDto);
 
-            if (ClassroomView != null) 
+            if (ClassroomView != null)
             {
                 return Ok(ClassroomView);
             }
@@ -66,6 +66,17 @@ namespace backend.Controllers
         public async Task<IActionResult> LeaveClassroom([FromQuery] int studentId)
         {
             var result = await _classroomService.LeaveClassroomAsync(studentId);
+
+            if (result)
+                return Ok(result);
+
+            return BadRequest(result);
+        }
+
+        [HttpPost("submit-leave-request")]
+        public async Task<IActionResult> SubmitLeaveRequest([FromBody] ClassroomPendingLeaveDTO classroomPendingLeaveDTO)
+        {
+            var result = await _classroomService.SubmitLeaveRequestAsync(classroomPendingLeaveDTO);
 
             if (result)
                 return Ok(result);

@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { teacherApi } from "../../../api/teacher/teacherApi";
+import { studentApi } from "../../../api/student/studentApi";
 import { useUser } from "../../../context/UserContext";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Check, X, UserCheck, UserX, Clock, Search, AlertCircle, Users, RefreshCw, CheckSquare, SquareCheck, Filter, Bell } from "lucide-react";
+import { Check, X, UserCheck, UserX, Clock, Search, AlertCircle, Users, RefreshCw, CheckSquare, SquareCheck, Filter, Bell, LogOut, LogIn } from "lucide-react";
 
 const DashboardPending = () => {
   const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState("join"); // "join" or "leave"
   const { user } = useUser();
 
   const fetchPending = async () => {
@@ -17,20 +19,42 @@ const DashboardPending = () => {
       setRefreshing(true);
       const response = await teacherApi.fetchPendingStudents(user.userID);
       console.log(response);
+      
       // Transform the response data to match our component structure
-      const transformedClassrooms = response.map(classroom => ({
-        name: classroom.className,
-        classCode: classroom.classCode,
-        classroomId: classroom.classroomId,
-        students: classroom.pendingStudents.map(student => ({
-          name: student.name,
-          email: student.email,
-          studentId: student.studentId,
-          request: student.request,
-          joinedAt: new Date().toISOString() // Using current date as placeholder if not available
-        })),
-        selectedStudents: []
-      })).filter(classroom => classroom.students.length > 0); // Only show classrooms with pending students
+      const transformedClassrooms = response.map(classroom => {
+        // First, separate students by request type
+        const joinStudents = classroom.pendingStudents.filter(student => student.request === 'Join Class');
+        const leaveStudents = classroom.pendingStudents.filter(student => student.request === 'Leave Class' || student.request === 'Leave Classroom');
+        
+        return {
+          name: classroom.className,
+          classCode: classroom.classCode,
+          classroomId: classroom.classroomId,
+          students: classroom.pendingStudents.map(student => ({
+            name: student.name,
+            email: student.email,
+            studentId: student.studentId,
+            request: student.request,
+            joinedAt: student.date // Using current date as placeholder if not available
+          })),
+          joinRequests: joinStudents.map(student => ({
+            name: student.name,
+            email: student.email,
+            studentId: student.studentId,
+            request: student.request,
+            joinedAt: new Date().toISOString()
+          })),
+          leaveRequests: leaveStudents.map(student => ({
+            name: student.name,
+            email: student.email,
+            studentId: student.studentId,
+            request: student.request,
+            joinedAt: new Date().toISOString()
+          })),
+          selectedJoinStudents: [],
+          selectedLeaveStudents: []
+        };
+      });
       
       setClassrooms(transformedClassrooms);
     } catch (error) {
@@ -48,33 +72,50 @@ const DashboardPending = () => {
     return () => clearInterval(intervalId);
   }, [user.userID]);
 
-  const toggleSelectAll = (classIndex, checked) => {
+  const toggleSelectAll = (classIndex, checked, requestType) => {
     setClassrooms((prev) =>
       prev.map((cls, i) => {
         if (i !== classIndex) return cls;
-        const allIds = checked ? cls.students.map((_, idx) => idx) : [];
-        return { ...cls, selectedStudents: allIds };
+        
+        if (requestType === "join") {
+          const allIds = checked ? Array.from({ length: cls.joinRequests.length }, (_, i) => i) : [];
+          return { ...cls, selectedJoinStudents: allIds };
+        } else {
+          const allIds = checked ? Array.from({ length: cls.leaveRequests.length }, (_, i) => i) : [];
+          return { ...cls, selectedLeaveStudents: allIds };
+        }
       })
     );
   };
 
-  const toggleStudent = (classIndex, studentIndex) => {
+  const toggleStudent = (classIndex, studentIndex, requestType) => {
     setClassrooms((prev) =>
       prev.map((cls, i) => {
         if (i !== classIndex) return cls;
-        const alreadySelected = cls.selectedStudents.includes(studentIndex);
-        const newSelected = alreadySelected
-          ? cls.selectedStudents.filter((i) => i !== studentIndex)
-          : [...cls.selectedStudents, studentIndex];
-        return { ...cls, selectedStudents: newSelected };
+        
+        if (requestType === "join") {
+          const alreadySelected = cls.selectedJoinStudents.includes(studentIndex);
+          const newSelected = alreadySelected
+            ? cls.selectedJoinStudents.filter((i) => i !== studentIndex)
+            : [...cls.selectedJoinStudents, studentIndex];
+          return { ...cls, selectedJoinStudents: newSelected };
+        } else {
+          const alreadySelected = cls.selectedLeaveStudents.includes(studentIndex);
+          const newSelected = alreadySelected
+            ? cls.selectedLeaveStudents.filter((i) => i !== studentIndex)
+            : [...cls.selectedLeaveStudents, studentIndex];
+          return { ...cls, selectedLeaveStudents: newSelected };
+        }
       })
     );
   };
 
-  const handleAccept = async (classIndex, studentIndex) => {
+  const handleAccept = async (classIndex, studentIndex, requestType) => {
     try {
       const classroom = classrooms[classIndex];
-      const student = classroom.students[studentIndex];
+      const student = requestType === "join" 
+        ? classroom.joinRequests[studentIndex] 
+        : classroom.leaveRequests[studentIndex];
 
       const data = {
         status: true,
@@ -83,39 +124,65 @@ const DashboardPending = () => {
         classCode: classroom.classCode
       }; 
 
-      await teacherApi.acceptPendingStudent(data);
+      if (requestType === "join") {
+        try {
+          await teacherApi.acceptPendingStudent(data);
+        } catch (error) {
+          console.error("Error acceptinig student", error.message);
+        }
+      } else {
+        try {
+          const response = await studentApi.leaveClassroom(data.studentId);
+          console.log("Successfully left the classroom:", response);
+        } catch (error) {
+          console.error("Error leaving classroom: ", error.message);
+        }
+      }
       
-      // Update the state to remove the accepted student
       setClassrooms(prev => 
         prev.map((cls, i) => {
           if (i !== classIndex) return cls;
-          return {
-            ...cls,
-            students: cls.students.filter((_, sIdx) => sIdx !== studentIndex),
-            selectedStudents: cls.selectedStudents
-              .filter(id => id !== studentIndex)
-              .map(id => id > studentIndex ? id - 1 : id)
-          };
-        }).filter(cls => cls.students.length > 0) // Remove empty classrooms
+          
+          if (requestType === "join") {
+            return {
+              ...cls,
+              joinRequests: cls.joinRequests.filter((_, sIdx) => sIdx !== studentIndex),
+              selectedJoinStudents: cls.selectedJoinStudents
+                .filter(id => id !== studentIndex)
+                .map(id => id > studentIndex ? id - 1 : id)
+            };
+          } else {
+            return {
+              ...cls,
+              leaveRequests: cls.leaveRequests.filter((_, sIdx) => sIdx !== studentIndex),
+              selectedLeaveStudents: cls.selectedLeaveStudents
+                .filter(id => id !== studentIndex)
+                .map(id => id > studentIndex ? id - 1 : id)
+            };
+          }
+        })
       );
       
-      toast.success(`${student.name} was successfully added to ${classroom.name}`, {
+      const actionText = requestType === "join" ? "added to" : "removed from";
+      toast.success(`${student.name} was successfully ${actionText} ${classroom.name}`, {
         position: "bottom-right",
         autoClose: 3000,
       });
     } catch (error) {
       console.error(error.response?.data || error.message || "An unknown error occurred");
-      toast.error("Failed to accept student");
+      toast.error(`Failed to ${activeTab === "join" ? "accept" : "remove"} student`);
     }
   };
 
-  const handleReject = async (classIndex, studentIndex) => {
+  const handleReject = async (classIndex, studentIndex, requestType) => {
     try {
       const classroom = classrooms[classIndex];
-      const student = classroom.students[studentIndex];
+      const student = requestType === "join" 
+        ? classroom.joinRequests[studentIndex] 
+        : classroom.leaveRequests[studentIndex];
 
       const data = {
-        status: true,
+        status: false,
         studentId: student.studentId,
         classroomId: classroom.classroomId,
         classCode: classroom.classCode
@@ -123,18 +190,28 @@ const DashboardPending = () => {
 
       await teacherApi.rejectPendingStudent(data);
       
-      // Update the state to remove the rejected student
       setClassrooms(prev => 
         prev.map((cls, i) => {
           if (i !== classIndex) return cls;
-          return {
-            ...cls,
-            students: cls.students.filter((_, sIdx) => sIdx !== studentIndex),
-            selectedStudents: cls.selectedStudents
-              .filter(id => id !== studentIndex)
-              .map(id => id > studentIndex ? id - 1 : id)
-          };
-        }).filter(cls => cls.students.length > 0) // Remove empty classrooms
+          
+          if (requestType === "join") {
+            return {
+              ...cls,
+              joinRequests: cls.joinRequests.filter((_, sIdx) => sIdx !== studentIndex),
+              selectedJoinStudents: cls.selectedJoinStudents
+                .filter(id => id !== studentIndex)
+                .map(id => id > studentIndex ? id - 1 : id)
+            };
+          } else {
+            return {
+              ...cls,
+              leaveRequests: cls.leaveRequests.filter((_, sIdx) => sIdx !== studentIndex),
+              selectedLeaveStudents: cls.selectedLeaveStudents
+                .filter(id => id !== studentIndex)
+                .map(id => id > studentIndex ? id - 1 : id)
+            };
+          }
+        })
       );
       
       toast.error(`${student.name}'s request was rejected`, {
@@ -147,9 +224,11 @@ const DashboardPending = () => {
     }
   };
 
-  const handleBulkAction = async (classIndex, action) => {
+  const handleBulkAction = async (classIndex, action, requestType) => {
     const classroom = classrooms[classIndex];
-    const selectedIndexes = [...classroom.selectedStudents].sort((a, b) => b - a); // Sort in descending order
+    const selectedIndexes = requestType === "join" 
+      ? [...classroom.selectedJoinStudents].sort((a, b) => b - a)
+      : [...classroom.selectedLeaveStudents].sort((a, b) => b - a);
     
     if (selectedIndexes.length === 0) {
       toast.info("Please select at least one student", {
@@ -162,9 +241,9 @@ const DashboardPending = () => {
     try {
       for (const studentIndex of selectedIndexes) {
         if (action === 'accept') {
-          await handleAccept(classIndex, studentIndex);
+          await handleAccept(classIndex, studentIndex, requestType);
         } else if (action === 'reject') {
-          await handleReject(classIndex, studentIndex);
+          await handleReject(classIndex, studentIndex, requestType);
         }
       }
       
@@ -182,16 +261,38 @@ const DashboardPending = () => {
   };
 
   // Filter students based on search term
-  const filteredClassrooms = classrooms.map(classroom => ({
-    ...classroom,
-    students: classroom.students.filter(student => 
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.studentId.toString().includes(searchTerm)
-    )
-  })).filter(classroom => classroom.students.length > 0);
+  const filteredClassrooms = classrooms
+    .map(classroom => ({
+      ...classroom,
+      joinRequests: classroom.joinRequests.filter(student => 
+        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.studentId.toString().includes(searchTerm)
+      ),
+      leaveRequests: classroom.leaveRequests.filter(student => 
+        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        student.studentId.toString().includes(searchTerm)
+      )
+    }))
+    .filter(classroom => 
+      (activeTab === "join" && classroom.joinRequests.length > 0) || 
+      (activeTab === "leave" && classroom.leaveRequests.length > 0)
+    );
 
-  const totalPendingStudents = classrooms.reduce((total, classroom) => total + classroom.students.length, 0);
+  // Calculate totals correctly
+  const totalJoinRequests = classrooms.reduce((total, classroom) => 
+    total + classroom.joinRequests.length, 0);
+    
+  const totalLeaveRequests = classrooms.reduce((total, classroom) => 
+    total + classroom.leaveRequests.length, 0);
+
+  // Get classrooms with current tab's requests  
+  const classroomsWithCurrentRequests = classrooms.filter(classroom => 
+    activeTab === "join" 
+      ? classroom.joinRequests.length > 0 
+      : classroom.leaveRequests.length > 0
+  );
 
   return (
     <div className="w-full p-6 bg-gray-50 min-h-screen">
@@ -223,15 +324,48 @@ const DashboardPending = () => {
             </div>
           </div>
           
+          <div className="flex border-b border-gray-200">
+            <button 
+              className={`flex-1 py-3 px-4 text-center font-medium ${
+                activeTab === "join" 
+                ? "text-bluez border-b-2 border-bluez bg-blue-50/50" 
+                : "text-gray-500 hover:bg-gray-50"
+              }`}
+              onClick={() => setActiveTab("join")}
+            >
+              <div className="flex items-center justify-center">
+                <LogIn size={18} className="mr-2" />
+                Join Requests ({totalJoinRequests})
+              </div>
+            </button>
+            <button 
+              className={`flex-1 py-3 px-4 text-center font-medium ${
+                activeTab === "leave" 
+                ? "text-redz border-b-2 border-redz bg-red-50/50" 
+                : "text-gray-500 hover:bg-gray-50"
+              }`}
+              onClick={() => setActiveTab("leave")}
+            >
+              <div className="flex items-center justify-center">
+                <LogOut size={18} className="mr-2" />
+                Leave Requests ({totalLeaveRequests})
+              </div>
+            </button>
+          </div>
+          
           <div className="p-4 bg-offwhite border-b border-gray-200">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-white rounded-lg p-4 shadow-sm flex items-center">
-                <div className="p-3 rounded-full bg-blue-100 mr-3">
-                  <Users size={20} className="text-bluez" />
+                <div className={`p-3 rounded-full ${activeTab === "join" ? "bg-blue-100" : "bg-red-100"} mr-3`}>
+                  <Users size={20} className={activeTab === "join" ? "text-bluez" : "text-redz"} />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-grayz">{totalPendingStudents}</div>
-                  <div className="text-sm text-gray-500">Total Pending</div>
+                  <div className="text-2xl font-bold text-grayz">
+                    {activeTab === "join" ? totalJoinRequests : totalLeaveRequests}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Total {activeTab === "join" ? "Join" : "Leave"} Requests
+                  </div>
                 </div>
               </div>
               
@@ -240,7 +374,7 @@ const DashboardPending = () => {
                   <Clock size={20} className="text-darkpurple" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-grayz">{classrooms.length}</div>
+                  <div className="text-2xl font-bold text-grayz">{classroomsWithCurrentRequests.length}</div>
                   <div className="text-sm text-gray-500">Classrooms with Requests</div>
                 </div>
               </div>
@@ -273,16 +407,24 @@ const DashboardPending = () => {
         ) : filteredClassrooms.length > 0 ? (
           <div className="space-y-6">
             {filteredClassrooms.map((cls, classIndex) => {
-              const isAllSelected = cls.selectedStudents.length === cls.students.length && cls.students.length > 0;
-              const hasSelected = cls.selectedStudents.length > 0;
+              const currentRequests = activeTab === "join" ? cls.joinRequests : cls.leaveRequests;
+              const currentSelected = activeTab === "join" ? cls.selectedJoinStudents : cls.selectedLeaveStudents;
+              const isAllSelected = currentSelected.length === currentRequests.length && currentRequests.length > 0;
+              const hasSelected = currentSelected.length > 0;
               
               return (
                 <div key={classIndex} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                  <div className="p-4 border-b border-gray-200 bg-offwhite flex flex-wrap justify-between items-center">
+                  <div className={`p-4 border-b border-gray-200 ${
+                    activeTab === "join" ? "bg-blue-50/50" : "bg-red-50/50"
+                  } flex flex-wrap justify-between items-center`}>
                     <div className="flex items-center">
                       <h2 className="text-lg font-bold text-grayz">{cls.name}</h2>
-                      <span className="ml-2 px-2 py-0.5 bg-blue-100 text-bluez text-xs rounded-full">
-                        {cls.students.length} {cls.students.length === 1 ? 'request' : 'requests'}
+                      <span className={`ml-2 px-2 py-0.5 ${
+                        activeTab === "join" 
+                        ? "bg-blue-100 text-bluez" 
+                        : "bg-red-100 text-redz"
+                      } text-xs rounded-full`}>
+                        {currentRequests.length} {currentRequests.length === 1 ? 'request' : 'requests'}
                       </span>
                       <span className="ml-2 text-sm text-gray-500">Code: {cls.classCode}</span>
                     </div>
@@ -291,22 +433,27 @@ const DashboardPending = () => {
                       <button 
                         className={`px-3 py-1.5 rounded text-sm font-medium flex items-center ${
                           hasSelected 
-                            ? 'bg-greenz text-white hover:bg-green-600' 
+                            ? activeTab === "join" 
+                              ? 'bg-greenz text-white hover:bg-green-600' 
+                              : 'bg-redz text-white hover:bg-red-600'
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
-                        onClick={() => handleBulkAction(classIndex, 'accept')}
+                        onClick={() => handleBulkAction(classIndex, 'accept', activeTab)}
                         disabled={!hasSelected}
                       >
-                        <UserCheck size={16} className="mr-1.5" />
-                        Accept Selected
+                        {activeTab === "join" ? (
+                          <><UserCheck size={16} className="mr-1.5" /> Accept Selected</>
+                        ) : (
+                          <><LogOut size={16} className="mr-1.5" /> Approve Removal</>
+                        )}
                       </button>
                       <button 
                         className={`px-3 py-1.5 rounded text-sm font-medium flex items-center ${
                           hasSelected 
-                            ? 'bg-redz text-white hover:bg-red-600' 
+                            ? 'bg-gray-700 text-white hover:bg-gray-800' 
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
-                        onClick={() => handleBulkAction(classIndex, 'reject')}
+                        onClick={() => handleBulkAction(classIndex, 'reject', activeTab)}
                         disabled={!hasSelected}
                       >
                         <UserX size={16} className="mr-1.5" />
@@ -325,25 +472,25 @@ const DashboardPending = () => {
                                 type="checkbox"
                                 className="h-4 w-4 text-bluez border-gray-300 rounded focus:ring-bluez focus:ring-offset-0"
                                 checked={isAllSelected}
-                                onChange={(e) => toggleSelectAll(classIndex, e.target.checked)}
+                                onChange={(e) => toggleSelectAll(classIndex, e.target.checked, activeTab)}
                               />
                             </div>
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Student</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Email</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Student ID</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Request</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Date Requested</th>
                           <th className="px-6 py-3 text-center text-xs font-medium text-grayz uppercase tracking-wider">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {cls.students.map((student, studentIndex) => (
+                        {currentRequests.map((student, studentIndex) => (
                           <tr
                             key={studentIndex}
                             className={`${
-                              cls.selectedStudents.includes(studentIndex) ? 'bg-blue-50' : 
-                              studentIndex % 2 === 0 ? 'bg-white' : 'bg-offwhite'
+                              currentSelected.includes(studentIndex) 
+                                ? activeTab === "join" ? 'bg-blue-50' : 'bg-red-50'
+                                : studentIndex % 2 === 0 ? 'bg-white' : 'bg-offwhite'
                             } hover:bg-blue-50/50 transition-colors`}
                           >
                             <td className="pl-6 py-4">
@@ -351,8 +498,8 @@ const DashboardPending = () => {
                                 <input
                                   type="checkbox"
                                   className="h-4 w-4 text-bluez border-gray-300 rounded focus:ring-bluez focus:ring-offset-0"
-                                  checked={cls.selectedStudents.includes(studentIndex)}
-                                  onChange={() => toggleStudent(classIndex, studentIndex)}
+                                  checked={currentSelected.includes(studentIndex)}
+                                  onChange={() => toggleStudent(classIndex, studentIndex, activeTab)}
                                 />
                               </div>
                             </td>
@@ -374,28 +521,25 @@ const DashboardPending = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {student.studentId}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                student.request === 'Join Class' ? 'bg-green-100 text-greenz' : 'bg-red-100 text-yellowz'
-                              }`}>
-                                {student.request}
-                              </span>
-                            </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {new Date(student.joinedAt).toLocaleDateString()}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-center">
                               <div className="flex items-center justify-center space-x-3">
                                 <button
-                                  onClick={() => handleAccept(classIndex, studentIndex)}
-                                  className="p-1.5 text-greenz hover:bg-green-50 rounded-full transition"
-                                  title="Accept"
+                                  onClick={() => handleAccept(classIndex, studentIndex, activeTab)}
+                                  className={`p-1.5 ${
+                                    activeTab === "join" 
+                                      ? "text-greenz hover:bg-green-50" 
+                                      : "text-redz hover:bg-red-50"
+                                  } rounded-full transition`}
+                                  title={activeTab === "join" ? "Accept" : "Approve Removal"}
                                 >
                                   <Check size={18} className="stroke-2" />
                                 </button>
                                 <button
-                                  onClick={() => handleReject(classIndex, studentIndex)}
-                                  className="p-1.5 text-redz hover:bg-red-50 rounded-full transition"
+                                  onClick={() => handleReject(classIndex, studentIndex, activeTab)}
+                                  className="p-1.5 text-gray-700 hover:bg-gray-100 rounded-full transition"
                                   title="Reject"
                                 >
                                   <X size={18} className="stroke-2" />
@@ -425,18 +569,32 @@ const DashboardPending = () => {
               </>
             ) : (
               <>
-                <div className="inline-block p-3 bg-green-100 rounded-full mb-4">
-                  <Check size={30} className="text-greenz" />
+                <div className={`inline-block p-3 ${
+                  activeTab === "join" ? "bg-blue-100" : "bg-red-100"
+                } rounded-full mb-4`}>
+                  {activeTab === "join" ? (
+                    <LogIn size={30} className="text-bluez" />
+                  ) : (
+                    <LogOut size={30} className="text-redz" />
+                  )}
                 </div>
-                <h2 className="text-xl font-medium text-grayz mb-2">No pending requests</h2>
+                <h2 className="text-xl font-medium text-grayz mb-2">
+                  No pending {activeTab === "join" ? "join" : "leave"} requests
+                </h2>
                 <p className="text-gray-500">
-                  You're all caught up! There are no pending student requests at this time.
+                  You're all caught up! There are no pending {activeTab === "join" ? "join" : "leave"} requests at this time.
                 </p>
               </>
             )}
             <button
-              onClick={() => setSearchTerm("")}
-              className="mt-4 px-4 py-2 bg-bluez text-white rounded-lg hover:bg-blue-700 transition"
+              onClick={() => {
+                setSearchTerm("");
+                setRefreshing(true);
+                fetchPending().then(() => setRefreshing(false));
+              }}
+              className={`mt-4 px-4 py-2 ${
+                activeTab === "join" ? "bg-bluez hover:bg-blue-700" : "bg-redz hover:bg-red-700"
+              } text-white rounded-lg transition`}
             >
               {searchTerm ? "Clear Search" : "Refresh"}
             </button>

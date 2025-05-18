@@ -14,12 +14,12 @@ namespace backend.Repositories
             _context = context;
         }
 
-        public async Task<ICollection<StudentLesson>> GetAllStudentLessonProgressAsync(ViewStudentLessonDto viewStudentLesson)
+        public async Task<ICollection<StudentLesson>> GetAllStudentLessonProgressAsync(GetStudentLessonProgressDto getStudentLessonProgressDto)
         {
             var studentLessons = await _context.StudentLessons
-            .Where(st => st.LessonId == viewStudentLesson.LessonId && 
+            .Where(st => st.LessonId == getStudentLessonProgressDto.LessonId && 
                         _context.StudentClassrooms
-                            .Any(sc => sc.ClassroomId == viewStudentLesson.ClassroomId && 
+                            .Any(sc => sc.ClassroomId == getStudentLessonProgressDto.ClassroomId && 
                                         sc.StudentId == st.StudentId))
             .ToListAsync();
 
@@ -41,16 +41,16 @@ namespace backend.Repositories
             _context.StudentLessons.Remove(studentLesson);
             return await SaveChangesAsync();
         }
-        public async Task<ICollection<StudentLesson>> GetStudentLessonByLessonIdAsync(int lessonId)
+        public async Task<StudentLesson> GetStudentLessonAsync(StudentLessonDto studentLessonDto)
         {
-            var studentLessons = await _context.StudentLessons
-                .Where(sl => sl.LessonId == lessonId)
-                .ToListAsync();
-            if (studentLessons == null || !studentLessons.Any())
-            {
-                throw new KeyNotFoundException($"No StudentLessons found for Lesson ID {lessonId}.");
-            }
-            return studentLessons;
+            var studentLesson = await _context.StudentLessons
+            .Where(st => st.LessonId == studentLessonDto.LessonId && 
+                        _context.StudentClassrooms
+                            .Any(sc => sc.ClassroomId == studentLessonDto.ClassroomId && 
+                                        sc.StudentId == st.StudentId))
+            .FirstOrDefaultAsync();
+
+            return studentLesson;
         }
         private async Task<bool> SaveChangesAsync()
         {

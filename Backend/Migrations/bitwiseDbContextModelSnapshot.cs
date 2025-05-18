@@ -240,6 +240,9 @@ namespace backend.Migrations
                     b.Property<int>("ClassroomId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Request")
                         .IsRequired()
                         .HasColumnType("text");

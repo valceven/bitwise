@@ -1,4 +1,5 @@
 using backend.DTOs.Classroom;
+using backend.DTOs.StudentLesson;
 using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.Services.Interfaces;
@@ -40,9 +41,9 @@ namespace backend.Services
             return await _lessonRepository.UpdateLessonAsync(existingLesson);
         }
 
-        public async Task<List<Lesson>> GetLessonByClassroomIdAsync(int classroomId)
+        public async Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(GetStudentLessonsDto studentLessonsDto)
         {
-            var lessons = await _lessonRepository.GetLessonByClassroomIdAsync(classroomId);
+            var lessons = await _lessonRepository.GetLessonByClassroomIdAsync(studentLessonsDto);
             return lessons.ToList();
         }
 

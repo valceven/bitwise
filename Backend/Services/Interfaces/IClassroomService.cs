@@ -9,5 +9,6 @@ namespace backend.Services.Interfaces
         Task<ClassroomResponseDTO> GetClassroomByClassCodeAsync(string classCode);
         Task<ViewClassroomResponseDto> ViewClassroomAsync(ViewClassroomDto viewClassroomDto);
         Task<bool> LeaveClassroomAsync(int StudentId);
+        Task<bool> SubmitLeaveRequestAsync(ClassroomPendingLeaveDTO cp);
     }
 }

@@ -1,4 +1,3 @@
-using backend.DTOs.Classroom;
 using backend.DTOs.Lesson;
 using backend.Models;
 
@@ -13,5 +12,6 @@ namespace backend.Repositories.Interfaces
         Task<List<Student>> GetStudentsByClassroomIdAsync(int classroomId);
         Task<bool> LeaveClassroomAsync(int studentId);
         Task<Classroom> GetClassroomByClassCodeAsync(string classCode);
+        Task<bool> SubmitLeaveRequestAsync(PendingStudents pendingStudent);
     }
 }

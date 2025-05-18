@@ -3,6 +3,7 @@ using backend.Models;
 using backend.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
+using backend.DTOs.StudentLesson;
 
 namespace backend.Repositories
 {
@@ -46,12 +47,10 @@ namespace backend.Repositories
             _context.Lessons.Update(lesson);
             return await _context.SaveChangesAsync() > 0;
         }
-        public async Task<List<Lesson>> GetLessonByClassroomIdAsync(int classroomId)
+        public async Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(GetStudentLessonsDto getStudentLessonsDto)
         {
-            var lessons = await _context.ClassroomLessons
-                .Where(cl => cl.ClassroomId == classroomId)
-                .Include(cl => cl.Lesson)
-                .Select(cl => cl.Lesson)
+            var lessons = await _context.StudentLessons
+                .Where(sl => sl.StudentId == getStudentLessonsDto.studentId)
                 .ToListAsync();
             return lessons;
         }

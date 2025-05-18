@@ -1,5 +1,4 @@
 using backend.DTOs.StudentTopic;
-using backend.Models;
 using backend.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,26 +13,39 @@ namespace backend.Presentation
         {
             _studentTopicService = studentTopicService;
         }
+        // Get all students topic progress
+        [HttpPost("get-all-students-topic-progress")]
+        public async Task<IActionResult> GetAllStudentsTopicProgress([FromBody] StudentTopicProgress studentTopicProgress)
+        {
+            var result = await _studentTopicService.GetAllStudentsTopicProgressAsync(studentTopicProgress);
+
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return NotFound(new { message = "No student topic progress found" });
+        }
 
         // When the student clicks on the topic and then it gets marked as viewed
-        [HttpPost("view-topic")]
-        public async Task<IActionResult> AddStudentTopic([FromBody] ViewStudentTopicDto viewStudentTopicDto)
+        [HttpPut("view-topic")]
+        public async Task<IActionResult> ViewStudentTopic([FromBody] StudentTopicDto studentTopicDto)
         {
-            var result = await _studentTopicService.ViewStudentTopicAsync(viewStudentTopicDto);
+            var result = await _studentTopicService.ViewStudentTopicAsync(studentTopicDto);
 
             if (result)
             {
-                return Ok(new { message = "Student topic added successfully" });
+                return Ok(new { message = "Student viewed the topic" });
             }
 
-            return BadRequest(new { message = "Failed to add student topic" });
+            return BadRequest(new { message = "Failed to view student topic" });
         }
 
         // When the student completes the topic, it gets marked as completed
-        [HttpPost("complete-student-topic")]
-        public async Task<IActionResult> CompleteStudentTopic([FromBody] CompleteStudentTopicDto completeStudentTopicDto)
+        [HttpPut("complete-student-topic")]
+        public async Task<IActionResult> CompleteStudentTopic([FromBody] StudentTopicDto studentTopicDto)
         {
-            var result = await _studentTopicService.CompleteStudentTopicAsync(completeStudentTopicDto);
+            var result = await _studentTopicService.CompleteStudentTopicAsync(studentTopicDto);
 
             if (result)
             {
