@@ -9,6 +9,8 @@ import { topic2Sections } from '../../../components/sections/lesson1/topic2/Topi
 import { topic3Sections } from '../../../components/sections/lesson1/topic3/Topic3Sections';
 //import { topic5Sections } from '../../components/sections/lesson2/topic5/Topic5Sections';
 import { topic7Sections } from '../../../components/sections/lesson3/topic7/Topic7Sections';
+import { topic8Sections } from '../../../components/sections/lesson4/topic8/Topic8Sections';
+import { topic9Sections } from '../../../components/sections/lesson4/topic9/Topic9Sections';
 
 const TopicView = () => {
    
@@ -39,7 +41,16 @@ const TopicView = () => {
     {
         id: "7",
         topicSections: topic7Sections
-    }];
+    },
+    {
+        id: "8",
+        topicSections: topic8Sections
+    },
+    {
+        id: "9",
+        topicSections: topic9Sections
+    }
+];
 
     const matchedTopic = topics.find(u => u.id === topicId);
     const topicSections = matchedTopic?.topicSections || [];    
@@ -57,11 +68,6 @@ const TopicView = () => {
     useEffect(() => {
         localStorage.setItem(`topicIndex-${topicId}`, currentIndex);
     }, [currentIndex, topicId]);
-
-
-
-    
-    
 
     const handleNext = () => {
         if (currentIndex < topicSections.length - 1) {
