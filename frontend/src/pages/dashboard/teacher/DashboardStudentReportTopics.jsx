@@ -6,20 +6,20 @@ import { useNavigate, useParams } from "react-router-dom";
 const topicsData = {
   "1": [
     { id: "1", name: "Topic 1", completionRate: 85, difficulty: "Easy" },
-    { id: "2", name: "Topic 2", completionRate: 62, difficulty: "Medium" },
-    { id: "3", name: "Topic 3", completionRate: 45, difficulty: "Hard" }
+    { id: "2", name: "Topic 2", completionRate: 62, difficulty: "Easy" },
+    { id: "3", name: "Topic 3", completionRate: 45, difficulty: "Easy" }
   ],
   "2": [
     { id: "4", name: "Topic 4", completionRate: 90, difficulty: "Easy" },
     { id: "5", name: "Topic 5", completionRate: 73, difficulty: "Medium" },
-    { id: "6", name: "Topic 6", completionRate: 58, difficulty: "Hard" }
+    { id: "6", name: "Topic 6", completionRate: 58, difficulty: "Medium" }
   ],
   "3": [
-    { id: "7", name: "Topic 7", completionRate: 67, difficulty: "Medium" }
+    { id: "7", name: "Topic 7", completionRate: 67, difficulty: "Easy" }
   ],
   "4": [
     { id: "8", name: "Topic 8", completionRate: 81, difficulty: "Easy" },
-    { id: "9", name: "Topic 9", completionRate: 42, difficulty: "Hard" }
+    { id: "9", name: "Topic 9", completionRate: 42, difficulty: "Medium" }
   ]
 };
 
@@ -74,8 +74,8 @@ const TopicsList = ({ topics, lessonId, onBack, onSelectTopic }) => {
         </div>
       </div>
       
-      <div className="p-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="p-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {topics.map((topic) => {
             const students = studentsData[topic.id] || [];
             const completedCount = students.filter(s => s.completed).length;
@@ -95,11 +95,11 @@ const TopicsList = ({ topics, lessonId, onBack, onSelectTopic }) => {
               <div 
                 key={topic.id}
                 onClick={() => onSelectTopic(topic.id)}
-                className={`bg-white border border-gray-200 border-l-4 ${cardColorClass} rounded-lg shadow-sm hover:shadow-md transition cursor-pointer p-5`}
+                className={`bg-white border border-gray-200 border-l-4 ${cardColorClass} text-lg rounded-lg shadow-sm hover:shadow-md transition cursor-pointer p-12 gap-y-2`}
               >
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-semibold text-grayz">{topic.name}</h3>
-                  <span className={`text-xs font-medium rounded-full px-2 py-1 ${
+                  <h3 className="font-semibold text-2xl text-grayz">{topic.name}</h3>
+                  <span className={`text-xs font-medium rounded-full px-4 py-1 ${
                     topic.difficulty === "Easy" ? "bg-green-100 text-greenz" :
                     topic.difficulty === "Medium" ? "bg-yellow-100 text-yellowz" : 
                     "bg-red-100 text-redz"
@@ -108,13 +108,13 @@ const TopicsList = ({ topics, lessonId, onBack, onSelectTopic }) => {
                   </span>
                 </div>
                 
-                <div className="flex items-center text-sm text-gray-600 mb-3">
-                  <Users size={16} className="mr-2 text-bluez" />
+                <div className="flex items-center text-md text-gray-600 mb-3 p-2">
+                  <Users size={24} className="mr-4 text-bluez" />
                   <span>{students.length} Students</span>
                 </div>
                 
-                <div className="mb-3">
-                  <div className="flex justify-between text-xs mb-1">
+                <div className="p-2 mx-2">
+                  <div className="flex justify-between text-md mb-1 gap-x-4">
                     <span className="text-gray-600">Completion</span>
                     <span className="font-medium text-grayz">{completionPercentage}%</span>
                   </div>

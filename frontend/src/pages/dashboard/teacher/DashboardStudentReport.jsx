@@ -48,28 +48,28 @@ const DashboardStudentReport = () => {
     { 
       text: "Lesson 1", 
       id: "1", 
-      description: "Introduction to the basics",
+      description: "Introduction to Boolean Algebra",
       topics: 3,
       completionRate: 85
     },
     { 
       text: "Lesson 2", 
       id: "2", 
-      description: "Intermediate concepts",
+      description: "Simplifying Boolean Expressions",
       topics: 3,
       completionRate: 67
     },
     { 
       text: "Lesson 3", 
       id: "3", 
-      description: "Advanced techniques",
+      description: "Boolean Algebra in Programming",
       topics: 1,
       completionRate: 42
     },
     { 
       text: "Lesson 4", 
       id: "4", 
-      description: "Final project preparation",
+      description: "Boolean Algebra in Logic Circuits",
       topics: 2,
       completionRate: 30
     },
@@ -152,10 +152,6 @@ const DashboardStudentReport = () => {
           </p>
           <p className="text-sm text-white/80">
             Section: <span className="font-medium text-white">{classroom.section}</span>
-          </p>
-          <p className="text-sm text-white/80">
-            <Users size={16} className="inline mr-1" />
-            <span className="font-medium text-white">{classroom.students?.length} Students</span>
           </p>
         </div>
       </div>
@@ -256,7 +252,7 @@ const DashboardStudentReport = () => {
             </button>
           </div>
 
-          <div className="max-h-96 overflow-y-auto custom-scrollbar bg-offwhite rounded-lg p-4">
+          <div className="max-h-108  overflow-y-auto custom-scrollbar bg-offwhite rounded-lg p-4">
             <div className="grid grid-cols-1 gap-3">
               {lessons.map((lesson) => (
                 <div
@@ -303,7 +299,7 @@ const DashboardStudentReport = () => {
   };
 
   return (
-    <div className="w-full p-6 h-130 overflow-y-auto bg-gray-50">
+    <div className="w-full p-6 h-full overflow-y-auto bg-gray-50">
       <div className="max-w-5xl mx-auto space-y-6">
         {renderContent()}
       </div>
