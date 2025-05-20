@@ -18,8 +18,14 @@ import summerflower from "../assets/summerflower.svg";
 import bg_text from "../assets/bg_text.svg";
 import halfasterisk from "../assets/halfasterisk.svg";
 import rectangle_diamond from "../assets/rectangle_diamond.svg";
+import { useEffect } from "react";
 
 function HomePage() {
+
+  useEffect(() => {
+      document.title = "Bitwise";
+    }, []);
+
   return (
     <>
       <div className="bg-offwhite h-[calc(100vh-8rem)]">

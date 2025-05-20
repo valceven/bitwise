@@ -121,6 +121,10 @@ const SignupPage = () => {
         }
     }, [step]);
 
+    useEffect(() => {
+      document.title = "Sign Up";
+    }, []);
+
     const renderStepFields = (setFieldValue, values) => {
         switch (step) {
             case 1:
