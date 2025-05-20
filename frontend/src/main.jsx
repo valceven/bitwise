@@ -55,12 +55,14 @@ const router = createBrowserRouter([
       { path: "teacher/classroom/:classCode", element: <DashboardStudentReport /> },
       { path: "teacher/classroom/:classCode/lesson/:lessonId", element: <DashboardStudentReportTopics /> },
       { path: "teacher/classroom/:classCode/lesson/:lessonId/topic/:topicId", element: <DashboardStudentReport /> },
+      { path: "teacher/classroom/:classCode/lesson/:lessonId/assessment/:assessmentId", element: <DashboardStudentReport /> },
       { path: "teacher/pending", element: <DashboardPending /> },
       
       // Student routes
       { path: "classroom/student/:classCode", element: <ClassroomView /> },
       { path: "classroom/student/:classCode/lesson/:lessonId", element: <LessonView /> },
       { path: "classroom/student/:classCode/lesson/:lessonId/topic/:topicId", element: <TopicView /> },
+      
     ],
   },
 ]);

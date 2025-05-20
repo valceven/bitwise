@@ -14,6 +14,7 @@ const DashboardStudentReport = () => {
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [showingClassRecord, setShowingClassRecord] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [lessonProgress, setLessonProgress] = useState({});
   const { user } = useUser();
   const navigate = useNavigate();
 
@@ -25,6 +26,32 @@ const DashboardStudentReport = () => {
       try {
         const response = await classroomApi.fetchClassroomByClassCode(classCode);
         setClassroom(response);
+
+        const classroomzId = response.classroomId;
+
+        if (response) {
+          const progressData = {};
+          
+          for (let i = 1; i <= 4; i++) {
+            try {
+              const data  = {
+                classroomId: classroomzId,
+                lessonId: i,
+              };
+
+              const lessonResponse = await classroomApi.fetchStudentLessonProgress(data);
+              
+              progressData[i] = lessonResponse;
+              
+            } catch (error) {
+              console.error(`Error fetching student lesson progress in lesson ${i}`, error.message);
+              toast.error(`Failed to fetch student lesson progress in lesson ${i}`);
+              
+              progressData[i] = 0;
+            }
+          }
+          setLessonProgress(progressData);
+        }
       } catch (error) {
         console.error("Error fetching classrooms:", error.message);
         toast.error("Failed to fetch classrooms");
@@ -34,6 +61,7 @@ const DashboardStudentReport = () => {
     };
 
     fetchClassroomByClassCode();
+    
     
     if (lessonId) {
       setSelectedLesson(lessonId);
@@ -273,16 +301,16 @@ const DashboardStudentReport = () => {
                       <div className="mt-3">
                         <div className="flex justify-between text-xs mb-1">
                           <span className="text-gray-600">Completion Rate</span>
-                          <span className="font-medium text-grayz">{lesson.completionRate}%</span>
+                          <span className="font-medium text-grayz">{lessonProgress[lesson.id]}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div 
                             className={`h-2 rounded-full ${
-                              lesson.completionRate > 75 ? 'bg-greenz' : 
-                              lesson.completionRate > 50 ? 'bg-yellowz' : 
+                              lessonProgress[lesson.id] > 75 ? 'bg-greenz' : 
+                              lessonProgress[lesson.id] > 50 ? 'bg-yellowz' : 
                               'bg-redz'
                             }`}
-                            style={{ width: `${lesson.completionRate}%` }}
+                            style={{ width: `${lessonProgress[lesson.id]}%` }}
                           ></div>
                         </div>
                       </div>

@@ -39,7 +39,22 @@ namespace backend.Services
             studentLesson.IsCompleted = true;
             return await _studentLessonRepository.UpdateStudentLessonAsync(studentLesson);
         }
-        
-        
+
+        public async Task<float> GetStudentLessonCompletionRate(GetStudentLessonProgressDto getStudentLessonProgressDto)
+        {
+            var result = await _studentLessonRepository.GetAllStudentLessonProgressAsync(getStudentLessonProgressDto);
+
+            if (result == null || !result.Any())
+            {
+                return 0.0f;
+            }
+
+            int totalRecords = result.Count();
+            int completedRecords = result.Count(r => r.IsCompleted);
+            
+            float completionRate = (float)completedRecords / totalRecords * 100;
+            
+            return (float)Math.Round(completionRate, 0);
+        }
     }
 }

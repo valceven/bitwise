@@ -75,8 +75,6 @@ namespace backend.Repositories
             }
         }
 
-        
-
         public async Task<List<(Classroom classroom, List<PendingStudents> pending)>> FetchPendingStudentsGroupedByClassroomAsync(int teacherId)
         {
             var classrooms = await _context.Classrooms
@@ -94,8 +92,6 @@ namespace backend.Repositories
                     .ToListAsync();
 
                 result.Add((classroom, pendingStudents));
-                Console.WriteLine($"Classroom: {classroom.ClassName}, ID: {classroom.ClassroomID}, TeacherID: {classroom.TeacherId}");
-                Console.WriteLine($"Pending Students Count: {pendingStudents.Count}");
                 foreach (var p in pendingStudents)
                 {
                     Console.WriteLine($"Pending Student ID: {p.StudentId}, ClassroomId: {p.ClassroomId}");

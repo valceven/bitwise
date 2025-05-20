@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Book, Users, CheckCircle, Award, Clock } from "lucide-react";
+import { ArrowLeft, Book, Users, CheckCircle, Award, Clock, FileText, BarChart } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 // Define the topics data structure based on lessonId
@@ -21,6 +21,19 @@ const topicsData = {
     { id: "8", name: "Topic 8", completionRate: 81, difficulty: "Easy" },
     { id: "9", name: "Topic 9", completionRate: 42, difficulty: "Medium" }
   ]
+};
+
+// Define assessments data structure that maps to each topic
+const assessmentsData = {
+  "1": { id: "1", name: "Assessment 1", topicId: "1", questions: 10, timeLimit: 15, passingScore: 70 },
+  "2": { id: "2", name: "Assessment 2", topicId: "2", questions: 12, timeLimit: 20, passingScore: 75 },
+  "3": { id: "3", name: "Assessment 3", topicId: "3", questions: 8, timeLimit: 12, passingScore: 70 },
+  "4": { id: "4", name: "Assessment 4", topicId: "4", questions: 15, timeLimit: 25, passingScore: 80 },
+  "5": { id: "5", name: "Assessment 5", topicId: "5", questions: 10, timeLimit: 30, passingScore: 75 },
+  "6": { id: "6", name: "Assessment 6", topicId: "6", questions: 12, timeLimit: 20, passingScore: 75 },
+  "7": { id: "7", name: "Assessment 7", topicId: "7", questions: 10, timeLimit: 15, passingScore: 70 },
+  "8": { id: "8", name: "Assessment 8", topicId: "8", questions: 15, timeLimit: 20, passingScore: 80 },
+  "9": { id: "9", name: "Assessment 9", topicId: "9", questions: 12, timeLimit: 25, passingScore: 75 }
 };
 
 // Sample student data by topic
@@ -55,8 +68,40 @@ const studentsData = {
   ]
 };
 
+// Sample assessment results by topic and student
+const assessmentResultsData = {
+  "1": [
+    { studentId: 1, score: 90, status: "Passed", completedAt: "2 days ago" },
+    { studentId: 2, score: 65, status: "Failed", completedAt: "3 days ago" }
+  ],
+  "2": [
+    { studentId: 3, score: 78, status: "Passed", completedAt: "1 day ago" }
+  ],
+  "3": [
+    { studentId: 4, score: 85, status: "Passed", completedAt: "4 days ago" }
+  ],
+  "4": [
+    { studentId: 5, score: 92, status: "Passed", completedAt: "1 week ago" }
+  ],
+  "5": [
+    { studentId: 6, score: 68, status: "Failed", completedAt: "2 days ago" }
+  ],
+  "6": [
+    { studentId: 7, score: 88, status: "Passed", completedAt: "3 days ago" }
+  ],
+  "7": [
+    { studentId: 8, score: 75, status: "Passed", completedAt: "1 day ago" }
+  ],
+  "8": [
+    { studentId: 9, score: 95, status: "Passed", completedAt: "5 days ago" }
+  ],
+  "9": [
+    { studentId: 10, score: 72, status: "Passed", completedAt: "2 weeks ago" }
+  ]
+};
+
 // TopicsList Component
-const TopicsList = ({ topics, lessonId, onBack, onSelectTopic }) => {
+const TopicsList = ({ topics, lessonId, onBack, onSelectTopic, onSelectAssessment }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       <div className="bg-bluez p-6">
@@ -69,13 +114,13 @@ const TopicsList = ({ topics, lessonId, onBack, onSelectTopic }) => {
           </button>
           <div>
             <h2 className="text-2xl font-bold text-white">Lesson {lessonId}</h2>
-            <p className="text-white/80 mt-1">{topics.length} topics available</p>
+            <p className="text-white/80 mt-1">{topics.length} topics available with {topics.length} assessments</p>
           </div>
         </div>
       </div>
       
       <div className="p-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8">
           {topics.map((topic) => {
             const students = studentsData[topic.id] || [];
             const completedCount = students.filter(s => s.completed).length;
@@ -83,6 +128,9 @@ const TopicsList = ({ topics, lessonId, onBack, onSelectTopic }) => {
               ? Math.round((completedCount / students.length) * 100) 
               : 0;
               
+            // Get the corresponding assessment
+            const assessment = assessmentsData[topic.id] || null;
+            
             // Determine card color based on topic difficulty
             let cardColorClass = "border-l-greenz";
             if (topic.difficulty === "Medium") {
@@ -92,38 +140,72 @@ const TopicsList = ({ topics, lessonId, onBack, onSelectTopic }) => {
             }
             
             return (
-              <div 
-                key={topic.id}
-                onClick={() => onSelectTopic(topic.id)}
-                className={`bg-white border border-gray-200 border-l-4 ${cardColorClass} text-lg rounded-lg shadow-sm hover:shadow-md transition cursor-pointer p-12 gap-y-2`}
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-semibold text-2xl text-grayz">{topic.name}</h3>
-                  <span className={`text-xs font-medium rounded-full px-4 py-1 ${
-                    topic.difficulty === "Easy" ? "bg-green-100 text-greenz" :
-                    topic.difficulty === "Medium" ? "bg-yellow-100 text-yellowz" : 
-                    "bg-red-100 text-redz"
-                  }`}>
-                    {topic.difficulty}
-                  </span>
-                </div>
-                
-                <div className="flex items-center text-md text-gray-600 mb-3 p-2">
-                  <Users size={24} className="mr-4 text-bluez" />
-                  <span>{students.length} Students</span>
-                </div>
-                
-                <div className="p-2 mx-2">
-                  <div className="flex justify-between text-md mb-1 gap-x-4">
-                    <span className="text-gray-600">Completion</span>
-                    <span className="font-medium text-grayz">{completionPercentage}%</span>
+              <div key={topic.id} className="mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Topic Card */}
+                  <div 
+                    onClick={() => onSelectTopic(topic.id)}
+                    className={`md:col-span-2 bg-white border border-gray-200 border-l-4 ${cardColorClass} rounded-lg shadow-sm hover:shadow-md transition cursor-pointer p-6`}
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="font-semibold text-xl text-grayz">{topic.name}</h3>
+                      <span className={`text-xs font-medium rounded-full px-3 py-1 ${
+                        topic.difficulty === "Easy" ? "bg-green-100 text-greenz" :
+                        topic.difficulty === "Medium" ? "bg-yellow-100 text-yellowz" : 
+                        "bg-red-100 text-redz"
+                      }`}>
+                        {topic.difficulty}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-sm text-gray-600 mb-3">
+                      <Users size={18} className="mr-2 text-bluez" />
+                      <span>{students.length} Students</span>
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-600">Completion</span>
+                        <span className="font-medium text-grayz">{completionPercentage}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-bluez h-2 rounded-full" 
+                          style={{ width: `${completionPercentage}%` }}
+                        ></div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  
+                  {/* Assessment Card */}
+                  {assessment && (
                     <div 
-                      className="bg-bluez h-2 rounded-full" 
-                      style={{ width: `${completionPercentage}%` }}
-                    ></div>
-                  </div>
+                      onClick={() => onSelectAssessment(assessment.id)}
+                      className="bg-white border border-gray-200 border-l-4 border-l-purplez rounded-lg shadow-sm hover:shadow-md transition cursor-pointer p-6"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="font-semibold text-xl text-grayz">{assessment.name}</h3>
+                        <div className="p-2 rounded-full bg-purple-100">
+                          <FileText size={16} className="text-purplez" />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-gray-600">
+                          <span className="mr-2">Questions:</span>
+                          <span className="font-medium text-grayz">{assessment.questions}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <span className="mr-2">Time Limit:</span>
+                          <span className="font-medium text-grayz">{assessment.timeLimit} min</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <span className="mr-2">Passing Score:</span>
+                          <span className="font-medium text-grayz">{assessment.passingScore}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -212,10 +294,9 @@ const StudentList = ({ topicId, students, onBack }) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {students.map((student, index) => (
+                {students.map((student) => (
                   <tr 
                     key={student.id} 
-                    className={index % 2 === 0 ? 'bg-white' : 'bg-offwhite'}
                     onClick={() => console.log(`View details for student ${student.id}`)}
                     className="hover:bg-lightpurple/20 cursor-pointer transition"
                   >
@@ -262,9 +343,153 @@ const StudentList = ({ topicId, students, onBack }) => {
   );
 };
 
+// AssessmentView Component
+const AssessmentView = ({ assessmentId, onBack }) => {
+  const assessment = assessmentsData[assessmentId];
+  const assessmentResults = assessmentResultsData[assessmentId] || [];
+  
+  // Get students who took this assessment
+  const studentsInAssessment = assessmentResults.map(result => {
+    const topicId = assessment.topicId;
+    const student = studentsData[topicId]?.find(s => s.id === result.studentId);
+    return {
+      ...student,
+      score: result.score,
+      status: result.status,
+      completedAt: result.completedAt
+    };
+  });
+  
+  // Calculate pass rate
+  const passRate = assessmentResults.length > 0
+    ? Math.round((assessmentResults.filter(r => r.status === "Passed").length / assessmentResults.length) * 100)
+    : 0;
+    
+  // Calculate average score
+  const avgScore = assessmentResults.length > 0
+    ? Math.round(assessmentResults.reduce((acc, r) => acc + r.score, 0) / assessmentResults.length)
+    : 0;
+  
+  return (
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-purplez p-6">
+        <div className="flex items-center">
+          <button 
+            onClick={onBack}
+            className="mr-4 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <div>
+            <h2 className="text-2xl font-bold text-white">{assessment ? assessment.name : `Assessment ${assessmentId}`}</h2>
+            <p className="text-white/80 mt-1">
+              {assessment ? `${assessment.questions} questions • ${assessment.timeLimit} min • ${assessment.passingScore}% to pass` : ''}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-6">
+        <div className="mb-6">
+          <div className="bg-offwhite rounded-lg p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="p-2 rounded-full bg-blue-100 mb-2">
+                <Users size={20} className="text-bluez" />
+              </div>
+              <span className="text-2xl font-bold text-grayz">{assessmentResults.length}</span>
+              <span className="text-xs text-gray-500">Attempts</span>
+            </div>
+            
+            <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="p-2 rounded-full bg-green-100 mb-2">
+                <CheckCircle size={20} className="text-greenz" />
+              </div>
+              <span className="text-2xl font-bold text-grayz">{assessmentResults.filter(r => r.status === "Passed").length}</span>
+              <span className="text-xs text-gray-500">Passed</span>
+            </div>
+            
+            <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="p-2 rounded-full bg-purple-100 mb-2">
+                <BarChart size={20} className="text-purplez" />
+              </div>
+              <span className="text-2xl font-bold text-grayz">{avgScore}%</span>
+              <span className="text-xs text-gray-500">Avg. Score</span>
+            </div>
+            
+            <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+              <div className="p-2 rounded-full bg-green-100 mb-2">
+                <Award size={20} className="text-greenz" />
+              </div>
+              <span className="text-2xl font-bold text-grayz">{passRate}%</span>
+              <span className="text-xs text-gray-500">Pass Rate</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-offwhite">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Student</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Score</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Completed</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {studentsInAssessment.map((student) => (
+                  <tr 
+                    key={student.id} 
+                    onClick={() => console.log(`View assessment details for student ${student.id}`)}
+                    className="hover:bg-lightpurple/20 cursor-pointer transition"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10">
+                          <img className="h-10 w-10 rounded-full" src={student.profileImg} alt={student.name} />
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-grayz">{student.name}</div>
+                          <div className="text-xs text-gray-500">Student ID: {student.id}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-grayz">{student.score}%</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        student.status === 'Passed' 
+                          ? 'bg-green-100 text-greenz' 
+                          : 'bg-red-100 text-redz'
+                      }`}>
+                        {student.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {student.completedAt}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          {studentsInAssessment.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-grayz text-lg">No students have taken this assessment yet.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const DashboardStudentReportTopics = () => {
   const navigate = useNavigate();
-  const { classCode, lessonId, topicId } = useParams();
+  const { classCode, lessonId, topicId, assessmentId } = useParams();
   
   useEffect(() => {
     // Check if the current lessonId exists in our data
@@ -281,9 +506,29 @@ const DashboardStudentReportTopics = () => {
     navigate(`/app/teacher/classroom/${classCode}/lesson/${lessonId}/topic/${selectedTopicId}`, { replace: false });
   };
 
+  const handleAssessmentClick = (selectedAssessmentId) => {
+    navigate(`/app/teacher/classroom/${classCode}/lesson/${lessonId}/assessment/${selectedAssessmentId}`, { replace: false });
+  };
+
   const handleBackFromTopic = () => {
     navigate(`/app/teacher/classroom/${classCode}/lesson/${lessonId}`, { replace: false });
   };
+
+  const handleBackFromAssessment = () => {
+    navigate(`/app/teacher/classroom/${classCode}/lesson/${lessonId}`, { replace: false });
+  };
+
+  // If we have an assessmentId, show the assessment details
+  if (assessmentId) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        <AssessmentView
+          assessmentId={assessmentId}
+          onBack={handleBackFromAssessment}
+        />
+      </div>
+    );
+  }
 
   // If we have a topicId, show the student list for that topic
   if (topicId) {
@@ -305,6 +550,7 @@ const DashboardStudentReportTopics = () => {
         lessonId={lessonId}
         onBack={handleBackFromLesson}
         onSelectTopic={handleTopicClick}
+        onSelectAssessment={handleAssessmentClick}
       />
     </div>
   );

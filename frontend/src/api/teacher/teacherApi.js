@@ -2,7 +2,7 @@ import apiService from "../apiService";
 
 const createClassroom = async (classroomData) => {
   try {
-    const response = await apiService.post("/createClassroom", classroomData);
+    const response = await apiService.post("/classroom/createClassroom", classroomData);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message || "An unknown error occurred";

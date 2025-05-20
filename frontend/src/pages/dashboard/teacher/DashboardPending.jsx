@@ -21,11 +21,9 @@ const DashboardPending = () => {
     try {
       setRefreshing(true);
       const response = await teacherApi.fetchPendingStudents(user.userID);
-      console.log(response);
+      console.log("Teacher Pending:", response);
       
-      // Transform the response data to match our component structure
       const transformedClassrooms = response.map(classroom => {
-        // First, separate students by request type
         const joinStudents = classroom.pendingStudents.filter(student => student.request === 'Join Class');
         const leaveStudents = classroom.pendingStudents.filter(student => student.request === 'Leave Class' || student.request === 'Leave Classroom');
         
@@ -38,7 +36,7 @@ const DashboardPending = () => {
             email: student.email,
             studentId: student.studentId,
             request: student.request,
-            joinedAt: student.date // Using current date as placeholder if not available
+            joinedAt: student.date
           })),
           joinRequests: joinStudents.map(student => ({
             name: student.name,
