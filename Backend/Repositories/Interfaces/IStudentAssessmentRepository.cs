@@ -6,7 +6,7 @@ namespace backend.Repositories.Interfaces
     {
         Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsAsync();
         Task<StudentAssessment> GetStudentAssessmentById(int StudentAssessmentId);
-        Task<StudentAssessment> CreateStudentAssessmentAsync(StudentAssessment studentAssessment);
+        Task<bool> CreateStudentAssessmentAsync(StudentAssessment studentAssessment);
         Task<bool> UpdateStudentAssessmentAsync(StudentAssessment studentAssessment);
         Task<bool> DeleteStudentAssessmentAsync(int StudentAssessmentId);
         Task<StudentAssessment> GetStudentAssessmentsByStudentId(int StudentId);
