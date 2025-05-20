@@ -16,7 +16,7 @@ namespace backend.Models
         [ForeignKey("Classroom")]
         public int ClassroomId {get; set;}
         public Classroom classroom {get; set;}
-        public int rank {get; set;}
+        public int Rank {get; set;}
         public double Score { get; set; }
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;        
     }

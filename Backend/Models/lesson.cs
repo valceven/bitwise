@@ -14,16 +14,10 @@ namespace backend.Models
         [Column(TypeName = "text")]
         public required string Title { get; set; }
         public string Description { get; set; } 
-
-        [ForeignKey("CreatedById")]
         public int? CreatedBy { get; set; } // null if created by admin
-
         public int Order { get; set; } 
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
         public ICollection<Topic> Topics { get; set; } = new List<Topic>();
         
     }
