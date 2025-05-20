@@ -1,17 +1,16 @@
 using backend.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 namespace backend.Repositories.Interfaces
 {
 
     public interface IStudentAssessmentRepository
     {
-        Task<ICollection<StudentAssessment>> GetAllAssessmentStudents();
-        Task<bool> AddtudentAssessmentAsync(StudentAssessment assessmentStudent);
-        Task<bool> UpdateStudentAssessmentAsync(StudentAssessment assessmentStudent);
-        Task<bool> DeleteStudentAssessmentAsync(int assessmentStudentId);
-        Task<StudentAssessment> GetStudentScoreByStudentIdAsync(int studentId, int classroomId);
-        Task<ICollection<StudentAssessment>> GetAllStudentScoresByClassroomId(int classroomId);
-        Task<ICollection<StudentAssessment>> GetAllStudentScoreByAssessmentId(int topicId, int classroomId);
+        Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsAsync();
+        Task<StudentAssessment> GetStudentAssessmentById(int StudentAssessmentId);
+        Task<StudentAssessment> CreateStudentAssessmentAsync(StudentAssessment studentAssessment);
+        Task<bool> UpdateStudentAssessmentAsync(StudentAssessment studentAssessment);
+        Task<bool> DeleteStudentAssessmentAsync(int StudentAssessmentId);
+        Task<StudentAssessment> GetStudentAssessmentsByStudentId(int StudentId);
+        Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsByTopicId(int TopicId);
+        Task<ICollection<StudentAssessment>> GetStudentAssessmentsByClassroomId(int ClassroomId);
     }
 }

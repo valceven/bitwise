@@ -11,7 +11,7 @@ namespace backend.Models
         [Required]
         [ForeignKey("TopicId")]
         public int TopicId { get; set; }
-    
+        public Topic Topic { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     }

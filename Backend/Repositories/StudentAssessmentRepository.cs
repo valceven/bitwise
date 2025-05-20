@@ -7,66 +7,98 @@ namespace backend.Repositories
 {
     public class StudentAssessmentRepository : IStudentAssessmentRepository
     {
-        private readonly bitwiseDbContext _context;
+        public readonly bitwiseDbContext _context;
 
         public StudentAssessmentRepository(bitwiseDbContext context)
         {
             _context = context;
         }
 
-        public async Task<ICollection<StudentAssessment>> GetAllAssessmentStudents()
+        public async Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsAsync()
         {
-            return await _context.StudentAssessments.ToListAsync();
+            return await _context.StudentAssessments
+                .Include(sa => sa.Student)
+                .ToListAsync();
         }
-        
-        public async Task<bool> AddtudentAssessmentAsync(StudentAssessment assessmentStudent)
-        {
-            
-            _context.StudentAssessments.Add(assessmentStudent);
-            return await _context.SaveChangesAsync() > 0;
-        }
-        public async Task<bool> UpdateStudentAssessmentAsync(StudentAssessment assessmentStudent)
-        {
-            _context.StudentAssessments.Update(assessmentStudent);
-            return await _context.SaveChangesAsync() > 0;
-        }
-        public async Task<bool> DeleteStudentAssessmentAsync(int assessmentStudentId)
-        {
-            var assessmentStudent = await _context.StudentAssessments.FindAsync(assessmentStudentId);
-            if (assessmentStudent == null)
-            {
-                return false;
-            }
-            _context.StudentAssessments.Remove(assessmentStudent);
-            return await _context.SaveChangesAsync() > 0;
-        }
-
-        public async Task<StudentAssessment> GetStudentScoreByStudentIdAsync(int studentId, int classroomId)
+        public async Task<StudentAssessment> GetStudentAssessmentById(int StudentAssessmentId)
         {
             var studentAssessment = await _context.StudentAssessments
                 .Include(sa => sa.Student)
-                .FirstOrDefaultAsync(sa => sa.StudentId == studentId && sa.ClassroomId == classroomId);
+                .FirstOrDefaultAsync(sa => sa.StudentAssessmentId == StudentAssessmentId);
             if (studentAssessment == null)
             {
-                throw new KeyNotFoundException($"No student found with ID {studentId} in Classroom ID {classroomId}.");
+                throw new Exception($"StudentAssessment with ID {StudentAssessmentId} not found.");
             }
             return studentAssessment;
         }
-        public async Task<ICollection<StudentAssessment>> GetAllStudentScoresByClassroomId(int classroomId)
+        public async Task<StudentAssessment> CreateStudentAssessmentAsync(StudentAssessment studentAssessment)
         {
+            await _context.StudentAssessments.AddAsync(studentAssessment);
+            await _context.SaveChangesAsync();
+            return studentAssessment;
+        }
+        public async Task<bool> UpdateStudentAssessmentAsync(StudentAssessment studentAssessment)
+        {
+            var existingStudentAssessment = await _context.StudentAssessments
+                .FirstOrDefaultAsync(sa => sa.StudentAssessmentId == studentAssessment.StudentAssessmentId);
+            if (existingStudentAssessment == null)
+            {
+                throw new Exception($"StudentAssessment with ID {studentAssessment.StudentAssessmentId} not found.");
+            }
+            existingStudentAssessment.Score = studentAssessment.Score;
+            existingStudentAssessment.IsCompleted = studentAssessment.IsCompleted;
+            existingStudentAssessment.SubmittedAt = studentAssessment.SubmittedAt;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> DeleteStudentAssessmentAsync(int StudentAssessmentId)
+        {
+            var studentAssessment = await _context.StudentAssessments
+                .FirstOrDefaultAsync(sa => sa.StudentAssessmentId == StudentAssessmentId);
+            if (studentAssessment == null)
+            {
+                throw new Exception($"StudentAssessment with ID {StudentAssessmentId} not found.");
+            }
+            _context.StudentAssessments.Remove(studentAssessment);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<StudentAssessment> GetStudentAssessmentsByStudentId(int studentId)
+        {
+            var studentAssessment = await _context.StudentAssessments
+                .Include(sa => sa.Student)
+                .FirstOrDefaultAsync(sa => sa.StudentId == studentId);
+            if (studentAssessment == null)
+            {
+                throw new Exception($"StudentAssessment with Student ID {studentId} not found.");
+            }
+            return studentAssessment;
+        }
+        public async Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsByTopicId(int topicId)
+        {
+            return await _context.StudentAssessments
+                .Include(sa => sa.Assessment)
+                    .ThenInclude(a => a.Topic)
+                .Where(sa => sa.Assessment.Topic.TopicId == topicId)
+                .ToListAsync();
+        }
+        public async Task<ICollection<StudentAssessment>> GetStudentAssessmentsByClassroomId(int classroomId)
+        {
+            var students = await _context.StudentClassrooms
+                .Where(sc => sc.ClassroomId == classroomId)
+                .Select(sc => sc.StudentId)
+                .ToListAsync();
+                
             var studentAssessments = await _context.StudentAssessments
                 .Include(sa => sa.Student)
-                .Where(sa => sa.ClassroomId == classroomId)
+                .Where(sa => students.Contains(sa.StudentId))
                 .ToListAsync();
+            if (studentAssessments == null)
+            {
+                throw new Exception($"StudentAssessments with Classroom ID {classroomId} not found.");
+            }
             return studentAssessments;
         }
-        public async Task<ICollection<StudentAssessment>> GetAllStudentScoreByAssessmentId(int topicId, int classroomId)
-        {
-            var studentAssessments = await _context.StudentAssessments
-                .Include(sa => sa.Student)
-                .Where(sa => sa.TopicId == topicId && sa.ClassroomId == classroomId)
-                .ToListAsync();
-            return studentAssessments;
-        }
+
     }
 }
