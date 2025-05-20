@@ -6,7 +6,6 @@ namespace backend.Models
 {
     public class ClassroomLesson
     {
-        // not working since hardcoded pa ang lessons
         [Key]
         public int ClassroomLessonId { get; set; }
 

@@ -21,7 +21,7 @@ namespace backend.Services
 
         public async Task<bool> ViewStudentTopicAsync(StudentTopicDto studentTopicDto)
         {
-            var studentTopic = await _studentTopicRepository.GetStudentTopicByStudentIdAsync(studentTopicDto);
+            var studentTopic = await _studentTopicRepository.GetStudentTopicAsync(studentTopicDto);
 
             studentTopic.IsViewed = true;
 
@@ -30,7 +30,7 @@ namespace backend.Services
 
         public async Task<bool> CompleteStudentTopicAsync(StudentTopicDto studentTopicDto)
         {
-            var studentTopic = await _studentTopicRepository.GetStudentTopicByStudentIdAsync(studentTopicDto);
+            var studentTopic = await _studentTopicRepository.GetStudentTopicAsync(studentTopicDto);
             if (studentTopic == null)
             {
                 return false;

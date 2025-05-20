@@ -16,7 +16,7 @@ namespace backend.Repositories
         }
 
 
-        public async Task<StudentTopic> GetStudentTopicByStudentIdAsync(StudentTopicDto studentTopicDto)
+        public async Task<StudentTopic> GetStudentTopicAsync(StudentTopicDto studentTopicDto)
         {
             var studentTopic = await _context.StudentTopics
             .Where(st => st.TopicId == studentTopicDto.TopicId && 
