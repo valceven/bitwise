@@ -3,6 +3,7 @@ import TruthTableLessonPart1 from './TruthTablesPart1';
 import TruthTableLessonPart2 from './TruthTablesPart2';
 import TruthTableBuilder from './TruthTablePart3';
 import TruthTableLessonPart4 from './TruthTablesPart4';
+import TruthTablesKeyTakeaways from './TruthTablesPart5';
 
  export const topic3Sections = [
     {
@@ -27,6 +28,12 @@ import TruthTableLessonPart4 from './TruthTablesPart4';
       title: "",
       content: (
         <TruthTableLessonPart4/>
+      )
+    },
+    {
+      title: "",
+      content: (
+        <TruthTablesKeyTakeaways/>
       )
     },
     

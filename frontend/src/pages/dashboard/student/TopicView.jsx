@@ -7,7 +7,8 @@ import { topic1Sections } from '../../../components/sections/lesson1/topic1/Topi
 import { topic4Sections } from '../../../components/sections/lesson2/topic4/Topic4Sections';
 import { topic2Sections } from '../../../components/sections/lesson1/topic2/Topic2Sections';
 import { topic3Sections } from '../../../components/sections/lesson1/topic3/Topic3Sections';
-//import { topic5Sections } from '../../components/sections/lesson2/topic5/Topic5Sections';
+import { topic5Sections } from '../../../components/sections/lesson2/topic5/Topic5Sections';
+
 
 const TopicView = () => {
    
@@ -33,7 +34,7 @@ const TopicView = () => {
     },
     {
         id: "5",
-       // topicSections: topic5Sections
+        topicSections: topic5Sections
     }];
 
     const matchedTopic = topics.find(u => u.id === topicId);
