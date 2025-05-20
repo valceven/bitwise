@@ -2,6 +2,7 @@ using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace backend.Repositories
 {
@@ -31,24 +32,16 @@ namespace backend.Repositories
             }
             return studentAssessment;
         }
-        public async Task<StudentAssessment> CreateStudentAssessmentAsync(StudentAssessment studentAssessment)
+        public async Task<bool> CreateStudentAssessmentAsync(StudentAssessment studentAssessment)
         {
             await _context.StudentAssessments.AddAsync(studentAssessment);
             await _context.SaveChangesAsync();
-            return studentAssessment;
+            return true;
+            
         }
         public async Task<bool> UpdateStudentAssessmentAsync(StudentAssessment studentAssessment)
         {
-            var existingStudentAssessment = await _context.StudentAssessments
-                .FirstOrDefaultAsync(sa => sa.StudentAssessmentId == studentAssessment.StudentAssessmentId);
-            if (existingStudentAssessment == null)
-            {
-                throw new Exception($"StudentAssessment with ID {studentAssessment.StudentAssessmentId} not found.");
-            }
-            existingStudentAssessment.Score = studentAssessment.Score;
-            existingStudentAssessment.IsCompleted = studentAssessment.IsCompleted;
-            existingStudentAssessment.SubmittedAt = studentAssessment.SubmittedAt;
-            await _context.SaveChangesAsync();
+            _context.StudentAssessments.Update(studentAssessment);
             return true;
         }
         public async Task<bool> DeleteStudentAssessmentAsync(int StudentAssessmentId)
@@ -88,7 +81,7 @@ namespace backend.Repositories
                 .Where(sc => sc.ClassroomId == classroomId)
                 .Select(sc => sc.StudentId)
                 .ToListAsync();
-                
+
             var studentAssessments = await _context.StudentAssessments
                 .Include(sa => sa.Student)
                 .Where(sa => students.Contains(sa.StudentId))
