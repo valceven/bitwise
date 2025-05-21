@@ -23,17 +23,13 @@ namespace backend.Services
 
         }
 
-        public async Task<bool> ViewStudentAssessment(ViewStudentAssessmentDto viewStudenAssessmentDto)
+        public async Task<bool> ViewStudentAssessment(int studentAssessmentId)
         {
-            var studentAssessment = new StudentAssessment
-            {
-                StudentId = viewStudenAssessmentDto.StudentId,
-                AssessmentId = viewStudenAssessmentDto.AssessmentId
-            };
-
-            return await _studentAssessmentRepository.CreateStudentAssessmentAsync(studentAssessment);
+            var studentAssessment = await _studentAssessmentRepository.GetStudentAssessmentById(studentAssessmentId);
+            studentAssessment.StartTime = DateTime.Now;
+            return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);
         }
-
+        
         public async Task<ICollection<StudentAssessment>> GetStudentAssessmentByAssessmentId(int AssessmentId)
         {
             return await _studentAssessmentRepository.GetAllStudentAssessmentsByAssessmentId(AssessmentId);
