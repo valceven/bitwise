@@ -27,6 +27,19 @@ namespace backend.Presentation
             return NotFound(new { message = "No student topic progress found" });
         }
 
+        [HttpPost("get-topic-completion")]
+        public async Task<IActionResult> GetStudentTopicProgress([FromBody] StudentTopicProgress studentTopicProgress)
+        {
+            var result = await _studentTopicService.GetALlStudentsTopicCompletionProgressAsync(studentTopicProgress);
+
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return NotFound(new { message = "An error occured" });
+        }
+
         // When the student clicks on the topic and then it gets marked as viewed
         [HttpPut("view-topic")]
         public async Task<IActionResult> ViewStudentTopic([FromBody] StudentTopicDto studentTopicDto)

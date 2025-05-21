@@ -3,7 +3,8 @@ using backend.Models;
 
 namespace backend.Repositories.Interfaces
 {
-    public interface IStudentTopicRepository{
+    public interface IStudentTopicRepository
+    {
         Task<StudentTopic> GetStudentTopicAsync(StudentTopicDto studentTopicDto);
         Task<ICollection<StudentTopic>> GetAllStudentTopicProgressdAsync(StudentTopicProgress studentTopicProgress);
         Task<bool> AddStudentTopicAsync(StudentTopic StudentTopic);

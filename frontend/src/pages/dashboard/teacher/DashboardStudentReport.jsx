@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "../../../context/UserContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import DashboardStudentReportTopics from "./DashboardStudentReportTopics";
+import DashboardStudentReportLessons from "./DashboardStudentReportLesson";
 import ClassRecord from "./ClassRecord";
 import { classroomApi } from "../../../api/classroom/classroomApi";
 import { useParams, useNavigate } from "react-router-dom";
 import { teacherApi } from "../../../api/teacher/teacherApi";
-import { BookOpen, Users, ClipboardList, ChevronRight, ArrowLeft, Award} from "lucide-react";
+import { BookOpen, Users, ClipboardList, ChevronRight, ArrowLeft, Award, AlertCircle } from "lucide-react";
 
 const DashboardStudentReport = () => {
   const [classroom, setClassroom] = useState(null);
@@ -15,10 +15,11 @@ const DashboardStudentReport = () => {
   const [showingClassRecord, setShowingClassRecord] = useState(false);
   const [loading, setLoading] = useState(true);
   const [lessonProgress, setLessonProgress] = useState({});
+  const [error, setError] = useState(null);
   const { user } = useUser();
   const navigate = useNavigate();
 
-  const { classCode, lessonId, topicId } = useParams();
+  const { classCode, lessonId } = useParams();
 
   useEffect(() => {
     const fetchClassroomByClassCode = async () => {
@@ -27,24 +28,22 @@ const DashboardStudentReport = () => {
         const response = await classroomApi.fetchClassroomByClassCode(classCode);
         setClassroom(response);
 
-        const classroomzId = response.classroomId;
-
         if (response) {
           const progressData = {};
           
           for (let i = 1; i <= 4; i++) {
             try {
-              const data  = {
-                classroomId: classroomzId,
+              const data = {
+                classroomId: response.classroomId,
                 lessonId: i,
               };
 
-              const lessonResponse = await classroomApi.fetchStudentLessonProgress(data);
+              const lessonResponse = await classroomApi.fetchStudentLessonProgress(data); // Random percentage 0-100
               
               progressData[i] = lessonResponse;
               
             } catch (error) {
-              console.error(`Error fetching student lesson progress in lesson ${i}`, error.message);
+              console.error(`Error fetching student lesson progress in lesson ${i}`, error?.message);
               toast.error(`Failed to fetch student lesson progress in lesson ${i}`);
               
               progressData[i] = 0;
@@ -53,7 +52,8 @@ const DashboardStudentReport = () => {
           setLessonProgress(progressData);
         }
       } catch (error) {
-        console.error("Error fetching classrooms:", error.message);
+        console.error("Error fetching classrooms:", error?.message);
+        setError("Failed to fetch classroom data");
         toast.error("Failed to fetch classrooms");
       } finally {
         setLoading(false);
@@ -61,7 +61,6 @@ const DashboardStudentReport = () => {
     };
 
     fetchClassroomByClassCode();
-    
     
     if (lessonId) {
       setSelectedLesson(lessonId);
@@ -114,7 +113,7 @@ const DashboardStudentReport = () => {
       }));
       toast.success("Student removed successfully");
     } catch (error) {
-      console.error("Error removing student:", error.message);
+      console.error("Error removing student:", error?.message);
       toast.error("Failed to remove student");
     }
   };
@@ -122,14 +121,6 @@ const DashboardStudentReport = () => {
   const handleLessonClick = (lessonId) => {
     const newUrl = `/app/teacher/classroom/${classCode}/lesson/${lessonId}`;
     navigate(newUrl, { replace: false });
-  };
-
-  const handleBackFromLesson = () => {
-    navigate(`/app/teacher/classroom/${classCode}`, { replace: false });
-  };
-  
-  const handleTopicClick = (topicId) => {
-    navigate(`/app/teacher/classroom/${classCode}/lesson/${selectedLesson}/topic/${topicId}`, { replace: false });
   };
 
   const handleShowClassRecord = () => {
@@ -141,8 +132,8 @@ const DashboardStudentReport = () => {
   };
 
   useEffect(() => {
-      document.title = "Classroom " + classCode;
-    }, []);
+    document.title = "Classroom " + classCode;
+  }, [classCode]);
 
   const renderSkeletonLoader = () => (
     <div className="bg-white border border-gray-200 shadow-md rounded-xl p-8 animate-pulse">
@@ -225,7 +216,7 @@ const DashboardStudentReport = () => {
           </div>
           <div>
             <div className="text-2xl font-bold text-grayz">
-              {Math.round(lessons.reduce((sum, lesson) => sum + lesson.completionRate, 0) / lessons.length)}%
+              {Math.round(Object.values(lessonProgress).reduce((sum, rate) => sum + rate, 0) / Object.values(lessonProgress).length)}%
             </div>
             <div className="text-sm text-gray-500">Avg. Completion</div>
           </div>
@@ -237,6 +228,24 @@ const DashboardStudentReport = () => {
   const renderContent = () => {
     if (loading) {
       return renderSkeletonLoader();
+    }
+    
+    if (error) {
+      return (
+        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className="text-red-500 mb-4">
+            <AlertCircle size={48} className="mx-auto mb-2" />
+            <h2 className="text-xl font-semibold">Error Loading Data</h2>
+          </div>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-bluez text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Try Again
+          </button>
+        </div>
+      );
     }
     
     if (showingClassRecord) {
@@ -251,12 +260,7 @@ const DashboardStudentReport = () => {
     
     if (selectedLesson) {
       return (
-        <DashboardStudentReportTopics
-          lessonId={selectedLesson}
-          onBack={handleBackFromLesson}
-          topicId={topicId}
-          onSelectTopic={handleTopicClick}
-        />
+        <DashboardStudentReportLessons />
       );
     }
 
@@ -280,7 +284,7 @@ const DashboardStudentReport = () => {
             </button>
           </div>
 
-          <div className="max-h-108  overflow-y-auto custom-scrollbar bg-offwhite rounded-lg p-4">
+          <div className="max-h-108 overflow-y-auto custom-scrollbar bg-offwhite rounded-lg p-4">
             <div className="grid grid-cols-1 gap-3">
               {lessons.map((lesson) => (
                 <div

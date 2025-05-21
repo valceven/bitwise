@@ -22,7 +22,18 @@ const fetchStudentLessonProgress = async (data) => {
     }
 }
 
+const fetchStudentTopicProgress = async (data) => {
+    try {
+        const response = await apiService.post("student-topic/get-topic-completion", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching student topic progress: ", error );
+        throw error.response?.data || error.message || "An unknown error occured";
+    }
+}
+
 export const classroomApi = {
     fetchClassroomByClassCode,
     fetchStudentLessonProgress,
+    fetchStudentTopicProgress
 };

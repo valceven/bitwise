@@ -18,7 +18,9 @@ import DashboardLayout from "./components/dashboard/DashboardLayout.jsx";
 import DashboardPending from "./pages/dashboard/teacher/DashboardPending.jsx";
 import LessonView from "./pages/dashboard/student/LessonView.jsx";
 import TopicView from "./pages/dashboard/student/TopicView.jsx";
+import DashboardStudentReportAssessment from "./pages/dashboard/teacher/DashboardStudentReportAssessment.jsx";
 import DashboardStudentReportTopics from "./pages/dashboard/teacher/DashboardStudentReportTopics.jsx";
+import DashboardStudentReportLesson from "./pages/dashboard/teacher/DashboardStudentReportLesson.jsx";
 import ClassroomView from "./pages/dashboard/student/ClassroomView.jsx";
 
 const router = createBrowserRouter([
@@ -53,9 +55,9 @@ const router = createBrowserRouter([
       
       // Teacher routes
       { path: "teacher/classroom/:classCode", element: <DashboardStudentReport /> },
-      { path: "teacher/classroom/:classCode/lesson/:lessonId", element: <DashboardStudentReportTopics /> },
-      { path: "teacher/classroom/:classCode/lesson/:lessonId/topic/:topicId", element: <DashboardStudentReport /> },
-      { path: "teacher/classroom/:classCode/lesson/:lessonId/assessment/:assessmentId", element: <DashboardStudentReport /> },
+      { path: "teacher/classroom/:classCode/lesson/:lessonId", element: <DashboardStudentReportLesson /> },
+      { path: "teacher/classroom/:classCode/lesson/:lessonId/topic/:topicId", element: <DashboardStudentReportTopics /> },
+      { path: "teacher/classroom/:classCode/lesson/:lessonId/assessment/:assessmentId", element: <DashboardStudentReportAssessment /> },
       { path: "teacher/pending", element: <DashboardPending /> },
       
       // Student routes
