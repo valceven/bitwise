@@ -7,6 +7,10 @@ namespace backend.Services
     public class StudentAssessmentService : IStudentAssessmentService
     {
         private readonly IStudentAssessmentRepository _studentAssessmentRepository;
+        public StudentAssessmentService(IStudentAssessmentRepository studentAssessmentRepository)
+        {
+            _studentAssessmentRepository = studentAssessmentRepository;
+        }
         public async Task<ICollection<StudentAssessment>> GetAllStudentAssessmentAsync()
         {
             return await _studentAssessmentRepository.GetAllStudentAssessmentsAsync();
@@ -23,20 +27,20 @@ namespace backend.Services
 
         }
 
-        public async Task<bool> ViewStudentAssessment(ViewStudentAssessmentDto viewStudenAssessmentDto)
+        public async Task<bool> ViewStudentAssessment(int studentAssessmentId)
         {
-            var studentAssessment = new StudentAssessment
+            var studentAssessment = await _studentAssessmentRepository.GetStudentAssessmentById(studentAssessmentId);
+            if (studentAssessment == null)
             {
-                StudentId = viewStudenAssessmentDto.StudentId,
-                AssessmentId = viewStudenAssessmentDto.AssessmentId
-            };
-
-            return await _studentAssessmentRepository.CreateStudentAssessmentAsync(studentAssessment);
+                throw new Exception($"StudentAssessment with ID {studentAssessmentId} not found.");
+            }
+            studentAssessment.StartTime = DateTime.UtcNow;
+            return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);
         }
-
-        public async Task<ICollection<StudentAssessment>> GetStudentAssessmentByTopicId(int TopicId)
+        
+        public async Task<ICollection<StudentAssessment>> GetStudentAssessmentByAssessmentId(int AssessmentId)
         {
-            return await _studentAssessmentRepository.GetAllStudentAssessmentsByTopicId(TopicId);
+            return await _studentAssessmentRepository.GetAllStudentAssessmentsByAssessmentId(AssessmentId);
         }
 
         public async Task<StudentAssessment> GetStudentAssessmentByStudentId(int StudentId)

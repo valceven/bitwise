@@ -34,19 +34,19 @@ namespace backend.Presentation
             return BadRequest(new { message = "Unexpected Error Occurred" });
         }
         [HttpPost("view-student-assessment")]
-        public async Task<IActionResult> ViewStudentAssessment([FromBody] ViewStudentAssessmentDto viewStudenAssessmentDto)
+        public async Task<IActionResult> ViewStudentAssessment([FromQuery] int studentAssessmentId)
         {
-            var result = await _studentAssessmentService.ViewStudentAssessment(viewStudenAssessmentDto);
+            var result = await _studentAssessmentService.ViewStudentAssessment(studentAssessmentId);
             if (result)
             {
                 return Ok(new { message = "Student Assessment Viewed Successfully" });
             }
             return BadRequest(new { message = "Unexpected Error Occurred" });
         }
-        [HttpGet("get-student-assessment-by-topic-id")]
-        public async Task<IActionResult> GetStudentAssessmentByTopicId([FromQuery] int topicId)
+        [HttpGet("get-student-assessment-by-assessment-id")]
+        public async Task<IActionResult> GetStudentAssessmentByAssessmentId([FromQuery] int AssessmentId)
         {
-            var studentAssessments = await _studentAssessmentService.GetStudentAssessmentByTopicId(topicId);
+            var studentAssessments = await _studentAssessmentService.GetStudentAssessmentByAssessmentId(AssessmentId);
             if (studentAssessments == null)
             {
                 return NotFound(new { message = "No Student Assessment Found" });
