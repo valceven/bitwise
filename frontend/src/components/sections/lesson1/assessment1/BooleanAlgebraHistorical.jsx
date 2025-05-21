@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle, XCircle, ChevronLeft, ChevronRight, Clock, Award, BookOpen } from "lucide-react"
+import { CheckCircle, XCircle, ChevronLeft, ChevronRight, Clock, Award, BookOpen, ArrowRight, Info } from "lucide-react"
 
 // Custom color palette
 const colors = {
@@ -18,7 +18,7 @@ const colors = {
   blackz: "#031926",
 }
 
-export default function HistoricalAssessment() {
+export default function HistoricalAssessment({ onComplete }) {
   // Assessment states
   const [currentStep, setCurrentStep] = useState(0)
   const [userAnswers, setUserAnswers] = useState([])
@@ -26,7 +26,10 @@ export default function HistoricalAssessment() {
   const [isCompleted, setIsCompleted] = useState(false)
   const [timelineVisible, setTimelineVisible] = useState(false)
   const [selectedOption, setSelectedOption] = useState(null)
-
+  const [showFeedback, setShowFeedback] = useState(false)
+  const [feedbackMessage, setFeedbackMessage] = useState("")
+  const [showHistoryInfo, setShowHistoryInfo] = useState(false)
+  
   useEffect(() => {
     // Show timeline with slight delay for animation effect
     const timer = setTimeout(() => {
@@ -36,212 +39,239 @@ export default function HistoricalAssessment() {
     return () => clearTimeout(timer)
   }, [])
 
-  // Reset selected option when changing steps
+  // Reset selected option and feedback when changing steps
   useEffect(() => {
     setSelectedOption(null)
+    setShowFeedback(false)
   }, [currentStep])
 
   // Assessment content structured as a journey
   const assessmentSteps = [
     {
-      type: "intro",
-      title: "The Origins of Boolean Algebra",
-      content:
-        "In this assessment, you will explore the fascinating history of Boolean Algebra, from its philosophical beginnings to its revolutionary impact on modern computing.",
-      image: "/placeholder.svg?height=300&width=600",
-      imageAlt: "Boolean Algebra representation",
+      type: 'intro',
+      title: 'The Origins of Boolean Algebra',
+      content: 'In this assessment, you will explore the fascinating history of Boolean Algebra, from its philosophical beginnings to its revolutionary impact on modern computing.',
+      image: '/api/placeholder/600/300',
+      imageAlt: 'Boolean Algebra representation'
     },
     {
-      type: "timelineExploration",
-      title: "Key Moments in Boolean History",
+      type: 'timelineExploration',
+      title: 'Key Moments in Boolean History',
       events: [
-        {
-          year: 1854,
-          title: "An Investigation of the Laws of Thought",
-          description: "George Boole publishes his groundbreaking work establishing Boolean logic.",
-          image: "/placeholder.svg?height=150&width=150",
+        { 
+          year: 1854, 
+          title: 'An Investigation of the Laws of Thought', 
+          description: 'George Boole publishes his groundbreaking work establishing Boolean logic.',
+          image: '/api/placeholder/150/150'
         },
-        {
-          year: 1938,
-          title: "Shannon's Thesis",
-          description: "Claude Shannon applies Boolean Algebra to electrical circuits in his Master's thesis.",
-          image: "/placeholder.svg?height=150&width=150",
+        { 
+          year: 1938, 
+          title: 'Shannon\'s Thesis', 
+          description: 'Claude Shannon applies Boolean Algebra to electrical circuits in his Master\'s thesis.',
+          image: '/api/placeholder/150/150'
         },
-        {
-          year: 1945,
-          title: "First Electronic Computers",
-          description: "Boolean logic used in the design of early electronic computers.",
-          image: "/placeholder.svg?height=150&width=150",
+        { 
+          year: 1945, 
+          title: 'First Electronic Computers', 
+          description: 'Boolean logic used in the design of early electronic computers.',
+          image: '/api/placeholder/150/150'
         },
-        {
-          year: 1970,
-          title: "Integrated Circuits",
-          description: "Boolean logic becomes fundamental to building complex integrated circuits.",
-          image: "/placeholder.svg?height=150&width=150",
+        { 
+          year: 1970, 
+          title: 'Integrated Circuits', 
+          description: 'Boolean logic becomes fundamental to building complex integrated circuits.',
+          image: '/api/placeholder/150/150'
         },
-        {
-          year: "Today",
-          title: "Everywhere Computing",
-          description: "Boolean Algebra powers all modern digital devices and search algorithms.",
-          image: "/placeholder.svg?height=150&width=150",
-        },
+        { 
+          year: 'Today', 
+          title: 'Everywhere Computing', 
+          description: 'Boolean Algebra powers all modern digital devices and search algorithms.',
+          image: '/api/placeholder/150/150'
+        }
       ],
-      question: "Which development made Boolean Algebra practical for electrical engineering?",
+      question: 'Which development made Boolean Algebra practical for electrical engineering?',
       options: [
-        "George Boole's original publication",
-        "Claude Shannon's application to electrical circuits",
-        "The invention of the transistor",
-        "The development of search algorithms",
+        'George Boole\'s original publication',
+        'Claude Shannon\'s application to electrical circuits',
+        'The invention of the transistor',
+        'The development of search algorithms'
       ],
       correctAnswer: 1,
+      explanation: 'Claude Shannon\'s 1938 Master\'s thesis demonstrated how Boolean Algebra could be applied to design and analyze electrical switching circuits, creating the foundation for digital circuit design.'
     },
     {
-      type: "contextMatching",
-      title: "Boolean Algebra in Context",
-      description: "Connect these historical developments with how they relate to Boolean Algebra.",
+      type: 'contextMatching',
+      title: 'Boolean Algebra in Context',
+      description: 'Connect these historical developments with how they relate to Boolean Algebra.',
       pairs: [
-        {
-          context: "Mathematical Logic",
-          booleanRelation: "Boolean Algebra provided a way to express logical statements mathematically",
-          id: "logic",
+        { 
+          context: 'Mathematical Logic', 
+          booleanRelation: 'Boolean Algebra provided a way to express logical statements mathematically',
+          id: 'logic'
         },
-        {
-          context: "Electronic Switching",
-          booleanRelation: "ON/OFF states in circuits directly map to Boolean 1/0 values",
-          id: "switching",
+        { 
+          context: 'Electronic Switching', 
+          booleanRelation: 'ON/OFF states in circuits directly map to Boolean 1/0 values',
+          id: 'switching'
         },
-        {
-          context: "Computer Programming",
-          booleanRelation: "IF-THEN statements in code rely on Boolean true/false conditions",
-          id: "programming",
+        { 
+          context: 'Computer Programming', 
+          booleanRelation: 'IF-THEN statements in code rely on Boolean true/false conditions',
+          id: 'programming' 
         },
-        {
-          context: "Search Engines",
-          booleanRelation: "Search queries use Boolean operators like AND, OR, and NOT",
-          id: "search",
-        },
+        { 
+          context: 'Search Engines', 
+          booleanRelation: 'Search queries use Boolean operators like AND, OR, and NOT',
+          id: 'search'
+        }
       ],
-      question: "Which historical context was the FIRST to make use of Boolean Algebra?",
-      options: ["Mathematical Logic", "Electronic Switching", "Computer Programming", "Search Engines"],
+      question: 'Which historical context was the FIRST to make use of Boolean Algebra?',
+      options: ['Mathematical Logic', 'Electronic Switching', 'Computer Programming', 'Search Engines'],
       correctAnswer: 0,
+      explanation: 'Boolean Algebra was first developed as a mathematical system to represent logic, years before its applications in electronic switching, programming, or search engines. George Boole created it in the 1850s as a branch of mathematical logic.'
     },
     {
-      type: "applicationSpotting",
-      title: "Boolean Algebra in Everyday Life",
-      description: "Boolean logic is all around us! Can you identify where it appears in these everyday scenarios?",
+      type: 'applicationSpotting',
+      title: 'Boolean Algebra in Everyday Life',
+      description: 'Boolean logic is all around us! Can you identify where it appears in these everyday scenarios?',
       scenarios: [
         {
           scenario: 'Using a search engine to find "laptops AND affordable NOT gaming"',
           hasBoolean: true,
-          explanation: "This uses Boolean operators to filter search results",
+          explanation: 'This uses Boolean operators to filter search results'
         },
         {
-          scenario: "A light controlled by two switches that both need to be ON",
+          scenario: 'A light controlled by two switches that both need to be ON',
           hasBoolean: true,
-          explanation: "This is an AND operation: Light = Switch1 AND Switch2",
+          explanation: 'This is an AND operation: Light = Switch1 AND Switch2'
         },
         {
-          scenario: "Setting your phone alarm to wake you up at 7:00 AM",
+          scenario: 'Setting your phone alarm to wake you up at 7:00 AM',
           hasBoolean: false,
-          explanation: "This is a simple time trigger, not a Boolean operation",
+          explanation: 'This is a simple time trigger, not a Boolean operation'
         },
         {
-          scenario: "A security system that activates if the door OR window is opened",
+          scenario: 'A security system that activates if the door OR window is opened',
           hasBoolean: true,
-          explanation: "This uses the OR operation: Alarm = Door OR Window",
-        },
+          explanation: 'This uses the OR operation: Alarm = Door OR Window'
+        }
       ],
-      question: "Which scenario does NOT directly use Boolean logic?",
+      question: 'Which scenario does NOT directly use Boolean logic?',
       options: [
-        "Search engine filtering",
-        "Light controlled by two switches",
-        "Setting an alarm clock",
-        "Security system activation",
+        'Search engine filtering',
+        'Light controlled by two switches',
+        'Setting an alarm clock',
+        'Security system activation'
       ],
       correctAnswer: 2,
+      explanation: 'Setting an alarm clock for 7:00 AM is just a simple time-based trigger. The clock activates when the time equals 7:00 AM, but it doesn\'t involve evaluating logical conditions like AND, OR, or NOT operations across multiple inputs.'
     },
     {
-      type: "pioneersFocus",
-      title: "Pioneers of Boolean Logic",
-      description:
-        "George Boole transformed logic from philosophy to mathematics, but many others expanded on his work.",
+      type: 'pioneersFocus',
+      title: 'Pioneers of Boolean Logic',
+      description: 'George Boole transformed logic from philosophy to mathematics, but many others expanded on his work.',
       pioneers: [
         {
-          name: "George Boole",
-          contribution: "Created Boolean Algebra as a system of logical thought",
-          years: "1815-1864",
-          image: "/placeholder.svg?height=150&width=150",
+          name: 'George Boole',
+          contribution: 'Created Boolean Algebra as a system of logical thought',
+          years: '1815-1864',
+          image: '/api/placeholder/150/150'
         },
         {
-          name: "Claude Shannon",
-          contribution: "Applied Boolean Algebra to electrical circuit design",
-          years: "1916-2001",
-          image: "/placeholder.svg?height=150&width=150",
+          name: 'Claude Shannon',
+          contribution: 'Applied Boolean Algebra to electrical circuit design',
+          years: '1916-2001',
+          image: '/api/placeholder/150/150'
         },
         {
-          name: "John Venn",
-          contribution: "Created Venn diagrams to visualize Boolean operations",
-          years: "1834-1923",
-          image: "/placeholder.svg?height=150&width=150",
-        },
+          name: 'John Venn',
+          contribution: 'Created Venn diagrams to visualize Boolean operations',
+          years: '1834-1923',
+          image: '/api/placeholder/150/150'
+        }
       ],
-      question: "What was George Boole's most significant contribution?",
+      question: 'What was George Boole\'s most significant contribution?',
       options: [
-        "Inventing the electronic computer",
-        "Creating a mathematical system for logical reasoning",
-        "Designing the first electronic circuits",
-        "Developing search algorithms",
+        'Inventing the electronic computer',
+        'Creating a mathematical system for logical reasoning',
+        'Designing the first electronic circuits',
+        'Developing search algorithms'
       ],
       correctAnswer: 1,
+      explanation: 'George Boole\'s most significant contribution was creating a mathematical system for logical reasoning, which he published in his 1854 work "An Investigation of the Laws of Thought". This system formed the basis of Boolean Algebra, a way to express logical operations mathematically.'
     },
     {
-      type: "reflection",
-      title: "The Impact of Boolean Algebra",
-      description:
-        "Boolean Algebra's journey from abstract mathematics to the foundation of computing represents one of the most impactful mathematical innovations in history.",
+      type: 'reflection',
+      title: 'The Impact of Boolean Algebra',
+      description: 'Boolean Algebra\'s journey from abstract mathematics to the foundation of computing represents one of the most impactful mathematical innovations in history.',
       reflectionPoints: [
-        "Boolean values (1/0, true/false) are the most fundamental unit of all digital systems",
-        "Every decision in programming relies on Boolean conditions",
-        "Boolean searching powers how we find information online",
-        "Complex computers ultimately operate using millions of simple Boolean operations",
+        'Boolean values (1/0, true/false) are the most fundamental unit of all digital systems',
+        'Every decision in programming relies on Boolean conditions',
+        'Boolean searching powers how we find information online',
+        'Complex computers ultimately operate using millions of simple Boolean operations'
       ],
-      question: "Why is Boolean Algebra considered fundamental to modern computing?",
+      question: 'Why is Boolean Algebra considered fundamental to modern computing?',
       options: [
-        "It allows computers to perform calculations with very large numbers",
-        "It forms the basis of all programming languages",
-        "It enables computers to operate using binary (ON/OFF) states",
-        "It was the first mathematical system ever developed",
+        'It allows computers to perform calculations with very large numbers',
+        'It forms the basis of all programming languages',
+        'It enables computers to operate using binary (ON/OFF) states',
+        'It was the first mathematical system ever developed'
       ],
       correctAnswer: 2,
+      explanation: 'Boolean Algebra is fundamental to computing because it enables computers to operate using binary (ON/OFF) states. These binary states, represented as 0s and 1s, are the foundation of all digital systems. Computer hardware like transistors and logic gates implement Boolean operations physically, making complex computing possible.'
     },
     {
-      type: "completion",
-      title: "Assessment Complete!",
-      content: "You've completed your journey through the history and significance of Boolean Algebra.",
-    },
-  ]
+      type: 'completion',
+      title: 'Assessment Complete!',
+      content: 'You\'ve completed your journey through the history and significance of Boolean Algebra.',
+    }
+  ];
 
   // Calculate progress percentage
   const progress = ((currentStep + 1) / assessmentSteps.length) * 100
-
+  
   // Get total number of questions (excluding intro and completion steps)
   const totalQuestions = assessmentSteps.filter((step) => step.type !== "intro" && step.type !== "completion").length
-
+  
   // Calculate score
   const score = userAnswers.filter((answer) => answer.isCorrect).length
+  
+  // Check if current step has a question
+  const hasQuestion = useCallback(() => {
+    const step = assessmentSteps[currentStep]
+    return step.options && step.correctAnswer !== undefined
+  }, [currentStep, assessmentSteps])
+
+  // Check if user has already answered the current question
+  const hasAnsweredCurrent = useCallback(() => {
+    return userAnswers.some((answer) => answer.questionIndex === currentStep)
+  }, [currentStep, userAnswers])
+
+  // Get user's answer for the current question
+  const getCurrentAnswer = useCallback(() => {
+    return userAnswers.find((answer) => answer.questionIndex === currentStep)
+  }, [currentStep, userAnswers])
 
   // Handle answer selection
-  const handleAnswerSelect = (questionIndex, answerIndex) => {
+  const handleAnswerSelect = (answerIndex) => {
+    if (hasAnsweredCurrent()) return
     setSelectedOption(answerIndex)
   }
 
-  // Handle submitting the current answer and moving to next step
-  const handleSubmitAnswer = () => {
+  // Show immediate feedback upon selection
+  const handleShowFeedback = () => {
     if (selectedOption === null) return
-
+    
     const currentQuestion = assessmentSteps[currentStep]
     const isCorrect = currentQuestion.correctAnswer === selectedOption
-
+    
+    // Set feedback message
+    if (isCorrect) {
+      setFeedbackMessage("Correct! " + currentQuestion.explanation)
+    } else {
+      setFeedbackMessage(`Not quite. The correct answer is: ${currentQuestion.options[currentQuestion.correctAnswer]}. ${currentQuestion.explanation}`)
+    }
+    
     // Add answer to userAnswers array
     setUserAnswers([
       ...userAnswers,
@@ -251,9 +281,9 @@ export default function HistoricalAssessment() {
         isCorrect,
       },
     ])
-
-    // Move to next step
-    handleNext()
+    
+    // Show feedback
+    setShowFeedback(true)
   }
 
   // Handle navigation between steps
@@ -274,23 +304,19 @@ export default function HistoricalAssessment() {
   // Complete the assessment
   const finishAssessment = () => {
     setIsCompleted(true)
-    console.log("Assessment completed with score:", score)
-    // In a real app, you would send the score to an API here
+    const finalScore = (score / totalQuestions) * 100
+    
+    // Call the onComplete callback if provided
+    if (onComplete) {
+      onComplete(score, totalQuestions, Math.round(finalScore))
+    }
+    
+    console.log("Assessment completed with score:", score, "out of", totalQuestions, ":", Math.round(finalScore) + "%")
   }
 
   // Toggle review mode
   const toggleReviewMode = () => {
     setIsReviewMode(!isReviewMode)
-  }
-
-  // Check if user has already answered the current question
-  const hasAnsweredCurrent = () => {
-    return userAnswers.some((answer) => answer.questionIndex === currentStep)
-  }
-
-  // Get user's answer for the current question
-  const getCurrentAnswer = () => {
-    return userAnswers.find((answer) => answer.questionIndex === currentStep)
   }
 
   // Custom Button component
@@ -353,15 +379,15 @@ export default function HistoricalAssessment() {
               {step.title}
             </h2>
             <img
-              src={step.image || "/placeholder.svg"}
+              src={step.image || "/api/placeholder/600/300"}
               alt={step.imageAlt}
               className="rounded-lg shadow-md w-full max-w-2xl"
             />
             <p className="text-lg" style={{ color: colors.grayz }}>
               {step.content}
             </p>
-            <Button onClick={handleNext} size="lg" className="mt-6">
-              Begin Journey
+            <Button onClick={handleNext} size="lg" className="mt-6 flex items-center gap-1">
+              Begin Journey <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
         )
@@ -396,7 +422,7 @@ export default function HistoricalAssessment() {
                       <div className="w-4 h-4 rounded-full mb-1" style={{ backgroundColor: colors.darkpurple }}></div>
                       <p className="font-bold text-sm">{event.year}</p>
                       <img
-                        src={event.image || "/placeholder.svg"}
+                        src={event.image || "/api/placeholder/150/150"}
                         alt={event.title}
                         className="w-16 h-16 rounded-full my-2 object-cover border-2"
                         style={{ borderColor: colors.bluez }}
@@ -414,60 +440,43 @@ export default function HistoricalAssessment() {
               </div>
             </div>
 
-            {/* Question */}
-            <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
-                {step.question}
-              </h3>
-              <div className="space-y-3">
-                {step.options?.map((option, idx) => {
-                  const isSelected = selectedOption === idx
-                  const isAnswered = hasAnsweredCurrent()
-                  const isCorrect = isReviewMode && step.correctAnswer === idx
-                  const isIncorrect = isReviewMode && currentAnswer?.selectedAnswer === idx && !currentAnswer.isCorrect
-
-                  let bgColor = colors.white
-                  let borderColor = "#e5e7eb" // Default gray border
-
-                  if (isSelected) {
-                    bgColor = `${colors.lightpurple}50` // 50% opacity
-                    borderColor = colors.bluez
-                  }
-                  if (isCorrect) {
-                    bgColor = `${colors.greenz}20` // 20% opacity
-                    borderColor = colors.greenz
-                  }
-                  if (isIncorrect) {
-                    bgColor = `${colors.redz}20` // 20% opacity
-                    borderColor = colors.redz
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => !isAnswered && handleAnswerSelect(currentStep, idx)}
-                      className={`p-3 border rounded-lg transition-all ${
-                        isAnswered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50"
-                      }`}
-                      style={{
-                        backgroundColor: bgColor,
-                        borderColor: borderColor,
-                        color: colors.grayz,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{option}</span>
-                        {isReviewMode && isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
-                        )}
-                        {isReviewMode && isIncorrect && <XCircle className="h-5 w-5" style={{ color: colors.redz }} />}
-                      </div>
-                    </div>
-                  )
-                })}
+            {/* Floating Year Info Button */}
+            <button
+              className="mt-2 flex items-center text-xs font-medium gap-1 text-bluez hover:underline"
+              onClick={() => setShowHistoryInfo(!showHistoryInfo)}
+            >
+              <Info className="h-3 w-3" /> Learn more about these events
+            </button>
+            
+            {/* History Information Panel - Shown on Click */}
+            {showHistoryInfo && (
+              <div className="mt-3 p-4 bg-white rounded-lg shadow-md text-sm" style={{ color: colors.grayz }}>
+                <h4 className="font-bold mb-2">Key Historical Facts</h4>
+                <ul className="space-y-2">
+                  <li>
+                    <span className="font-medium">1854:</span> George Boole published "An Investigation of the Laws of Thought", establishing Boolean logic as a mathematical system.
+                  </li>
+                  <li>
+                    <span className="font-medium">1938:</span> Claude Shannon's master's thesis at MIT demonstrated how electrical circuits could implement Boolean operations.
+                  </li>
+                  <li>
+                    <span className="font-medium">1940s:</span> Boolean Algebra became essential in the design of early electronic computers like ENIAC.
+                  </li>
+                  <li>
+                    <span className="font-medium">1970s:</span> The development of integrated circuits made complex Boolean operations possible in increasingly smaller devices.
+                  </li>
+                </ul>
+                <button 
+                  className="mt-2 text-bluez hover:underline"
+                  onClick={() => setShowHistoryInfo(false)}
+                >
+                  Close
+                </button>
               </div>
-              {renderNavigation()}
-            </div>
+            )}
+
+            {/* Question */}
+            {renderQuestion(step)}
           </div>
         )
 
@@ -494,59 +503,7 @@ export default function HistoricalAssessment() {
             </div>
 
             {/* Question */}
-            <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
-                {step.question}
-              </h3>
-              <div className="space-y-3">
-                {step.options?.map((option, idx) => {
-                  const isSelected = selectedOption === idx
-                  const isAnswered = hasAnsweredCurrent()
-                  const isCorrect = isReviewMode && step.correctAnswer === idx
-                  const isIncorrect = isReviewMode && currentAnswer?.selectedAnswer === idx && !currentAnswer.isCorrect
-
-                  let bgColor = colors.white
-                  let borderColor = "#e5e7eb" // Default gray border
-
-                  if (isSelected) {
-                    bgColor = `${colors.lightpurple}50` // 50% opacity
-                    borderColor = colors.bluez
-                  }
-                  if (isCorrect) {
-                    bgColor = `${colors.greenz}20` // 20% opacity
-                    borderColor = colors.greenz
-                  }
-                  if (isIncorrect) {
-                    bgColor = `${colors.redz}20` // 20% opacity
-                    borderColor = colors.redz
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => !isAnswered && handleAnswerSelect(currentStep, idx)}
-                      className={`p-3 border rounded-lg transition-all ${
-                        isAnswered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50"
-                      }`}
-                      style={{
-                        backgroundColor: bgColor,
-                        borderColor: borderColor,
-                        color: colors.grayz,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{option}</span>
-                        {isReviewMode && isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
-                        )}
-                        {isReviewMode && isIncorrect && <XCircle className="h-5 w-5" style={{ color: colors.redz }} />}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-              {renderNavigation()}
-            </div>
+            {renderQuestion(step)}
           </div>
         )
 
@@ -572,7 +529,7 @@ export default function HistoricalAssessment() {
                   <p className="font-medium" style={{ color: colors.grayz }}>
                     {item.scenario}
                   </p>
-                  {isReviewMode && (
+                  {(isReviewMode || showFeedback) && (
                     <p className="mt-2 text-sm" style={{ color: colors.grayz, opacity: 0.7 }}>
                       {item.explanation}
                     </p>
@@ -582,59 +539,7 @@ export default function HistoricalAssessment() {
             </div>
 
             {/* Question */}
-            <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
-                {step.question}
-              </h3>
-              <div className="space-y-3">
-                {step.options?.map((option, idx) => {
-                  const isSelected = selectedOption === idx
-                  const isAnswered = hasAnsweredCurrent()
-                  const isCorrect = isReviewMode && step.correctAnswer === idx
-                  const isIncorrect = isReviewMode && currentAnswer?.selectedAnswer === idx && !currentAnswer.isCorrect
-
-                  let bgColor = colors.white
-                  let borderColor = "#e5e7eb" // Default gray border
-
-                  if (isSelected) {
-                    bgColor = `${colors.lightpurple}50` // 50% opacity
-                    borderColor = colors.bluez
-                  }
-                  if (isCorrect) {
-                    bgColor = `${colors.greenz}20` // 20% opacity
-                    borderColor = colors.greenz
-                  }
-                  if (isIncorrect) {
-                    bgColor = `${colors.redz}20` // 20% opacity
-                    borderColor = colors.redz
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => !isAnswered && handleAnswerSelect(currentStep, idx)}
-                      className={`p-3 border rounded-lg transition-all ${
-                        isAnswered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50"
-                      }`}
-                      style={{
-                        backgroundColor: bgColor,
-                        borderColor: borderColor,
-                        color: colors.grayz,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{option}</span>
-                        {isReviewMode && isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
-                        )}
-                        {isReviewMode && isIncorrect && <XCircle className="h-5 w-5" style={{ color: colors.redz }} />}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-              {renderNavigation()}
-            </div>
+            {renderQuestion(step)}
           </div>
         )
 
@@ -654,7 +559,7 @@ export default function HistoricalAssessment() {
                   className="w-64 bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all"
                 >
                   <img
-                    src={pioneer.image || "/placeholder.svg"}
+                    src={pioneer.image || "/api/placeholder/150/150"}
                     alt={pioneer.name}
                     className="w-full h-40 object-cover"
                   />
@@ -672,59 +577,7 @@ export default function HistoricalAssessment() {
             </div>
 
             {/* Question */}
-            <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
-                {step.question}
-              </h3>
-              <div className="space-y-3">
-                {step.options?.map((option, idx) => {
-                  const isSelected = selectedOption === idx
-                  const isAnswered = hasAnsweredCurrent()
-                  const isCorrect = isReviewMode && step.correctAnswer === idx
-                  const isIncorrect = isReviewMode && currentAnswer?.selectedAnswer === idx && !currentAnswer.isCorrect
-
-                  let bgColor = colors.white
-                  let borderColor = "#e5e7eb" // Default gray border
-
-                  if (isSelected) {
-                    bgColor = `${colors.lightpurple}50` // 50% opacity
-                    borderColor = colors.bluez
-                  }
-                  if (isCorrect) {
-                    bgColor = `${colors.greenz}20` // 20% opacity
-                    borderColor = colors.greenz
-                  }
-                  if (isIncorrect) {
-                    bgColor = `${colors.redz}20` // 20% opacity
-                    borderColor = colors.redz
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => !isAnswered && handleAnswerSelect(currentStep, idx)}
-                      className={`p-3 border rounded-lg transition-all ${
-                        isAnswered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50"
-                      }`}
-                      style={{
-                        backgroundColor: bgColor,
-                        borderColor: borderColor,
-                        color: colors.grayz,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{option}</span>
-                        {isReviewMode && isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
-                        )}
-                        {isReviewMode && isIncorrect && <XCircle className="h-5 w-5" style={{ color: colors.redz }} />}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-              {renderNavigation()}
-            </div>
+            {renderQuestion(step)}
           </div>
         )
 
@@ -737,7 +590,7 @@ export default function HistoricalAssessment() {
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
             {/* Reflection points */}
-            <div className="p-6 rounded-lg" style={{ backgroundColor: `${colors.lightpurple}50` }}>
+            <div className="p-6 rounded-lg" style={{ backgroundColor: `${colors.lightpurple}30` }}>
               <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
                 Key Takeaways:
               </h3>
@@ -759,59 +612,7 @@ export default function HistoricalAssessment() {
             </div>
 
             {/* Question */}
-            <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
-                {step.question}
-              </h3>
-              <div className="space-y-3">
-                {step.options?.map((option, idx) => {
-                  const isSelected = selectedOption === idx
-                  const isAnswered = hasAnsweredCurrent()
-                  const isCorrect = isReviewMode && step.correctAnswer === idx
-                  const isIncorrect = isReviewMode && currentAnswer?.selectedAnswer === idx && !currentAnswer.isCorrect
-
-                  let bgColor = colors.white
-                  let borderColor = "#e5e7eb" // Default gray border
-
-                  if (isSelected) {
-                    bgColor = `${colors.lightpurple}50` // 50% opacity
-                    borderColor = colors.bluez
-                  }
-                  if (isCorrect) {
-                    bgColor = `${colors.greenz}20` // 20% opacity
-                    borderColor = colors.greenz
-                  }
-                  if (isIncorrect) {
-                    bgColor = `${colors.redz}20` // 20% opacity
-                    borderColor = colors.redz
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => !isAnswered && handleAnswerSelect(currentStep, idx)}
-                      className={`p-3 border rounded-lg transition-all ${
-                        isAnswered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50"
-                      }`}
-                      style={{
-                        backgroundColor: bgColor,
-                        borderColor: borderColor,
-                        color: colors.grayz,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{option}</span>
-                        {isReviewMode && isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
-                        )}
-                        {isReviewMode && isIncorrect && <XCircle className="h-5 w-5" style={{ color: colors.redz }} />}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-              {renderNavigation()}
-            </div>
+            {renderQuestion(step)}
           </div>
         )
 
@@ -844,19 +645,22 @@ export default function HistoricalAssessment() {
               {finalScore >= 80 ? (
                 <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: `${colors.greenz}20` }}>
                   <p style={{ color: colors.greenz }}>
-                    Excellent work! You have a strong understanding of Boolean Algebra's history and significance.
+                    <strong>Excellent work!</strong> You have a strong understanding of Boolean Algebra's history and significance. 
+                    You clearly understand how this mathematical system evolved from abstract theory to the foundation of modern computing.
                   </p>
                 </div>
               ) : finalScore >= 60 ? (
                 <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: `${colors.bluez}20` }}>
                   <p style={{ color: colors.bluez }}>
-                    Good job! You understand many key aspects of Boolean Algebra's history.
+                    <strong>Good job!</strong> You understand many key aspects of Boolean Algebra's history. 
+                    With a bit more study on the pioneers and applications, you'll have a comprehensive understanding of this topic.
                   </p>
                 </div>
               ) : (
                 <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: `${colors.orangez}20` }}>
                   <p style={{ color: colors.orangez }}>
-                    You might benefit from reviewing the material again to strengthen your understanding.
+                    <strong>Keep learning!</strong> You might benefit from reviewing the material again to strengthen your understanding.
+                    Focus particularly on the timeline of Boolean Algebra's development and how it transitioned from theory to practice.
                   </p>
                 </div>
               )}
@@ -867,10 +671,17 @@ export default function HistoricalAssessment() {
                 <BookOpen className="h-4 w-4" />
                 {isReviewMode ? "Hide Review" : "Review Answers"}
               </Button>
-              <Button onClick={() => setCurrentStep(0)} variant="outline" className="flex items-center gap-2">
+              <Button
+                onClick={() => {
+                    setCurrentStep(0);
+                    window.location.reload();
+                }}
+                variant="outline"
+                className="flex items-center gap-2"
+                >
                 <Clock className="h-4 w-4" />
                 Restart Assessment
-              </Button>
+                </Button>
               <Button className="flex items-center gap-2">
                 <Award className="h-4 w-4" />
                 Continue to Next Topic
@@ -883,6 +694,85 @@ export default function HistoricalAssessment() {
       default:
         return <div>Loading...</div>
     }
+  }
+
+  // Render question and answer options
+  const renderQuestion = (step) => {
+    if (!step.question || !step.options) return null
+
+    const currentAnswer = getCurrentAnswer()
+    const answered = hasAnsweredCurrent()
+
+    return (
+      <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
+        <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
+          {step.question}
+        </h3>
+        
+        <div className="space-y-3">
+          {step.options?.map((option, idx) => {
+            const isSelected = selectedOption === idx
+            const isAnswered = answered
+            const isCorrect = isReviewMode && step.correctAnswer === idx
+            const isIncorrect = isReviewMode && currentAnswer?.selectedAnswer === idx && !currentAnswer.isCorrect
+
+            let bgColor = colors.white
+            let borderColor = "#e5e7eb" // Default gray border
+
+            if (isSelected) {
+              bgColor = `${colors.lightpurple}50` // 50% opacity
+              borderColor = colors.bluez
+            }
+            if (isCorrect) {
+              bgColor = `${colors.greenz}20` // 20% opacity
+              borderColor = colors.greenz
+            }
+            if (isIncorrect) {
+              bgColor = `${colors.redz}20` // 20% opacity
+              borderColor = colors.redz
+            }
+
+            return (
+              <div
+                key={idx}
+                onClick={() => !isAnswered && handleAnswerSelect(idx)}
+                className={`p-3 border rounded-lg transition-all ${
+                  isAnswered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50"
+                }`}
+                style={{
+                  backgroundColor: bgColor,
+                  borderColor: borderColor,
+                  color: colors.grayz,
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span>{option}</span>
+                  {isReviewMode && isCorrect && (
+                    <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
+                  )}
+                  {isReviewMode && isIncorrect && <XCircle className="h-5 w-5" style={{ color: colors.redz }} />}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        
+        {/* Feedback area */}
+        {showFeedback && (
+          <div 
+            className="mt-4 p-4 rounded-lg" 
+            style={{ 
+              backgroundColor: currentAnswer?.isCorrect ? `${colors.greenz}20` : `${colors.redz}20`,
+              color: currentAnswer?.isCorrect ? colors.greenz : colors.redz 
+            }}
+          >
+            <p>{feedbackMessage}</p>
+          </div>
+        )}
+
+        {renderNavigation()}
+      </div>
+    )
   }
 
   // Custom progress bar component
@@ -907,7 +797,8 @@ export default function HistoricalAssessment() {
       return null
     }
 
-    const hasAnswered = hasAnsweredCurrent()
+    const answered = hasAnsweredCurrent()
+    const showSubmitButton = hasQuestion() && !answered
 
     return (
       <div className="flex justify-between pt-6">
@@ -920,13 +811,24 @@ export default function HistoricalAssessment() {
           <ChevronLeft className="h-4 w-4" /> Previous
         </Button>
 
-        {hasAnswered ? (
-          <Button onClick={handleNext} className="flex items-center gap-1">
-            {currentStep >= assessmentSteps.length - 2 ? "Complete" : "Next"} <ChevronRight className="h-4 w-4" />
+        {showSubmitButton ? (
+          <Button 
+            onClick={handleShowFeedback} 
+            disabled={selectedOption === null} 
+            className="flex items-center gap-1"
+            style={{
+              backgroundColor: selectedOption === null ? "#ccc" : colors.darkpurple,
+              color: colors.white,
+            }}
+          >
+            Submit Answer
           </Button>
         ) : (
-          <Button onClick={handleSubmitAnswer} disabled={selectedOption === null} className="flex items-center gap-1">
-            Submit Answer
+          <Button 
+            onClick={handleNext} 
+            className="flex items-center gap-1"
+          >
+            {currentStep >= assessmentSteps.length - 2 ? "Complete" : "Next"} <ChevronRight className="h-4 w-4" />
           </Button>
         )}
       </div>

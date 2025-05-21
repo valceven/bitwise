@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import HistoricalAssessment from '../../../components/sections/lesson1/assessment1/BooleanAlgebraHistorical';
+// import TruthTablesAssessment from '../../../components/assessments/TruthTablesAssessment';
+// Import other assessment components as needed
 
 export const AssessmentView = () => {
   const { topicId } = useParams();
@@ -9,22 +11,23 @@ export const AssessmentView = () => {
   const [assessmentData, setAssessmentData] = useState(null);
   
   useEffect(() => {
-    // This would be where you fetch assessment data from your API
-    // For now, we'll simulate loading and use a placeholder
+    // Simulate loading assessment data
     const fetchAssessmentData = async () => {
       try {
-        // Simulating API call
+        // In a real app, this would be an API call
         // const response = await fetch(`/api/assessments/${topicId}`);
         // const data = await response.json();
         
-        // Placeholder data
+        // Placeholder data for now
         const data = {
           topicId: topicId || '1',
-          title: 'Boolean Algebra: Origins and Significance',
-          description: 'Test your knowledge of Boolean Algebra history',
+          title: getAssessmentTitle(topicId),
+          description: getAssessmentDescription(topicId),
           lastAttemptScore: null,
           bestScore: null,
-          attempts: 0,
+          attempts: localStorage.getItem(`assessment-attempts-${topicId}`) 
+            ? parseInt(localStorage.getItem(`assessment-attempts-${topicId}`)) 
+            : 0,
           maxAttempts: 3
         };
         
@@ -39,28 +42,82 @@ export const AssessmentView = () => {
     fetchAssessmentData();
   }, [topicId]);
   
-  const handleScoreUpdate = (score, totalQuestions) => {
-    // Placeholder for API call to update scores
-    console.log('Assessment completed with score:', score, 'out of', totalQuestions);
+  // Helper functions to get assessment titles and descriptions based on topicId
+  const getAssessmentTitle = (id) => {
+    const titles = {
+      '1': 'Boolean Algebra: Origins and Significance',
+      '2': 'Truth Tables and Boolean Operations',
+      '3': 'Boolean Logic Applications',
+      '4': 'Circuit Design with Boolean Logic',
+      // Add more topics as needed
+    };
+    return titles[id] || 'Assessment';
+  };
+  
+  const getAssessmentDescription = (id) => {
+    const descriptions = {
+      '1': 'Test your knowledge of Boolean Algebra history',
+      '2': 'Demonstrate your understanding of Truth Tables and Boolean operations',
+      '3': 'Apply Boolean Logic to solve real-world problems',
+      '4': 'Design digital circuits using Boolean Algebra',
+      // Add more topics as needed
+    };
+    return descriptions[id] || 'Complete this assessment to test your knowledge';
+  };
+  
+  // Handle assessment completion and score updates
+  const handleScoreUpdate = (score, totalQuestions, percentage) => {
+    // Update attempts count in localStorage
+    const currentAttempts = assessmentData.attempts + 1;
+    localStorage.setItem(`assessment-attempts-${topicId}`, currentAttempts);
     
-    // In a real implementation, you would:
-    // 1. Send the score to your backend
-    // 2. Update assessment data with new score
-    // 3. Handle any required navigation or state updates
+    // Update best score in localStorage if this score is better
+    const currentBestScore = localStorage.getItem(`assessment-best-score-${topicId}`);
+    if (!currentBestScore || parseInt(currentBestScore) < percentage) {
+      localStorage.setItem(`assessment-best-score-${topicId}`, percentage);
+    }
     
-    // TODO: Replace with actual API call
-    // const response = await fetch('/api/updateScore', {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     topicId: topicId,
-    //     score: score,
-    //     totalQuestions: totalQuestions
-    //   })
-    // });
+    // Mark as completed in localStorage
+    localStorage.setItem(`assessment-completed-${topicId}`, 'true');
+    
+    // In a real implementation, you would send this data to your backend:
+    console.log('Assessment completed:', {
+      topicId,
+      score,
+      totalQuestions,
+      percentage,
+      attempts: currentAttempts
+    });
+    
+    // Refresh assessment data to show updated stats
+    setAssessmentData({
+      ...assessmentData,
+      attempts: currentAttempts,
+      bestScore: Math.max(percentage, currentBestScore || 0),
+      lastAttemptScore: percentage
+    });
+    
+    // Optional: navigate to next topic or lesson view after a delay
+    // setTimeout(() => {
+    //   navigate('/app/lessonview');
+    // }, 5000);
   };
   
   const handleReturn = () => {
     navigate('/app/lessonview');
+  };
+  
+  // Render the appropriate assessment component based on topicId
+  const renderAssessment = () => {
+    switch(topicId) {
+      case '1':
+        return <HistoricalAssessment onComplete={handleScoreUpdate} />;
+      case '2':
+        return <TruthTablesAssessment onComplete={handleScoreUpdate} />;
+      // Add more cases for other topics
+      default:
+        return <HistoricalAssessment onComplete={handleScoreUpdate} />;
+    }
   };
   
   if (loading) {
@@ -94,12 +151,15 @@ export const AssessmentView = () => {
             {assessmentData.bestScore && (
               <p>Best score: {assessmentData.bestScore}%</p>
             )}
+            {assessmentData.lastAttemptScore && (
+              <p>Last attempt: {assessmentData.lastAttemptScore}%</p>
+            )}
           </div>
         )}
       </div>
       
       {/* Main Assessment Component */}
-      <HistoricalAssessment />
+      {renderAssessment()}
     </div>
   );
 };
