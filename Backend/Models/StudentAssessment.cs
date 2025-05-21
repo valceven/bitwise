@@ -19,5 +19,6 @@ namespace backend.Models
         public double Score { get; set; }
         public bool IsCompleted { get; set; } = false;
         public DateTime SubmittedAt { get; set; }
+        public DateTime StartTime { get; set; }
     }
 }

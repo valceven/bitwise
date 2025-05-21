@@ -49,9 +49,9 @@ namespace backend.Repositories
                                 ViewedAt = DateTime.MinValue,
                             CompletedAt = DateTime.MinValue
                             };
-                        _context.StudentLessons.Add(studentLesson);
+                        _context.StudentLessons.AddAsync(studentLesson);
                         }
-                        for(int i = 0; i <= 8; i++)
+                        for(int i = 1; i <= 9; i++)
                         {
                             var studentTopic = new StudentTopic
                             {
@@ -62,8 +62,21 @@ namespace backend.Repositories
                                 ViewedAt = DateTime.MinValue,
                                 CompletedAt = DateTime.MinValue
                             };
-                        _context.StudentTopics.Add(studentTopic);
+                        _context.StudentTopics.AddAsync(studentTopic);
                         }
+                        for (int i = 1; i <= 9; i++)
+                        {
+                            var studentAssessment = new StudentAssessment
+                            {
+                                StudentId = dto.StudentId,
+                                AssessmentId = i,
+                                Score = 0,
+                                IsCompleted = false,
+                                SubmittedAt = DateTime.MinValue,
+                                StartTime = DateTime.MinValue
+                            };
+                            _context.StudentAssessments.AddAsync(studentAssessment);
+                        } 
                         _context.StudentClassrooms.Add(studentClassroom);
                     } else {
                         return false;
