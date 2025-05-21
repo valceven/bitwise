@@ -34,9 +34,9 @@ namespace backend.Services
             return await _studentAssessmentRepository.CreateStudentAssessmentAsync(studentAssessment);
         }
 
-        public async Task<ICollection<StudentAssessment>> GetStudentAssessmentByTopicId(int TopicId)
+        public async Task<ICollection<StudentAssessment>> GetStudentAssessmentByAssessmentId(int AssessmentId)
         {
-            return await _studentAssessmentRepository.GetAllStudentAssessmentsByTopicId(TopicId);
+            return await _studentAssessmentRepository.GetAllStudentAssessmentsByAssessmentId(AssessmentId);
         }
 
         public async Task<StudentAssessment> GetStudentAssessmentByStudentId(int StudentId)

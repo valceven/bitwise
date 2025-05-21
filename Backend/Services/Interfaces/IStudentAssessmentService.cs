@@ -9,7 +9,7 @@ namespace backend.Services.Interfaces
         Task<ICollection<StudentAssessment>> GetAllStudentAssessmentAsync();
         Task<bool> CompleteStudentAssessment(RecordStudentAssessmentDto recordStudentAssessmentDto);
         Task<bool> ViewStudentAssessment(ViewStudentAssessmentDto viewStudenAssessmentDto);
-        Task<ICollection<StudentAssessment>> GetStudentAssessmentByTopicId(int TopicId);
+        Task<ICollection<StudentAssessment>> GetStudentAssessmentByAssessmentId(int AssessmentId);
         Task<StudentAssessment> GetStudentAssessmentByStudentId(int StudentId);
     }
 }
