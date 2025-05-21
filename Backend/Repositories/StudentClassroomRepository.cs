@@ -48,9 +48,18 @@ namespace backend.Repositories
                 {
                     _context.StudentTopics.RemoveRange(studentTopics);
                 }
+
+                var studentAssessments = await _context.StudentAssessments
+                    .Where(sa => sa.StudentId == studentId)
+                    .ToListAsync();
+
+                if (studentAssessments.Any())
+                {
+                    _context.StudentAssessments.RemoveRange(studentAssessments);
+                }
                 
                 // 3. Remove from StudentClassrooms
-                _context.StudentClassrooms.Remove(studentClassroom);
+                    _context.StudentClassrooms.Remove(studentClassroom);
                 
                 // 4. Remove any pending request for this student and classroom
                 var pendingStudent = await _context.PendingStudents
