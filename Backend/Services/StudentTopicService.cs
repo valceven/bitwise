@@ -39,5 +39,21 @@ namespace backend.Services
             return await _studentTopicRepository.UpdateStudentTopicAsync(studentTopic);
         }
 
+        public async Task<float> GetALlStudentsTopicCompletionProgressAsync(StudentTopicProgress studentTopicProgress)
+        {
+            var result = await _studentTopicRepository.GetAllStudentTopicProgressdAsync(studentTopicProgress);
+
+            if (result == null || !result.Any())
+            {
+                return 0.0f;
+            }
+
+            int totalRecords = result.Count();
+            int completedRecords = result.Count(r => r.IsCompleted);
+            
+            float completionRate = (float)completedRecords / totalRecords * 100;
+            
+            return (float)Math.Round(completionRate, 0);
+        }
     }
 }
