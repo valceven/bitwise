@@ -26,6 +26,7 @@ const StudentClassroom = () => {
       try {
         const classroomResponse = await studentApi.fetchClassroom(user.userID);
         if (classroomResponse) {
+          console.log("KEIRU: ", classroomResponse)
           setClassroom(classroomResponse);
           hasClassroom = true;
           clearInterval(intervalId);

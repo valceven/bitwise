@@ -9,6 +9,7 @@ namespace backend.DTOs.Classroom
         public string ClassName { get; set; }
         public int TeacherId { get; set; }
         public string Section { get; set; }
+        public string ClassCode { get; set; }
         public string Description { get; set; }
         public List<ViewLessonFromClassroomDto> Lessons { get; set; }
     }

@@ -79,6 +79,7 @@ namespace backend.Services
                 ClassName = classroom.ClassName,
                 TeacherId = classroom.TeacherId,
                 Section = classroom.Section,
+                ClassCode = classroom.ClassCode,
                 Description = classroom.Description,
                 Lessons = lessons
             };

@@ -56,6 +56,7 @@ namespace backend.Services
                 ClassName = classroom.ClassName,
                 ClassroomId = classroom.ClassroomID,
                 Section = classroom.Section,
+                ClassCode = classroom.ClassCode,
                 Description = classroom.Description,
                 TeacherName = classroom.Teacher.User.Name,
             };

@@ -12,7 +12,7 @@ namespace backend.DTOs.Student
         public string Description { get; set; }
         public int ClassroomId { get; set; }
         public string TeacherName { get; set; }
-
+        public string ClassCode { get; set; }
         // to add here mga deatils like topic etc placeholder rani for now.
     }
 }
