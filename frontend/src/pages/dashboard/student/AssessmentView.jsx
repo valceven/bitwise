@@ -1,32 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import HistoricalAssessment from '../../../components/sections/lesson1/assessment1/BooleanAlgebraHistorical';
-// import TruthTablesAssessment from '../../../components/assessments/TruthTablesAssessment';
-// Import other assessment components as needed
+import LogicGateExplorer from '../../../components/sections/lesson1/assessment2/LogicGateExplorerAssessment';
+import TruthTableConstructionAssessment from '../../../components/sections/lesson1/assessment3/TruthTableAssessment';
 
 export const AssessmentView = () => {
-  const { topicId } = useParams();
+  const { topicId, assessmentId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [assessmentData, setAssessmentData] = useState(null);
+  
+  // Use assessmentId if provided, otherwise default to topicId
+  // This ensures backward compatibility while adding support for specific assessments
+  const currentAssessmentId = assessmentId || topicId;
   
   useEffect(() => {
     // Simulate loading assessment data
     const fetchAssessmentData = async () => {
       try {
         // In a real app, this would be an API call
-        // const response = await fetch(`/api/assessments/${topicId}`);
+        // const response = await fetch(`/api/assessments/${currentAssessmentId}`);
         // const data = await response.json();
         
         // Placeholder data for now
         const data = {
-          topicId: topicId || '1',
-          title: getAssessmentTitle(topicId),
-          description: getAssessmentDescription(topicId),
-          lastAttemptScore: null,
-          bestScore: null,
-          attempts: localStorage.getItem(`assessment-attempts-${topicId}`) 
-            ? parseInt(localStorage.getItem(`assessment-attempts-${topicId}`)) 
+          topicId: topicId,
+          assessmentId: currentAssessmentId,
+          title: getAssessmentTitle(currentAssessmentId),
+          description: getAssessmentDescription(currentAssessmentId),
+          lastAttemptScore: localStorage.getItem(`assessment-last-score-${currentAssessmentId}`) 
+            ? parseInt(localStorage.getItem(`assessment-last-score-${currentAssessmentId}`)) 
+            : null,
+          bestScore: localStorage.getItem(`assessment-best-score-${currentAssessmentId}`) 
+            ? parseInt(localStorage.getItem(`assessment-best-score-${currentAssessmentId}`)) 
+            : null,
+          attempts: localStorage.getItem(`assessment-attempts-${currentAssessmentId}`) 
+            ? parseInt(localStorage.getItem(`assessment-attempts-${currentAssessmentId}`)) 
             : 0,
           maxAttempts: 3
         };
@@ -40,16 +49,16 @@ export const AssessmentView = () => {
     };
     
     fetchAssessmentData();
-  }, [topicId]);
+  }, [currentAssessmentId, topicId]);
   
-  // Helper functions to get assessment titles and descriptions based on topicId
+  // Helper functions to get assessment titles and descriptions based on assessmentId
   const getAssessmentTitle = (id) => {
     const titles = {
       '1': 'Boolean Algebra: Origins and Significance',
       '2': 'Truth Tables and Boolean Operations',
       '3': 'Boolean Logic Applications',
       '4': 'Circuit Design with Boolean Logic',
-      // Add more topics as needed
+      // Add more assessments as needed
     };
     return titles[id] || 'Assessment';
   };
@@ -60,7 +69,7 @@ export const AssessmentView = () => {
       '2': 'Demonstrate your understanding of Truth Tables and Boolean operations',
       '3': 'Apply Boolean Logic to solve real-world problems',
       '4': 'Design digital circuits using Boolean Algebra',
-      // Add more topics as needed
+      // Add more assessments as needed
     };
     return descriptions[id] || 'Complete this assessment to test your knowledge';
   };
@@ -69,20 +78,24 @@ export const AssessmentView = () => {
   const handleScoreUpdate = (score, totalQuestions, percentage) => {
     // Update attempts count in localStorage
     const currentAttempts = assessmentData.attempts + 1;
-    localStorage.setItem(`assessment-attempts-${topicId}`, currentAttempts);
+    localStorage.setItem(`assessment-attempts-${currentAssessmentId}`, currentAttempts);
+    
+    // Save last score
+    localStorage.setItem(`assessment-last-score-${currentAssessmentId}`, percentage);
     
     // Update best score in localStorage if this score is better
-    const currentBestScore = localStorage.getItem(`assessment-best-score-${topicId}`);
+    const currentBestScore = localStorage.getItem(`assessment-best-score-${currentAssessmentId}`);
     if (!currentBestScore || parseInt(currentBestScore) < percentage) {
-      localStorage.setItem(`assessment-best-score-${topicId}`, percentage);
+      localStorage.setItem(`assessment-best-score-${currentAssessmentId}`, percentage);
     }
     
     // Mark as completed in localStorage
-    localStorage.setItem(`assessment-completed-${topicId}`, 'true');
+    localStorage.setItem(`assessment-completed-${currentAssessmentId}`, 'true');
     
     // In a real implementation, you would send this data to your backend:
     console.log('Assessment completed:', {
       topicId,
+      assessmentId: currentAssessmentId,
       score,
       totalQuestions,
       percentage,
@@ -96,27 +109,35 @@ export const AssessmentView = () => {
       bestScore: Math.max(percentage, currentBestScore || 0),
       lastAttemptScore: percentage
     });
-    
-    // Optional: navigate to next topic or lesson view after a delay
-    // setTimeout(() => {
-    //   navigate('/app/lessonview');
-    // }, 5000);
   };
   
   const handleReturn = () => {
     navigate('/app/lessonview');
   };
   
-  // Render the appropriate assessment component based on topicId
+  // Render the appropriate assessment component based on assessmentId
   const renderAssessment = () => {
-    switch(topicId) {
+    console.log(`Rendering assessment ID: ${currentAssessmentId}`);
+    
+    switch(currentAssessmentId) {
       case '1':
         return <HistoricalAssessment onComplete={handleScoreUpdate} />;
       case '2':
-        return <TruthTablesAssessment onComplete={handleScoreUpdate} />;
-      // Add more cases for other topics
+        return <LogicGateExplorer onComplete={handleScoreUpdate} />;
+      case '3':
+        return <TruthTableConstructionAssessment onComplete={handleScoreUpdate} />;
+      // Add more cases for other assessments
       default:
-        return <HistoricalAssessment onComplete={handleScoreUpdate} />;
+        return (
+          <div className="p-6 bg-white rounded-lg shadow-md">
+            <p>Assessment {currentAssessmentId} not found. Please select a valid assessment.</p>
+            <button 
+              onClick={handleReturn}
+              className="mt-4 px-4 py-2 bg-bluez text-white rounded-lg">
+              Return to Lessons
+            </button>
+          </div>
+        );
     }
   };
   
