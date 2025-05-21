@@ -4,17 +4,17 @@ import { ArrowLeft, Book, Users, CheckCircle, Award, Clock, FileText, BarChart, 
 import { classroomApi } from "../../../api/classroom/classroomApi";
 import { studentTopicApi } from "../../../api/studentTopic/studentTopicApi";
 
-
+// Updated assessment data to include average score and completion data
 const assessmentsData = {
-  "1": { id: "1", name: "Assessment 1", topicId: "1", questions: 10, timeLimit: 15, passingScore: 70 },
-  "2": { id: "2", name: "Assessment 2", topicId: "2", questions: 12, timeLimit: 20, passingScore: 75 },
-  "3": { id: "3", name: "Assessment 3", topicId: "3", questions: 8, timeLimit: 12, passingScore: 70 },
-  "4": { id: "4", name: "Assessment 4", topicId: "4", questions: 15, timeLimit: 25, passingScore: 80 },
-  "5": { id: "5", name: "Assessment 5", topicId: "5", questions: 10, timeLimit: 30, passingScore: 75 },
-  "6": { id: "6", name: "Assessment 6", topicId: "6", questions: 12, timeLimit: 20, passingScore: 75 },
-  "7": { id: "7", name: "Assessment 7", topicId: "7", questions: 10, timeLimit: 15, passingScore: 70 },
-  "8": { id: "8", name: "Assessment 8", topicId: "8", questions: 15, timeLimit: 20, passingScore: 80 },
-  "9": { id: "9", name: "Assessment 9", topicId: "9", questions: 12, timeLimit: 25, passingScore: 75 }
+  "1": { id: "1", name: "Assessment 1", topicId: "1", averageScore: 78, completionRate: 65 },
+  "2": { id: "2", name: "Assessment 2", topicId: "2", averageScore: 82, completionRate: 70 },
+  "3": { id: "3", name: "Assessment 3", topicId: "3", averageScore: 75, completionRate: 60 },
+  "4": { id: "4", name: "Assessment 4", topicId: "4", averageScore: 88, completionRate: 85 },
+  "5": { id: "5", name: "Assessment 5", topicId: "5", averageScore: 81, completionRate: 72 },
+  "6": { id: "6", name: "Assessment 6", topicId: "6", averageScore: 79, completionRate: 68 },
+  "7": { id: "7", name: "Assessment 7", topicId: "7", averageScore: 73, completionRate: 55 },
+  "8": { id: "8", name: "Assessment 8", topicId: "8", averageScore: 85, completionRate: 80 },
+  "9": { id: "9", name: "Assessment 9", topicId: "9", averageScore: 77, completionRate: 62 }
 };
 
 export const TopicsList = ({ topics, lessonId, onBack }) => {
@@ -23,7 +23,6 @@ export const TopicsList = ({ topics, lessonId, onBack }) => {
     const [topicProgressRates, setTopicProgressRates] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
 
     useEffect(() => {
         const fetchClassroomData = async () => {
@@ -109,9 +108,7 @@ export const TopicsList = ({ topics, lessonId, onBack }) => {
           <div className="grid grid-cols-1 gap-8">
             {topics.map((topic) => {
               const assessment = assessmentsData[topic.id] || null;
-              
               const completionRate = topicProgressRates[topic.id] || 0;
-
               
               let cardColorClass = "border-l-greenz";
               if (topic.difficulty === "Medium") {
@@ -160,32 +157,61 @@ export const TopicsList = ({ topics, lessonId, onBack }) => {
                       </div>
                     </Link>
                     
-                    {/* Assessment Card */}
+                    {/* Updated Assessment Card with progress tracker and average score */}
                     {assessment && (
                       <Link 
                         to={`/app/teacher/classroom/${classCode}/lesson/${lessonId}/assessment/${assessment.id}`}
                         className="bg-white border border-gray-200 border-l-4 border-l-purplez rounded-lg shadow-sm hover:shadow-md transition cursor-pointer p-6 block"
                       >
-                        <div className="flex justify-between items-start mb-3">
+                        <div className="flex justify-between items-start mb-4">
                           <h3 className="font-semibold text-xl text-grayz">{assessment.name}</h3>
                           <div className="p-2 rounded-full bg-purple-100">
                             <FileText size={16} className="text-purplez" />
                           </div>
                         </div>
                         
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center text-gray-600">
-                            <span className="mr-2">Questions:</span>
-                            <span className="font-medium text-grayz">{assessment.questions}</span>
+                        {/* Average Score with visual gauge */}
+                        <div className="mb-4">
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-gray-600">Average Score</span>
+                            <div className="flex items-center">
+                              <Award size={16} className="mr-1 text-yellow-500" />
+                              <span className="font-medium text-grayz">{assessment.averageScore}%</span>
+                            </div>
                           </div>
-                          <div className="flex items-center text-gray-600">
-                            <span className="mr-2">Time Limit:</span>
-                            <span className="font-medium text-grayz">{assessment.timeLimit} min</span>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full ${
+                                assessment.averageScore >= 80 ? "bg-greenz" :
+                                assessment.averageScore >= 70 ? "bg-yellowz" : "bg-redz"
+                              }`}
+                              style={{ width: `${assessment.averageScore}%` }}
+                            ></div>
                           </div>
-                          <div className="flex items-center text-gray-600">
-                            <span className="mr-2">Passing Score:</span>
-                            <span className="font-medium text-grayz">{assessment.passingScore}%</span>
+                        </div>
+                        
+                        {/* Completion Rate */}
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="text-gray-600">Completion</span>
+                            <div className="flex items-center">
+                              <CheckCircle size={16} className="mr-1 text-bluez" />
+                              <span className="font-medium text-grayz">{assessment.completionRate}%</span>
+                            </div>
                           </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-purplez h-2 rounded-full" 
+                              style={{ width: `${assessment.completionRate}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        
+                        {/* View Details button */}
+                        <div className="mt-4 text-center">
+                          <span className="inline-block text-sm font-medium text-purplez hover:text-purple-700">
+                            View Assessment Details →
+                          </span>
                         </div>
                       </Link>
                     )}
