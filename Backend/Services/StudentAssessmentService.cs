@@ -7,6 +7,10 @@ namespace backend.Services
     public class StudentAssessmentService : IStudentAssessmentService
     {
         private readonly IStudentAssessmentRepository _studentAssessmentRepository;
+        public StudentAssessmentService(IStudentAssessmentRepository studentAssessmentRepository)
+        {
+            _studentAssessmentRepository = studentAssessmentRepository;
+        }
         public async Task<ICollection<StudentAssessment>> GetAllStudentAssessmentAsync()
         {
             return await _studentAssessmentRepository.GetAllStudentAssessmentsAsync();
@@ -26,7 +30,11 @@ namespace backend.Services
         public async Task<bool> ViewStudentAssessment(int studentAssessmentId)
         {
             var studentAssessment = await _studentAssessmentRepository.GetStudentAssessmentById(studentAssessmentId);
-            studentAssessment.StartTime = DateTime.Now;
+            if (studentAssessment == null)
+            {
+                throw new Exception($"StudentAssessment with ID {studentAssessmentId} not found.");
+            }
+            studentAssessment.StartTime = DateTime.UtcNow;
             return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);
         }
         

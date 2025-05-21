@@ -22,9 +22,7 @@ namespace backend.Repositories
         }
         public async Task<StudentAssessment> GetStudentAssessmentById(int StudentAssessmentId)
         {
-            var studentAssessment = await _context.StudentAssessments
-                .Include(sa => sa.Student)
-                .FirstOrDefaultAsync(sa => sa.StudentAssessmentId == StudentAssessmentId);
+            var studentAssessment = await _context.StudentAssessments.FirstOrDefaultAsync(sa => sa.StudentAssessmentId == StudentAssessmentId);
             if (studentAssessment == null)
             {
                 throw new Exception($"StudentAssessment with ID {StudentAssessmentId} not found.");
@@ -41,7 +39,7 @@ namespace backend.Repositories
         public async Task<bool> UpdateStudentAssessmentAsync(StudentAssessment studentAssessment)
         {
             _context.StudentAssessments.Update(studentAssessment);
-            return true;
+            return await _context.SaveChangesAsync() > 0;
         }
         public async Task<bool> DeleteStudentAssessmentAsync(int StudentAssessmentId)
         {
