@@ -5,23 +5,41 @@ import TopicCard from "../../../components/TopicCard";
 import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../../components/buttons/PurpleButton";
 import gridBox from "../../../assets/gridbox.svg";
-
+import { useEffect } from "react";
 
 const LessonView = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedTopic, setSelectedTopic] = useState(1);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { lessonId } = useParams();
 
-  const topics = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const allTopics = [
+    { id: 1, lessonId: "1" },
+    { id: 2, lessonId: "1" },
+    { id: 3, lessonId: "1" },
+    { id: 4, lessonId: "2" },
+    { id: 5, lessonId: "2" },
+    { id: 6, lessonId: "2" },
+    { id: 7, lessonId: "3" },
+    { id: 8, lessonId: "4" },
+    { id: 9, lessonId: "4" },
+  ];
 
-  const handleTopicClick = (topic) => {
-    setSelectedTopic(topic);
+  const topics = allTopics.filter((topic) => topic.lessonId === lessonId);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+
+  useEffect(() => {
+    if (topics.length > 0) {
+      setSelectedTopic(topics[0].id);
+    }
+  }, [lessonId]);
+
+  const handleTopicClick = (topicId) => {
+    setSelectedTopic(topicId); // now it's just a number
     setShowConfirmation(false);
   };
 
   const handleProceedTopic = (topicId) => {
-    navigate(`/app/lessonview/${lessonId}/topicview/${topicId}`);
+    navigate(`topic/${topicId}`);
   };
 
   return (
@@ -74,16 +92,16 @@ const LessonView = () => {
       <div className="w-150 flex flex-col z-0 pt-7 mr-20">
         {topics.map((topic, index) => (
           <div
-            key={topic.lessonId}
+            key={topic.id}
             className={`w-3/5 flex mx-auto ${
               index % 2 === 0 ? "justify-start" : "justify-end pr-7"
             }`}
           >
             <AnimatedTopicButton
-              key={topic}
-              topic={topic}
-              isSelected={selectedTopic === topic}
-              onClick={() => handleTopicClick(topic)}
+              key={topic.id}
+              topic={topic.id}
+              isSelected={selectedTopic === topic.id}
+              onClick={() => handleTopicClick(topic.id)}
               className="w-full"
             />
           </div>

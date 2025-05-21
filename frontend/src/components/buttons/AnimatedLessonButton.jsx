@@ -8,7 +8,8 @@ import pressedAnimation from "../../assets/pressedAnimationTopicButton.json";
 
 const AnimatedLessonButton = ({
   label,
-  onClick,
+  onClick, // keeps the current Lottie interaction logic
+  onEnterLesson, // new prop for the "Enter Lesson" button
   isSelected,
   className,
   locked,
@@ -87,15 +88,45 @@ const AnimatedLessonButton = ({
               </p>
               <div className="flex flex-row items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-1" /* clock icon */ />
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
                   30 min
                 </div>
                 <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-1" /* level icon */ />
+                  <svg
+                    className="w-4 h-4 mr-1"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M2 20h.01M7 20v-4" />
+                    <path d="M12 20v-8" />
+                    <path d="M17 20v-12" />
+                    <path d="M22 20v-16" />
+                  </svg>
                   Beginner
                 </div>
               </div>
-              <div className="flex items-center justify-center p-2 addgrotesk bg-black text-white rounded-lg text-xs mt-4 cursor-pointer hover:bg-gray-800 transition duration-300">
+              <div
+                onClick={(e) => {
+                  e.stopPropagation(); // prevent bubbling to parent
+                  if (onEnterLesson) onEnterLesson(); // trigger only onEnterLesson
+                }}
+                className="flex items-center justify-center p-2 addgrotesk bg-black text-white rounded-lg text-xs mt-4 cursor-pointer hover:bg-gray-800 transition duration-300"
+              >
                 Enter Lesson
               </div>
             </div>

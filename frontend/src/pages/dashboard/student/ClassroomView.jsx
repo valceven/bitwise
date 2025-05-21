@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AnimatedLessonButton from "../../../components/buttons/AnimatedLessonButton.jsx";
 import { studentApi } from "../../../api/student/studentApi.js";
 import { studentLessonApi } from "../../../api/studentLesson/studentLesson.js";
 import gridBox from "../../../assets/gridbox.svg";
 
 const ClassroomView = ({ classroom, user }) => {
+  const navigate = useNavigate();
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedLesson, setSelectedLesson] = useState("Lesson 1");
+  const [selectedLesson, setSelectedLesson] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -15,16 +17,24 @@ const ClassroomView = ({ classroom, user }) => {
       try {
         const classroomResponse = await studentApi.fetchClassroom(user.userID);
 
-        const studentLesson = { classroomId: classroomResponse.classroomId, studentId: user.userID };
+        const studentLesson = {
+          classroomId: classroomResponse.classroomId,
+          studentId: user.userID,
+        };
 
-        const lessonResponse = await studentLessonApi.fetchStudentLessons(studentLesson);
-        
-        await setLessons(lessonResponse.lessons);
+        const lessonResponse = await studentLessonApi.fetchStudentLessons(
+          studentLesson
+        );
+
+        const sortedLessons = lessonResponse.lessons.sort(
+          (a, b) => a.lessonId - b.lessonId
+        );
+        await setLessons(sortedLessons);
+
         if (lessonResponse.lessons.length > 0) {
           // Set the lessonId of the first lesson as the selected lesson
-          setSelectedLesson(lessonResponse.lessons[0].lessonId.toString());
+          setSelectedLesson(lessonResponse.lessons[0].lessonId);
         }
-
       } catch (error) {
         console.error("Error fetching classroom or lessons:", error.message);
       } finally {
@@ -33,7 +43,7 @@ const ClassroomView = ({ classroom, user }) => {
     };
 
     fetchData();
-}, []); 
+  }, []);
 
   const handleLeaveClassroom = () => {
     setShowConfirmation(true); // Just show the confirmation modal
@@ -41,7 +51,6 @@ const ClassroomView = ({ classroom, user }) => {
 
   const confirmLeave = async () => {
     try {
-
       const data = {
         studentId: user.userID,
         classroomId: classroom.classroomId,
@@ -57,15 +66,24 @@ const ClassroomView = ({ classroom, user }) => {
     }
   };
 
-  const handleEnterLesson = async () => {
+  const handleEnterLesson = async (lessonId) => {
     try {
-      const data = { classroomId: 35, studentId: 1, lessonId: 0 }
+      const data = {
+        classroomId: classroom.classroomId,
+        studentId: user.userID,
+        lessonId: lessonId,
+        classCode: classroom.classCode,
+      };
+
       const response = await studentLessonApi.enterLesson(data);
       console.log(response);
+
+      // Navigate to the lesson view route with the proper parameters
+      navigate(`student/${classroom.classCode}/lesson/${lessonId}`);
     } catch (error) {
       console.error("Error entering lesson:", error.message);
     }
-  }
+  };
 
   return (
     <div
@@ -104,23 +122,24 @@ const ClassroomView = ({ classroom, user }) => {
         </button>
       </div>
 
-      <div className="w-150 flex flex-col z-0 pt-7 mr-20">
+      <div className="w-150 flex flex-col z-0 pt-7 mr-20 overflow-visible relative">
         {isLoading ? (
           <div className="text-center text-gray-500">Loading lessons...</div>
         ) : (
           lessons.map((lesson, index) => (
             <div
               key={lesson.lessonId}
-              className={`w-3/5 flex mx-auto ${
+              className={`w-3/5 flex mx-auto overflow-visible relative ${
                 index % 2 === 0 ? "justify-start" : "justify-end pr-7"
               }`}
             >
               <AnimatedLessonButton
-                label={lesson.title}
-                onClick={() => handleEnterLesson()}
+                label={"Lesson No " + (index + 1)}
+                onClick={() => setSelectedLesson(lesson.lessonId)} // Only selects, no navigation
+                onEnterLesson={() => handleEnterLesson(lesson.lessonId)} // This triggers navigation
                 isSelected={selectedLesson === lesson.lessonId}
                 className="w-full"
-                locked={index !== 0}
+                locked={false}
               />
             </div>
           ))
