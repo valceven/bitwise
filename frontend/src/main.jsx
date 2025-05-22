@@ -23,6 +23,7 @@ import DashboardStudentReportTopics from "./pages/dashboard/teacher/DashboardStu
 import DashboardStudentReportLesson from "./pages/dashboard/teacher/DashboardStudentReportLesson.jsx";
 import ClassroomView from "./pages/dashboard/student/ClassroomView.jsx";
 import AssessmentView from "./pages/dashboard/student/AssessmentView.jsx";
+import StudentClassroom from "./pages/dashboard/student/StudentClassroom.jsx";
 
 const router = createBrowserRouter([
   {
@@ -51,7 +52,7 @@ const router = createBrowserRouter([
     errorElement: <PageNotFound />,
     children: [
       { index: true, element: <DashboardHome /> },
-      { path: "classroom", element: <DashboardClassroom />},
+      { path: "classroom", element: <StudentClassroom />},
       { path: "profile", element: <ProfilePage /> },
       
       // Teacher routes
@@ -62,7 +63,7 @@ const router = createBrowserRouter([
       { path: "teacher/pending", element: <DashboardPending /> },
       
       // Student routes
-      { path: "classroom/student/:classCode", element: <ClassroomView /> },
+      { path: "classroom/student/:classCode", element: <DashboardClassroom /> },
       { path: "classroom/student/:classCode/lesson/:lessonId", element: <LessonView /> },
       { path: "classroom/student/:classCode/lesson/:lessonId/topic/:topicId", element: <TopicView /> },
       { path: "classroom/student/:classCode/lesson/:lessonId/assessment/:assessmentId", element: <AssessmentView />}

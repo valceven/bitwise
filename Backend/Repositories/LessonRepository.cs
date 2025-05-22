@@ -47,10 +47,10 @@ namespace backend.Repositories
             _context.Lessons.Update(lesson);
             return await _context.SaveChangesAsync() > 0;
         }
-        public async Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(GetStudentLessonsDto getStudentLessonsDto)
+        public async Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(int studentId)
         {
             var lessons = await _context.StudentLessons
-                .Where(sl => sl.StudentId == getStudentLessonsDto.studentId)
+                .Where(sl => sl.StudentId == studentId)
                 .ToListAsync();
             return lessons;
         }

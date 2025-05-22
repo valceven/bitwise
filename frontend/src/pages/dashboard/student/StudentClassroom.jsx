@@ -26,7 +26,6 @@ const StudentClassroom = () => {
       try {
         const classroomResponse = await studentApi.fetchClassroom(user.userID);
         if (classroomResponse) {
-          console.log("KEIRU: ", classroomResponse)
           setClassroom(classroomResponse);
           hasClassroom = true;
           clearInterval(intervalId);
@@ -47,8 +46,7 @@ const StudentClassroom = () => {
           console.error("Error checking pending status:", error.message);
           setPendingRequest(null);
         }
-      }
-      
+      }      
       setIsLoading(false);
     };
 

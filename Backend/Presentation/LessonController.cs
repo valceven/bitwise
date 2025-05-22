@@ -42,10 +42,10 @@ namespace backend.Presentation
 
             return NotFound(new { message = "Lesson not found" });
         }
-        [HttpPost("get-lessons-by-student-classroom")]
-        public async Task<IActionResult> GetLessonsByClassroomId([FromBody] GetStudentLessonsDto studentLessonDto)
+        [HttpGet("get-lessons-by-student-classroom")]
+        public async Task<IActionResult> GetLessonsByClassroomId([FromQuery] int studentId)
         {
-            var lessons = await _lessonService.GetLessonByClassroomIdAsync(studentLessonDto);
+            var lessons = await _lessonService.GetLessonByClassroomIdAsync(studentId);
             if (lessons != null && lessons.Count > 0)
             {
                 return Ok(new {lessons});

@@ -8,7 +8,7 @@ namespace backend.Repositories.Interfaces
     {
         Task<Lesson> CreateLessonAsync(Lesson lesson);
         Task<Lesson?> GetLessonByIdAsync(int lessonId);
-        Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(GetStudentLessonsDto studentLessonsDto);
+        Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(int studentId);
         Task<List<Lesson>> GetAllLessons();
         Task<bool> UpdateLessonAsync(Lesson lesson);
         Task<bool> DeleteLessonAsync(int lessonId);

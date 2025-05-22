@@ -2,6 +2,7 @@ import apiService from "../apiService";
 
 const enterLesson = async (data) => {
     try {
+        console.log("NI SUDE KO", data);
         const response = await apiService.put("student-lesson/view-student-lesson", data)
         console.log(response)
 
@@ -12,10 +13,11 @@ const enterLesson = async (data) => {
     }
 }
 
-const fetchStudentLessons = async (studentLesson) => {
+const fetchStudentLessons = async (studentId) => {
     try {
-        const response = await apiService.post("lessons/get-lessons-by-student-classroom", 
-            studentLesson
+        const response = await apiService.get("lessons/get-lessons-by-student-classroom", {
+             params: { studentId }
+            }
         );
         return response.data;
     } catch (error) {

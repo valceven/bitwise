@@ -7,7 +7,6 @@ namespace backend.DTOs.StudentLesson
 {
     public class GetStudentLessonsDto
     {
-        public int classroomId { get; set; }
         public int studentId { get; set; }
     }
 }

@@ -10,6 +10,6 @@ namespace backend.Services.Interfaces
         Task<Lesson?> GetLessonByIdAsync(int lessonId);
         Task<bool> UpdateLessonAsync(UpdateLessonDto updatedLessonDto);
         Task<bool> DeleteLessonAsync(int lessonId);
-        Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(GetStudentLessonsDto studentLessonDto);
+        Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(int studentId);
     }
 }

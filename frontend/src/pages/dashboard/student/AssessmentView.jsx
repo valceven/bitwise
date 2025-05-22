@@ -5,13 +5,15 @@ import LogicGateExplorer from '../../../components/sections/lesson1/assessment2/
 import TruthTableConstructionAssessment from '../../../components/sections/lesson1/assessment3/TruthTableAssessment';
 import BooleanLawsAssessment from '../../../components/sections/lesson2/assessment4/BooleanLawsAssessment';
 import BooleanRace from '../../../components/sections/lesson2/assessment5/BooleanRace';
-import CodeDetectiveGamez from '../../../components/sections/lesson3/assessment/CodeDetectiveGame';
+import CodeDetectiveGamez from '../../../components/sections/lesson3/assessment7/CodeDetectiveGame';
 
 export const AssessmentView = () => {
   const { topicId, assessmentId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [assessmentData, setAssessmentData] = useState(null);
+
+  const { classCode } = useParams();
   
   // Use assessmentId if provided, otherwise default to topicId
   // This ensures backward compatibility while adding support for specific assessments
@@ -118,7 +120,6 @@ export const AssessmentView = () => {
     navigate('/app/lessonview');
   };
   
-  // Render the appropriate assessment component based on assessmentId
   const renderAssessment = () => {
     console.log(`Rendering assessment ID: ${currentAssessmentId}`);
     

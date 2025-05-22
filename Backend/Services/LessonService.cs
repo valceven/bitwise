@@ -41,9 +41,9 @@ namespace backend.Services
             return await _lessonRepository.UpdateLessonAsync(existingLesson);
         }
 
-        public async Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(GetStudentLessonsDto studentLessonsDto)
+        public async Task<ICollection<StudentLesson>> GetLessonByClassroomIdAsync(int studentId)
         {
-            var lessons = await _lessonRepository.GetLessonByClassroomIdAsync(studentLessonsDto);
+            var lessons = await _lessonRepository.GetLessonByClassroomIdAsync(studentId);
             return lessons.ToList();
         }
 

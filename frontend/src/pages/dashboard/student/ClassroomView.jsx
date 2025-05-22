@@ -13,18 +13,12 @@ const ClassroomView = ({ classroom, user }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+
     const fetchData = async () => {
       try {
-        const classroomResponse = await studentApi.fetchClassroom(user.userID);
+        const lessonResponse = await studentLessonApi.fetchStudentLessons(user.userID);
 
-        const studentLesson = {
-          classroomId: classroomResponse.classroomId,
-          studentId: user.userID,
-        };
-
-        const lessonResponse = await studentLessonApi.fetchStudentLessons(
-          studentLesson
-        );
+        console.log(lessonResponse)
 
         const sortedLessons = lessonResponse.lessons.sort(
           (a, b) => a.lessonId - b.lessonId
@@ -41,6 +35,10 @@ const ClassroomView = ({ classroom, user }) => {
         setIsLoading(false);
       }
     };
+
+    if (classroom.classroomId) {
+      navigate(`app/classroom/student/${classroom.classCode}`, { replace: true }); // or { replace: false } if you want it added to history
+    }
 
     fetchData();
   }, []);
@@ -72,14 +70,13 @@ const ClassroomView = ({ classroom, user }) => {
         classroomId: classroom.classroomId,
         studentId: user.userID,
         lessonId: lessonId,
-        classCode: classroom.classCode,
       };
 
       const response = await studentLessonApi.enterLesson(data);
-      console.log(response);
+      console.log("MARS", response);
 
       // Navigate to the lesson view route with the proper parameters
-      navigate(`student/${classroom.classCode}/lesson/${lessonId}`);
+      navigate(`lesson/${lessonId}`);
     } catch (error) {
       console.error("Error entering lesson:", error.message);
     }
@@ -136,7 +133,7 @@ const ClassroomView = ({ classroom, user }) => {
               <AnimatedLessonButton
                 label={"Lesson No " + (index + 1)}
                 onClick={() => setSelectedLesson(lesson.lessonId)} // Only selects, no navigation
-                onEnterLesson={() => handleEnterLesson(lesson.lessonId)} // This triggers navigation
+                onEnterLesson={() => handleEnterLesson(lesson.lessonId, lesson.studentLessonId)} // This triggers navigation
                 isSelected={selectedLesson === lesson.lessonId}
                 className="w-full"
                 locked={false}
