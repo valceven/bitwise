@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import HistoricalAssessment from '../../../components/sections/lesson1/assessment1/BooleanAlgebraHistorical';
 import LogicGateExplorer from '../../../components/sections/lesson1/assessment2/LogicGateExplorerAssessment';
 import TruthTableConstructionAssessment from '../../../components/sections/lesson1/assessment3/TruthTableAssessment';
+import BooleanLawsAssessment from '../../../components/sections/lesson2/assessment4/BooleanLawsAssessment';
+import BooleanRace from '../../../components/sections/lesson2/assessment5/BooleanRace';
+import CodeDetectiveGamez from '../../../components/sections/lesson3/assessment/CodeDetectiveGame';
 
 export const AssessmentView = () => {
   const { topicId, assessmentId } = useParams();
@@ -126,7 +129,12 @@ export const AssessmentView = () => {
         return <LogicGateExplorer onComplete={handleScoreUpdate} />;
       case '3':
         return <TruthTableConstructionAssessment onComplete={handleScoreUpdate} />;
-      // Add more cases for other assessments
+      case '4':
+        return  <BooleanLawsAssessment onComplete={handleScoreUpdate} />;
+      case '5':
+        return <BooleanRace onComplete={handleScoreUpdate} />
+      case '7': 
+        return <CodeDetectiveGamez onComplete={handleScoreUpdate} />;
       default:
         return (
           <div className="p-6 bg-white rounded-lg shadow-md">

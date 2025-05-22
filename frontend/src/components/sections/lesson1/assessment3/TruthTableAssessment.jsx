@@ -2,7 +2,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle, XCircle, ChevronLeft, ChevronRight, Info, AlertCircle } from "lucide-react"
 
-// Use the original colors from the first file
+// Enhanced color palette with more colors
 const colors = {
   greenz: "#27AE60",
   darkpurple: "#9B51E0",
@@ -16,6 +16,19 @@ const colors = {
   redz: "#F14E3A",
   white: "#FFFFFF",
   blackz: "#031926",
+  // New colors
+  pinkz: "#FF6B9D",
+  mintgreenz: "#51E5A8",
+  lavenderz: "#B794F6",
+  coralz: "#FF8A80",
+  tealz: "#26C6DA",
+  indigoz: "#5C7CFA",
+  emeraldz: "#10B981",
+  rosez: "#FB7185",
+  violetz: "#8B5CF6",
+  ambez: "#F59E0B",
+  limez: "#84CC16",
+  skyz: "#0EA5E9"
 }
 
 const TruthTableConstructionAssessment = ({ onComplete }) => {
@@ -84,30 +97,25 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
     },
     {
       type: "complexTableConstruction",
-      title: "Construct a Complex Truth Table",
-      description: "Now let's build a truth table for the expression: (A OR B) AND (NOT C)",
+      title: "Construct a Truth Table",
+      description: "Now let's build a simplified truth table for the expression: A AND (NOT B)",
       operationDescription:
-        "This expression has two parts: (A OR B) and (NOT C). We'll calculate each part separately, then combine them with the AND operator.",
+        "This expression has two parts: A and (NOT B). We'll calculate NOT B first, then combine it with A using the AND operator.",
       table: {
-        headers: ["A", "B", "C", "A OR B", "NOT C", "(A OR B) AND (NOT C)"],
+        headers: ["A", "B", "NOT B", "A AND (NOT B)"],
         rows: [
-          [0, 0, 0, null, null, null],
-          [0, 0, 1, null, null, null],
-          [0, 1, 0, null, null, null],
-          [0, 1, 1, null, null, null],
-          [1, 0, 0, null, null, null],
-          [1, 0, 1, null, null, null],
-          [1, 1, 0, null, null, null],
-          [1, 1, 1, null, null, null],
+          [0, 0, null, null],
+          [0, 1, null, null],
+          [1, 0, null, null],
+          [1, 1, null, null],
         ],
       },
       correctAnswers: {
-        "A OR B": [0, 0, 1, 1, 1, 1, 1, 1],
-        "NOT C": [1, 0, 1, 0, 1, 0, 1, 0],
-        "(A OR B) AND (NOT C)": [0, 0, 1, 0, 1, 0, 1, 0],
+        "NOT B": [1, 0, 1, 0],
+        "A AND (NOT B)": [0, 0, 1, 0],
       },
       explanation:
-        "For (A OR B) AND (NOT C), we first calculate (A OR B), which is 1 whenever either A or B is 1. Then we calculate (NOT C), which is 1 when C is 0. Finally, we apply the AND operation to these intermediate results.",
+        "For A AND (NOT B), we first calculate (NOT B), which inverts B (0 becomes 1, 1 becomes 0). Then we apply the AND operation between A and (NOT B). The result is 1 only when A is 1 AND B is 0.",
     },
     {
       type: "equivalenceChallenge",
@@ -186,7 +194,7 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
   const handleTruthTableInput = (rowIndex, columnHeader, value) => {
     setUserTruthTable({
       ...userTruthTable,
-      [`${rowIndex}-${columnHeader}`]: Number.parseInt(value),
+      [`${rowIndex}-${columnHeader}`]: value === "" ? undefined : Number.parseInt(value),
     })
   }
 
@@ -408,12 +416,12 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
   // Progress Bar component
   const ProgressBar = ({ value }) => {
     return (
-      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500 ease-in-out"
           style={{
             width: `${value}%`,
-            backgroundColor: colors.greenz,
+            background: `linear-gradient(90deg, ${colors.mintgreenz}, ${colors.cyanz}, ${colors.bluez})`,
           }}
         />
       </div>
@@ -437,12 +445,12 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
         <div
           className="p-3 cursor-pointer flex justify-between items-center"
           onClick={onToggle}
-          style={{ backgroundColor: `${colors.bluez}20` }}
+          style={{ backgroundColor: `${colors.lavenderz}20` }}
         >
-          <h3 className="font-medium" style={{ color: colors.bluez }}>
+          <h3 className="font-medium" style={{ color: colors.lavenderz }}>
             {title}
           </h3>
-          <Info className="h-4 w-4" style={{ color: colors.bluez }} />
+          <Info className="h-4 w-4" style={{ color: colors.lavenderz }} />
         </div>
         <AnimatePresence>
           {isOpen && (
@@ -467,11 +475,11 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
 
     return (
       <div className="overflow-x-auto mt-4 mb-6">
-        <table className="w-full text-center border-collapse rounded-lg overflow-hidden">
+        <table className="w-full text-center border-collapse rounded-lg overflow-hidden shadow-md">
           <thead>
-            <tr style={{ backgroundColor: `${colors.bluez}20` }}>
+            <tr style={{ background: `linear-gradient(135deg, ${colors.tealz}, ${colors.cyanz})` }}>
               {headers.map((header, index) => (
-                <th key={index} className="p-2 border">
+                <th key={index} className="p-3 border text-white font-bold">
                   {header}
                 </th>
               ))}
@@ -479,7 +487,8 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
           </thead>
           <tbody>
             {rows.map((row, rowIndex) => (
-              <tr key={rowIndex} className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+              <tr key={rowIndex} className={rowIndex % 2 === 0 ? "bg-white" : ""} 
+                  style={{ backgroundColor: rowIndex % 2 === 1 ? `${colors.skyz}10` : "white" }}>
                 {row.map((cell, cellIndex) => {
                   const isEditable = editable && cell === null
                   const cellHeader = headers[cellIndex]
@@ -487,11 +496,11 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
                   const isHighlighted = highlightCell === cellKey
                   const userValue = userTruthTable[cellKey]
 
-                  const cellClass = "p-2 border"
+                  const cellClass = "p-3 border font-medium"
                   const cellStyle = {}
 
                   if (isHighlighted) {
-                    cellStyle.backgroundColor = `${colors.yellowz}30`
+                    cellStyle.backgroundColor = `${colors.ambez}30`
                   }
 
                   // Check if answer is correct (for feedback)
@@ -505,9 +514,11 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
 
                     // Apply styling based on correctness
                     if (isCorrect) {
-                      cellStyle.backgroundColor = `${colors.greenz}20`
+                      cellStyle.backgroundColor = `${colors.emeraldz}20`
+                      cellStyle.borderColor = colors.emeraldz
                     } else {
-                      cellStyle.backgroundColor = `${colors.redz}20`
+                      cellStyle.backgroundColor = `${colors.coralz}20`
+                      cellStyle.borderColor = colors.coralz
                     }
                   }
 
@@ -517,7 +528,8 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
                         <select
                           value={userValue || ""}
                           onChange={(e) => onCellChange(rowIndex, cellHeader, e.target.value)}
-                          className="w-12 text-center border rounded py-1"
+                          className="w-16 text-center border-2 rounded-md py-2 font-bold"
+                          style={{ borderColor: colors.indigoz }}
                           disabled={answered}
                         >
                           <option value="">?</option>
@@ -525,12 +537,12 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
                           <option value="1">1</option>
                         </select>
                       ) : cell === "?" ? (
-                        "?"
+                        <span style={{ color: colors.violetz }}>?</span>
                       ) : (
-                        cell
+                        <span style={{ color: cell === 1 ? colors.emeraldz : colors.grayz }}>{cell}</span>
                       )}
                       {answered && isCorrect === false && (
-                        <div className="text-xs mt-1" style={{ color: colors.redz }}>
+                        <div className="text-xs mt-1 font-bold" style={{ color: colors.redz }}>
                           Correct:{" "}
                           {Array.isArray(correctAnswers)
                             ? correctAnswers[rowIndex]
@@ -578,15 +590,21 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
       case "intro":
         return (
           <div className="flex flex-col items-center space-y-6 text-center">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-4"
+                 style={{ background: `linear-gradient(135deg, ${colors.pinkz}, ${colors.violetz})` }}>
+              <span className="text-3xl">🧮</span>
+            </div>
+            <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
               {step.title}
             </h2>
-            <img
-              src={step.image || "/placeholder.svg"}
-              alt={step.imageAlt}
-              className="rounded-lg shadow-md w-full max-w-2xl"
-            />
-            <p className="text-lg" style={{ color: colors.grayz }}>
+            <div className="w-full max-w-2xl h-64 rounded-xl flex items-center justify-center"
+                 style={{ background: `linear-gradient(135deg, ${colors.cyanz}20, ${colors.lavenderz}20)` }}>
+              <div className="text-center">
+                <div className="text-6xl mb-4">📊</div>
+                <p className="text-lg font-medium" style={{ color: colors.grayz }}>Interactive Truth Table Learning</p>
+              </div>
+            </div>
+            <p className="text-lg max-w-2xl" style={{ color: colors.grayz }}>
               {step.content}
             </p>
             <Button onClick={handleNext} size="lg" className="mt-6">
@@ -598,42 +616,55 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
       case "variableExplanation":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.tealz})` }}>
+                <span className="text-2xl">📈</span>
+              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+                {step.title}
+              </h2>
+            </div>
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
             {/* Examples table */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-bold mb-4">Examples:</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-center border-collapse">
-                  <thead>
-                    <tr style={{ backgroundColor: `${colors.bluez}20` }}>
-                      <th className="p-2 border">Number of Variables</th>
-                      <th className="p-2 border">Number of Rows</th>
-                      <th className="p-2 border">Formula</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {step.examples.map((example, index) => (
-                      <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                        <td className="p-2 border">{example.variables}</td>
-                        <td className="p-2 border">{example.rows}</td>
-                        <td className="p-2 border">{example.formula}</td>
+            <div className="rounded-xl shadow-lg overflow-hidden" 
+                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.skyz}10)` }}>
+              <div className="p-6">
+                <h3 className="text-lg font-bold mb-4" style={{ color: colors.indigoz }}>Examples:</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-center border-collapse">
+                    <thead>
+                      <tr style={{ background: `linear-gradient(135deg, ${colors.indigoz}, ${colors.violetz})` }}>
+                        <th className="p-3 border text-white font-bold">Number of Variables</th>
+                        <th className="p-3 border text-white font-bold">Number of Rows</th>
+                        <th className="p-3 border text-white font-bold">Formula</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {step.examples.map((example, index) => (
+                        <tr key={index} style={{ 
+                          backgroundColor: index % 2 === 0 ? colors.white : `${colors.mintgreenz}10` 
+                        }}>
+                          <td className="p-3 border font-medium">{example.variables}</td>
+                          <td className="p-3 border font-bold" style={{ color: colors.emeraldz }}>{example.rows}</td>
+                          <td className="p-3 border font-mono" style={{ color: colors.indigoz }}>{example.formula}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
-              <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: `${colors.bluez}10` }}>
-                <p className="font-medium">Formula: {step.formula}</p>
+                <div className="mt-4 p-4 rounded-lg" style={{ background: `linear-gradient(135deg, ${colors.lavenderz}20, ${colors.pinkz}20)` }}>
+                  <p className="font-bold text-center" style={{ color: colors.violetz }}>
+                    Formula: {step.formula}
+                  </p>
+                </div>
               </div>
             </div>
 
             {/* Question */}
-            <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
+            <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: colors.offwhite }}>
               <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
                 {step.question}
               </h3>
@@ -644,34 +675,34 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
                   const isCorrect = step.correctAnswer === idx
 
                   let bgColor = colors.white
-                  let borderColor = "#e5e7eb"
+                  let borderColor = colors.cyanz
 
                   if (answered && isSelected) {
-                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.greenz}20` : `${colors.redz}20`
-                    borderColor = userAnswers[currentStep].isCorrect ? colors.greenz : colors.redz
+                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.emeraldz}20` : `${colors.coralz}20`
+                    borderColor = userAnswers[currentStep].isCorrect ? colors.emeraldz : colors.coralz
                   }
 
                   return (
                     <div
                       key={idx}
                       onClick={() => !answered && handleAnswerSelect(idx)}
-                      className={`p-3 border rounded-lg transition-all ${answered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50 hover:bg-bluez hover:bg-opacity-10"}`}
+                      className={`p-4 border-2 rounded-xl transition-all transform ${answered ? "cursor-default" : "cursor-pointer hover:scale-105 hover:shadow-md"}`}
                       style={{
                         backgroundColor: bgColor,
-                        borderColor: isSelected ? borderColor : "#e5e7eb",
+                        borderColor: isSelected ? borderColor : colors.cyanz,
                         color: colors.grayz,
                       }}
                     >
                       <div className="flex items-center justify-between">
-                        <span>{option}</span>
+                        <span className="font-medium">{option}</span>
                         {answered && isSelected && userAnswers[currentStep].isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
+                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz }} />
                         )}
                         {answered && isSelected && !userAnswers[currentStep].isCorrect && (
-                          <XCircle className="h-5 w-5" style={{ color: colors.redz }} />
+                          <XCircle className="h-6 w-6" style={{ color: colors.coralz }} />
                         )}
                         {answered && !isSelected && isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz, opacity: 0.5 }} />
+                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz, opacity: 0.5 }} />
                         )}
                       </div>
                     </div>
@@ -682,13 +713,14 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
               {/* Feedback */}
               {showFeedback && (
                 <div
-                  className="mt-4 p-4 rounded-lg"
+                  className="mt-4 p-4 rounded-xl border-2"
                   style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.greenz}10` : `${colors.redz}10`,
-                    color: userAnswers[currentStep]?.isCorrect ? colors.greenz : colors.redz,
+                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.emeraldz}10` : `${colors.coralz}10`,
+                    borderColor: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
+                    color: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
                   }}
                 >
-                  <p>{feedbackMessage}</p>
+                  <p className="font-medium">{feedbackMessage}</p>
                 </div>
               )}
 
@@ -704,188 +736,196 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
 
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ background: `linear-gradient(135deg, ${colors.ambez}, ${colors.orangez})` }}>
+                <span className="text-2xl">⚙️</span>
+              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+                {step.title}
+              </h2>
+            </div>
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
             {/* Variable selection */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="flex flex-col md:flex-row justify-between items-center">
-                <div>
-                  <h3 className="text-lg font-bold mb-2">Select number of variables:</h3>
-                  <div className="flex space-x-2">
-                    {[1, 2, 3].map((num) => (
-                      <button
-                        key={num}
-                        className="px-4 py-2 rounded-lg transition-all"
-                        style={{
-                          backgroundColor: selectedVariables === num ? colors.bluez : "#e5e7eb",
-                          color: selectedVariables === num ? colors.white : colors.grayz,
-                        }}
-                        onClick={() => setSelectedVariables(num)}
-                      >
-                        {num}
-                      </button>
+            <div className="rounded-xl shadow-lg overflow-hidden" 
+                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.ambez}10)` }}>
+              <div className="p-6">
+                <div className="flex flex-col md:flex-row justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-bold mb-3" style={{ color: colors.ambez }}>Select number of variables:</h3>
+                    <div className="flex space-x-3">
+                      {[1, 2, 3].map((num) => (
+                        <button
+                          key={num}
+                          className="px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-105"
+                          style={{
+                            background: selectedVariables === num 
+                              ? `linear-gradient(135deg, ${colors.ambez}, ${colors.orangez})` 
+                              : colors.white,
+                            color: selectedVariables === num ? colors.white : colors.ambez,
+                            border: `2px solid ${colors.ambez}`,
+                          }}
+                          onClick={() => setSelectedVariables(num)}
+                        >
+                          {num}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-4 md:mt-0 p-4 rounded-xl" 
+                       style={{ background: `linear-gradient(135deg, ${colors.limez}20, ${colors.emeraldz}20)` }}>
+                    <div className="text-xl font-bold" style={{ color: colors.emeraldz }}>
+                      Rows needed: {Math.pow(2, selectedVariables)}
+                    </div>
+                    <div className="text-sm font-mono" style={{ color: colors.tealz }}>
+                      Formula: 2<sup>{selectedVariables}</sup> = {Math.pow(2, selectedVariables)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dynamic Truth Table based on variable selection */}
+                <div className="mt-6">
+                  <h3 className="font-bold mb-3" style={{ color: colors.indigoz }}>
+                    Example Truth Table with {selectedVariables} variable{selectedVariables > 1 ? "s" : ""}:
+                  </h3>
+                  <TruthTable
+                    headers={[...headers, "Output"]}
+                    rows={rows.map(row => [...row, "?"])}
+                    editable={false}
+                    onCellChange={() => {}}
+                    highlightCell={null}
+                    correctAnswers={null}
+                  />
+                </div>
+
+                {/* Visual representation showing the exponential growth */}
+                <div className="mt-6">
+                  <h3 className="font-bold mb-3" style={{ color: colors.violetz }}>Visual Row Growth with Variables:</h3>
+                  <div className="flex items-end justify-center h-40 space-x-8 mt-4">
+                    {[1, 2, 3, 4].map((num) => (
+                      <div key={num} className="flex flex-col items-center">
+                        <div
+                          className="rounded-t-xl flex items-center justify-center text-white font-bold px-4 shadow-lg"
+                          style={{
+                            height: `${Math.min(Math.pow(2, num) * 4, 150)}px`,
+                            width: "70px",
+                            background: num <= 3 
+                              ? `linear-gradient(180deg, ${colors.violetz}, ${colors.pinkz})` 
+                              : `linear-gradient(180deg, ${colors.grayz}50, ${colors.grayz}30)`,
+                          }}
+                        >
+                          {Math.pow(2, num)}
+                        </div>
+                        <div className="mt-2 text-center">
+                          <div className="font-bold" style={{ color: colors.violetz }}>
+                            {num} var{num !== 1 ? "s" : ""}
+                          </div>
+                          <div className="text-xs font-mono" style={{ color: colors.tealz }}>
+                            2<sup>{num}</sup> rows
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
-                </div>
-                <div className="mt-4 md:mt-0 p-3 rounded-lg" style={{ backgroundColor: colors.offwhite }}>
-                  <div className="text-lg font-bold">Rows needed: {Math.pow(2, selectedVariables)}</div>
-                  <div className="text-sm">
-                    Formula: 2<sup>{selectedVariables}</sup> = {Math.pow(2, selectedVariables)}
-                  </div>
-                </div>
-              </div>
-
-              {/* Dynamic Truth Table based on variable selection */}
-              <div className="mt-6">
-                <h3 className="font-bold mb-2">
-                  Example Truth Table with {selectedVariables} variable{selectedVariables > 1 ? "s" : ""}:
-                </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-center border-collapse">
-                    <thead>
-                      <tr style={{ backgroundColor: `${colors.bluez}20` }}>
-                        {headers.map((header, index) => (
-                          <th key={index} className="p-2 border">
-                            {header}
-                          </th>
-                        ))}
-                        <th className="p-2 border">Output</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((row, rowIndex) => (
-                        <tr key={rowIndex} className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                          {row.map((cell, cellIndex) => (
-                            <td key={cellIndex} className="p-2 border">
-                              {cell}
-                            </td>
-                          ))}
-                          <td className="p-2 border">?</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Visual representation showing the exponential growth */}
-              <div className="mt-6">
-                <h3 className="font-bold mb-2">Visual Row Growth with Variables:</h3>
-                <div className="flex items-end justify-center h-40 space-x-8 mt-4">
-                  {[1, 2, 3, 4].map((num) => (
-                    <div key={num} className="flex flex-col items-center">
-                      <div
-                        className="rounded-t-lg flex items-center justify-center text-white font-bold px-3"
-                        style={{
-                          height: `${Math.min(Math.pow(2, num) * 4, 150)}px`,
-                          width: "60px",
-                          backgroundColor: colors.bluez,
-                          opacity: num <= 3 ? 1 : 0.5,
-                        }}
-                      >
-                        {Math.pow(2, num)}
-                      </div>
-                      <div className="mt-2 text-center">
-                        <div className="font-bold">
-                          {num} var{num !== 1 ? "s" : ""}
-                        </div>
-                        <div className="text-xs">
-                          2<sup>{num}</sup> rows
-                        </div>
-                      </div>
+                  {/* Warning about keeping tables manageable */}
+                  <div className="mt-4 p-4 rounded-xl border-2" 
+                       style={{ backgroundColor: `${colors.coralz}10`, borderColor: colors.coralz }}>
+                    <div className="flex items-start">
+                      <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.coralz }} />
+                      <p className="text-sm font-medium" style={{ color: colors.coralz }}>
+                        <strong>Note:</strong> As you can see, with 4 variables, we already need 16 rows! For
+                        practicality, we'll limit our exercises to a maximum of 3 variables (8 rows).
+                      </p>
                     </div>
-                  ))}
-                </div>
-                {/* Warning about keeping tables manageable */}
-                <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: `${colors.redz}10` }}>
-                  <div className="flex items-start">
-                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.redz }} />
-                    <p className="text-sm" style={{ color: colors.redz }}>
-                      <strong>Note:</strong> As you can see, with 4 variables, we already need 16 rows! For
-                      practicality, we'll limit our exercises to a maximum of 3 variables (8 rows).
-                    </p>
+                  </div>
+
+                  <div className="mt-4 p-4 rounded-xl border-2" 
+                       style={{ backgroundColor: `${colors.cyanz}10`, borderColor: colors.cyanz }}>
+                    <div className="flex items-start">
+                      <Info className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.cyanz }} />
+                      <p className="text-sm font-medium" style={{ color: colors.cyanz }}>{step.instructionalText}</p>
+                    </div>
                   </div>
                 </div>
 
-              <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: `${colors.bluez}10` }}>
-                <div className="flex items-start">
-                  <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.bluez }} />
-                  <p className="text-sm">{step.instructionalText}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Interactive exercise: Calculate rows needed */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-bold mb-4">Practice: Row Calculation</h3>
-              <div className="space-y-4">
-                <div className="p-4 rounded-lg" style={{ backgroundColor: colors.offwhite }}>
-                  <p className="font-medium">Fill in the missing values:</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">For 2 variables, rows needed:</label>
-                      <input
-                        type="number"
-                        className="mt-1 p-2 w-full border rounded-md"
-                        placeholder="Enter answer"
-                        value={userRowCalculations?.["2"] || ""}
-                        onChange={(e) => handleRowCalculation("2", e.target.value)}
-                        disabled={hasCalculationAnswer("2")}
-                      />
-                      {hasCalculationAnswer("2") && (
-                        <div
-                          className="text-sm mt-1"
-                          style={{ color: isCalculationCorrect("2") ? colors.greenz : colors.redz }}
-                        >
-                          {isCalculationCorrect("2") ? "✓ Correct!" : `✗ Incorrect. Answer: ${Math.pow(2, 2)}`}
+                {/* Interactive exercise: Calculate rows needed */}
+                <div className="mt-6 p-6 rounded-xl" 
+                     style={{ background: `linear-gradient(135deg, ${colors.lavenderz}10, ${colors.pinkz}10)` }}>
+                  <h3 className="text-lg font-bold mb-4" style={{ color: colors.violetz }}>Practice: Row Calculation</h3>
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: colors.white }}>
+                      <p className="font-medium mb-4" style={{ color: colors.grayz }}>Fill in the missing values:</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-bold mb-2" style={{ color: colors.violetz }}>
+                            For 2 variables, rows needed:
+                          </label>
+                          <input
+                            type="number"
+                            className="mt-1 p-3 w-full border-2 rounded-lg font-bold text-center"
+                            style={{ borderColor: colors.violetz }}
+                            placeholder="Enter answer"
+                            value={userRowCalculations?.["2"] || ""}
+                            onChange={(e) => handleRowCalculation("2", e.target.value)}
+                            disabled={hasCalculationAnswer("2")}
+                          />
+                          {hasCalculationAnswer("2") && (
+                            <div
+                              className="text-sm mt-2 font-bold"
+                              style={{ color: isCalculationCorrect("2") ? colors.emeraldz : colors.coralz }}
+                            >
+                              {isCalculationCorrect("2") ? "✓ Correct!" : `✗ Incorrect. Answer: ${Math.pow(2, 2)}`}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">For 5 variables, rows needed:</label>
-                      <input
-                        type="number"
-                        className="mt-1 p-2 w-full border rounded-md"
-                        placeholder="Enter answer"
-                        value={userRowCalculations?.["5"] || ""}
-                        onChange={(e) => handleRowCalculation("5", e.target.value)}
-                        disabled={hasCalculationAnswer("5")}
-                      />
-                      {hasCalculationAnswer("5") && (
-                        <div
-                          className="text-sm mt-1"
-                          style={{ color: isCalculationCorrect("5") ? colors.greenz : colors.redz }}
+                        <div>
+                          <label className="block text-sm font-bold mb-2" style={{ color: colors.violetz }}>
+                            For 5 variables, rows needed:
+                          </label>
+                          <input
+                            type="number"
+                            className="mt-1 p-3 w-full border-2 rounded-lg font-bold text-center"
+                            style={{ borderColor: colors.violetz }}
+                            placeholder="Enter answer"
+                            value={userRowCalculations?.["5"] || ""}
+                            onChange={(e) => handleRowCalculation("5", e.target.value)}
+                            disabled={hasCalculationAnswer("5")}
+                          />
+                          {hasCalculationAnswer("5") && (
+                            <div
+                              className="text-sm mt-2 font-bold"
+                              style={{ color: isCalculationCorrect("5") ? colors.emeraldz : colors.coralz }}
+                            >
+                              {isCalculationCorrect("5") ? "✓ Correct!" : `✗ Incorrect. Answer: ${Math.pow(2, 5)}`}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {!hasCalculationAnswer("2") || !hasCalculationAnswer("5") ? (
+                        <button
+                          className="mt-4 px-6 py-3 rounded-lg text-white font-bold transform transition-all hover:scale-105"
+                          style={{ background: `linear-gradient(135deg, ${colors.violetz}, ${colors.pinkz})` }}
+                          onClick={checkRowCalculations}
                         >
-                          {isCalculationCorrect("5") ? "✓ Correct!" : `✗ Incorrect. Answer: ${Math.pow(2, 5)}`}
+                          Check Answers
+                        </button>
+                      ) : (
+                        <div
+                          className="mt-4 p-4 rounded-lg border-2"
+                          style={{ backgroundColor: `${colors.emeraldz}10`, borderColor: colors.emeraldz, color: colors.emeraldz }}
+                        >
+                          <p className="font-bold">Great! You understand how to calculate the number of rows needed based on variables.</p>
                         </div>
                       )}
                     </div>
                   </div>
-                  {!hasCalculationAnswer("2") || !hasCalculationAnswer("5") ? (
-                    <button
-                      className="mt-4 px-4 py-2 rounded-lg text-white"
-                      style={{ backgroundColor: colors.bluez }}
-                      onClick={checkRowCalculations}
-                    >
-                      Check Answers
-                    </button>
-                  ) : (
-                    <div
-                      className="mt-4 p-3 rounded-lg"
-                      style={{ backgroundColor: `${colors.greenz}10`, color: colors.greenz }}
-                    >
-                      <p>Great! You understand how to calculate the number of rows needed based on variables.</p>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
 
             {/* Question */}
-            <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
+            <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: colors.offwhite }}>
               <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
                 {step.question}
               </h3>
@@ -896,34 +936,34 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
                   const isCorrect = step.correctAnswer === idx
 
                   let bgColor = colors.white
-                  let borderColor = "#e5e7eb"
+                  let borderColor = colors.ambez
 
                   if (answered && isSelected) {
-                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.greenz}20` : `${colors.redz}20`
-                    borderColor = userAnswers[currentStep].isCorrect ? colors.greenz : colors.redz
+                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.emeraldz}20` : `${colors.coralz}20`
+                    borderColor = userAnswers[currentStep].isCorrect ? colors.emeraldz : colors.coralz
                   }
 
                   return (
                     <div
                       key={idx}
                       onClick={() => !answered && handleAnswerSelect(idx)}
-                      className={`p-3 border rounded-lg transition-all ${answered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50 hover:bg-bluez hover:bg-opacity-10"}`}
+                      className={`p-4 border-2 rounded-xl transition-all transform ${answered ? "cursor-default" : "cursor-pointer hover:scale-105 hover:shadow-md"}`}
                       style={{
                         backgroundColor: bgColor,
-                        borderColor: isSelected ? borderColor : "#e5e7eb",
+                        borderColor: isSelected ? borderColor : colors.ambez,
                         color: colors.grayz,
                       }}
                     >
                       <div className="flex items-center justify-between">
-                        <span>{option}</span>
+                        <span className="font-medium">{option}</span>
                         {answered && isSelected && userAnswers[currentStep].isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
+                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz }} />
                         )}
                         {answered && isSelected && !userAnswers[currentStep].isCorrect && (
-                          <XCircle className="h-5 w-5" style={{ color: colors.redz }} />
+                          <XCircle className="h-6 w-6" style={{ color: colors.coralz }} />
                         )}
                         {answered && !isSelected && isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz, opacity: 0.5 }} />
+                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz, opacity: 0.5 }} />
                         )}
                       </div>
                     </div>
@@ -934,184 +974,14 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
               {/* Feedback */}
               {showFeedback && (
                 <div
-                  className="mt-4 p-4 rounded-lg"
+                  className="mt-4 p-4 rounded-xl border-2"
                   style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.greenz}10` : `${colors.redz}10`,
-                    color: userAnswers[currentStep]?.isCorrect ? colors.greenz : colors.redz,
+                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.emeraldz}10` : `${colors.coralz}10`,
+                    borderColor: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
+                    color: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
                   }}
                 >
-                  <p>{feedbackMessage}</p>
-                </div>
-              )}
-
-              {renderNavigation()}
-            </div>
-          </div>
-          </div>
-        )
-
-      case "tableConstruction":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
-            <p style={{ color: colors.grayz }}>{step.description}</p>
-
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="p-4 rounded-lg mb-4" style={{ backgroundColor: `${colors.bluez}10` }}>
-                <h3 className="font-bold mb-2">Operation: AND</h3>
-                <p>{step.operationDescription}</p>
-              </div>
-
-              <h3 className="text-lg font-bold mb-2">Complete the Truth Table:</h3>
-              <p className="mb-4">Fill in the values for the "A AND B" column:</p>
-
-              <TruthTable
-                headers={step.table.headers}
-                rows={step.table.rows}
-                editable={true}
-                onCellChange={handleTruthTableInput}
-                highlightCell={highlightCell}
-                correctAnswers={step.correctAnswers}
-              />
-
-              {!hasAnsweredCurrent() && (
-                <Button onClick={() => checkTruthTableAnswers("basic")} className="mt-4">
-                  Check Answers
-                </Button>
-              )}
-
-              {/* Explanation toggle */}
-              <ExplanationPanel
-                title="Need help? Click for explanation"
-                isOpen={explanationOpen}
-                onToggle={() => setExplanationOpen(!explanationOpen)}
-              >
-                <p>The AND operation returns 1 (true) only when both inputs are 1 (true).</p>
-                <ul className="list-disc pl-5 mt-2 space-y-1">
-                  <li>0 AND 0 = 0 (false AND false = false)</li>
-                  <li>0 AND 1 = 0 (false AND true = false)</li>
-                  <li>1 AND 0 = 0 (true AND false = false)</li>
-                  <li>1 AND 1 = 1 (true AND true = true)</li>
-                </ul>
-              </ExplanationPanel>
-
-              {/* Feedback */}
-              {showFeedback && (
-                <div
-                  className="mt-4 p-4 rounded-lg"
-                  style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.greenz}10` : `${colors.redz}10`,
-                    color: userAnswers[currentStep]?.isCorrect ? colors.greenz : colors.redz,
-                  }}
-                >
-                  <p>{feedbackMessage}</p>
-                </div>
-              )}
-            </div>
-
-            {renderNavigation()}
-          </div>
-        )
-
-      case "intermediateColumnsExplanation":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
-            <p style={{ color: colors.grayz }}>{step.description}</p>
-
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-bold mb-4">Expression: {step.expression}</h3>
-
-              <div className="p-4 rounded-lg mb-4" style={{ backgroundColor: colors.offwhite }}>
-                <h4 className="font-bold mb-2">Step-by-Step Approach:</h4>
-                <ol className="list-decimal pl-5 space-y-2">
-                  {step.steps.map((stepItem, index) => (
-                    <li key={index}>{stepItem}</li>
-                  ))}
-                </ol>
-              </div>
-
-              <div className="mt-6">
-                <h4 className="font-bold mb-2">Visual Example:</h4>
-                <img
-                  src={step.imageUrl || "/placeholder.svg?height=300&width=600"}
-                  alt="Truth table with intermediate columns"
-                  className="rounded-lg shadow-sm w-full max-w-2xl mx-auto"
-                />
-              </div>
-
-              <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: `${colors.bluez}10` }}>
-                <div className="flex items-start">
-                  <Info className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.bluez }} />
-                  <p>
-                    <strong>Key Insight:</strong> Breaking down complex expressions into intermediate steps makes truth
-                    tables easier to construct and understand. Each intermediate column represents a sub-expression.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Question */}
-            <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
-                {step.question}
-              </h3>
-              <div className="space-y-3">
-                {step.options.map((option, idx) => {
-                  const answered = hasAnsweredCurrent()
-                  const isSelected = answered ? userAnswers[currentStep]?.answer === idx : false
-                  const isCorrect = step.correctAnswer === idx
-
-                  let bgColor = colors.white
-                  let borderColor = "#e5e7eb"
-
-                  if (answered && isSelected) {
-                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.greenz}20` : `${colors.redz}20`
-                    borderColor = userAnswers[currentStep].isCorrect ? colors.greenz : colors.redz
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => !answered && handleAnswerSelect(idx)}
-                      className={`p-3 border rounded-lg transition-all ${answered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50 hover:bg-bluez hover:bg-opacity-10"}`}
-                      style={{
-                        backgroundColor: bgColor,
-                        borderColor: isSelected ? borderColor : "#e5e7eb",
-                        color: colors.grayz,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{option}</span>
-                        {answered && isSelected && userAnswers[currentStep].isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
-                        )}
-                        {answered && isSelected && !userAnswers[currentStep].isCorrect && (
-                          <XCircle className="h-5 w-5" style={{ color: colors.redz }} />
-                        )}
-                        {answered && !isSelected && isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz, opacity: 0.5 }} />
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Feedback */}
-              {showFeedback && (
-                <div
-                  className="mt-4 p-4 rounded-lg"
-                  style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.greenz}10` : `${colors.redz}10`,
-                    color: userAnswers[currentStep]?.isCorrect ? colors.greenz : colors.redz,
-                  }}
-                >
-                  <p>{feedbackMessage}</p>
+                  <p className="font-medium">{feedbackMessage}</p>
                 </div>
               )}
 
@@ -1123,102 +993,105 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
       case "complexTableConstruction":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ background: `linear-gradient(135deg, ${colors.indigoz}, ${colors.violetz})` }}>
+                <span className="text-2xl">🔧</span>
+              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+                {step.title}
+              </h2>
+            </div>
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="p-4 rounded-lg mb-4" style={{ backgroundColor: `${colors.bluez}10` }}>
-                <h3 className="font-bold mb-2">Expression: {step.expression}</h3>
-                <p>{step.operationDescription}</p>
-              </div>
-
-              <h3 className="text-lg font-bold mb-2">Complete the Truth Table:</h3>
-              <p className="mb-4">Fill in the values for each intermediate column, then the final result:</p>
-
-              <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: `${colors.yellowz}10` }}>
-                <div className="flex items-start">
-                  <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.yellowz }} />
-                  <p className="text-sm">
-                    <strong>Tip:</strong> Work from left to right. First calculate "A OR B" for each row, then "NOT C", 
-                    and finally combine them with AND to get the final result.
-                  </p>
+            <div className="rounded-xl shadow-lg overflow-hidden" 
+                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.indigoz}10)` }}>
+              <div className="p-6">
+                <div className="p-4 rounded-xl mb-4" 
+                     style={{ background: `linear-gradient(135deg, ${colors.indigoz}20, ${colors.violetz}20)` }}>
+                  <h3 className="font-bold mb-2" style={{ color: colors.indigoz }}>
+                    Expression: {step.description.split(': ')[1]}
+                  </h3>
+                  <p style={{ color: colors.violetz }}>{step.operationDescription}</p>
                 </div>
-              </div>
 
-              <TruthTable
-                headers={step.table.headers}
-                rows={step.table.rows}
-                editable={true}
-                onCellChange={handleTruthTableInput}
-                highlightCell={highlightCell}
-                correctAnswers={step.correctAnswers}
-              />
+                <h3 className="text-lg font-bold mb-2" style={{ color: colors.indigoz }}>Complete the Truth Table:</h3>
+                <p className="mb-4" style={{ color: colors.grayz }}>
+                  Fill in the values for each intermediate column, then the final result:
+                </p>
 
-              {!hasAnsweredCurrent() && (
-                <Button onClick={() => checkTruthTableAnswers("complex")} className="mt-4">
-                  Check Answers
-                </Button>
-              )}
-
-              {/* Explanation toggle */}
-              <ExplanationPanel
-                title="Need help? Click for explanation"
-                isOpen={explanationOpen}
-                onToggle={() => setExplanationOpen(!explanationOpen)}
-              >
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-bold">A OR B:</h4>
-                    <p>The OR operation returns 1 (true) when at least one input is 1 (true).</p>
-                    <ul className="list-disc pl-5 mt-2 space-y-1">
-                      <li>0 OR 0 = 0 (false OR false = false)</li>
-                      <li>0 OR 1 = 1 (false OR true = true)</li>
-                      <li>1 OR 0 = 1 (true OR false = true)</li>
-                      <li>1 OR 1 = 1 (true OR true = true)</li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="font-bold">NOT C:</h4>
-                    <p>The NOT operation inverts the input.</p>
-                    <ul className="list-disc pl-5 mt-2 space-y-1">
-                      <li>NOT 0 = 1 (not false = true)</li>
-                      <li>NOT 1 = 0 (not true = false)</li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="font-bold">(A OR B) AND (NOT C):</h4>
-                    <p>The AND operation returns 1 (true) only when both inputs are 1 (true).</p>
-                    <p>Use the values from the intermediate columns to calculate this final result.</p>
+                <div className="mb-4 p-4 rounded-xl border-2" 
+                     style={{ backgroundColor: `${colors.ambez}10`, borderColor: colors.ambez }}>
+                  <div className="flex items-start">
+                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.ambez }} />
+                    <p className="text-sm font-medium" style={{ color: colors.ambez }}>
+                      <strong>Tip:</strong> Work from left to right. First calculate "NOT B", then combine A with "NOT B" using AND.
+                    </p>
                   </div>
                 </div>
-              </ExplanationPanel>
 
-              {/* Feedback */}
-              {showFeedback && (
-                <div
-                  className="mt-4 p-4 rounded-lg"
-                  style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.greenz}10` : `${colors.redz}10`,
-                    color: userAnswers[currentStep]?.isCorrect ? colors.greenz : colors.redz,
-                  }}
+                <TruthTable
+                  headers={step.table.headers}
+                  rows={step.table.rows}
+                  editable={true}
+                  onCellChange={handleTruthTableInput}
+                  highlightCell={highlightCell}
+                  correctAnswers={step.correctAnswers}
+                />
+
+                {!hasAnsweredCurrent() && (
+                  <Button onClick={() => checkTruthTableAnswers("complex")} className="mt-4">
+                    Check Answers
+                  </Button>
+                )}
+
+                {/* Explanation toggle */}
+                <ExplanationPanel
+                  title="Need help? Click for explanation"
+                  isOpen={explanationOpen}
+                  onToggle={() => setExplanationOpen(!explanationOpen)}
                 >
-                  <p>{feedbackMessage}</p>
-                  {!userAnswers[currentStep]?.isCorrect && (
-                    <div className="mt-3 p-3 rounded-lg" style={{ backgroundColor: `${colors.offwhite}` }}>
-                      <p className="font-bold mb-2">Review the correct answers:</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>A OR B: 1 when either A or B (or both) is 1</li>
-                        <li>NOT C: 1 when C is 0, and 0 when C is 1</li>
-                        <li>(A OR B) AND (NOT C): 1 only when both (A OR B) AND (NOT C) are 1</li>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="font-bold" style={{ color: colors.violetz }}>NOT B:</h4>
+                      <p>The NOT operation inverts the input.</p>
+                      <ul className="list-disc pl-5 mt-2 space-y-1">
+                        <li>NOT 0 = 1 (not false = true)</li>
+                        <li>NOT 1 = 0 (not true = false)</li>
                       </ul>
                     </div>
-                  )}
-                </div>
-              )}
+
+                    <div>
+                      <h4 className="font-bold" style={{ color: colors.indigoz }}>A AND (NOT B):</h4>
+                      <p>The AND operation returns 1 (true) only when both inputs are 1 (true).</p>
+                      <p>Use A and the NOT B values to calculate this final result.</p>
+                    </div>
+                  </div>
+                </ExplanationPanel>
+
+                {/* Feedback */}
+                {showFeedback && (
+                  <div
+                    className="mt-4 p-4 rounded-xl border-2"
+                    style={{
+                      backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.emeraldz}10` : `${colors.coralz}10`,
+                      borderColor: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
+                      color: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
+                    }}
+                  >
+                    <p className="font-medium">{feedbackMessage}</p>
+                    {!userAnswers[currentStep]?.isCorrect && (
+                      <div className="mt-3 p-3 rounded-lg" style={{ backgroundColor: colors.white }}>
+                        <p className="font-bold mb-2" style={{ color: colors.grayz }}>Review the correct answers:</p>
+                        <ul className="list-disc pl-5 space-y-1" style={{ color: colors.grayz }}>
+                          <li>NOT B: 1 when B is 0, and 0 when B is 1</li>
+                          <li>A AND (NOT B): 1 only when both A is 1 AND (NOT B) is 1</li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {renderNavigation()}
@@ -1229,20 +1102,33 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
       case "realWorldApplication":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ 
+                     background: step.type === "equivalenceChallenge" 
+                       ? `linear-gradient(135deg, ${colors.rosez}, ${colors.pinkz})` 
+                       : `linear-gradient(135deg, ${colors.emeraldz}, ${colors.tealz})` 
+                   }}>
+                <span className="text-2xl">
+                  {step.type === "equivalenceChallenge" ? "🔄" : "🏠"}
+                </span>
+              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+                {step.title}
+              </h2>
+            </div>
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
             {step.scenario && (
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-bold mb-2">Scenario:</h3>
-                <p>{step.scenario}</p>
+              <div className="rounded-xl shadow-lg p-6" 
+                   style={{ background: `linear-gradient(135deg, ${colors.emeraldz}10, ${colors.tealz}10)` }}>
+                <h3 className="text-lg font-bold mb-3" style={{ color: colors.emeraldz }}>Scenario:</h3>
+                <p style={{ color: colors.tealz }}>{step.scenario}</p>
               </div>
             )}
 
             {/* Question */}
-            <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
+            <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: colors.offwhite }}>
               <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
                 {step.question}
               </h3>
@@ -1253,34 +1139,34 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
                   const isCorrect = step.correctAnswer === idx
 
                   let bgColor = colors.white
-                  let borderColor = "#e5e7eb"
+                  let borderColor = step.type === "equivalenceChallenge" ? colors.rosez : colors.emeraldz
 
                   if (answered && isSelected) {
-                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.greenz}20` : `${colors.redz}20`
-                    borderColor = userAnswers[currentStep].isCorrect ? colors.greenz : colors.redz
+                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.emeraldz}20` : `${colors.coralz}20`
+                    borderColor = userAnswers[currentStep].isCorrect ? colors.emeraldz : colors.coralz
                   }
 
                   return (
                     <div
                       key={idx}
                       onClick={() => !answered && handleAnswerSelect(idx)}
-                      className={`p-3 border rounded-lg transition-all ${answered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50 hover:bg-bluez hover:bg-opacity-10"}`}
+                      className={`p-4 border-2 rounded-xl transition-all transform ${answered ? "cursor-default" : "cursor-pointer hover:scale-105 hover:shadow-md"}`}
                       style={{
                         backgroundColor: bgColor,
-                        borderColor: isSelected ? borderColor : "#e5e7eb",
+                        borderColor: isSelected ? borderColor : (step.type === "equivalenceChallenge" ? colors.rosez : colors.emeraldz),
                         color: colors.grayz,
                       }}
                     >
                       <div className="flex items-center justify-between">
-                        <span>{option}</span>
+                        <span className="font-medium">{option}</span>
                         {answered && isSelected && userAnswers[currentStep].isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
+                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz }} />
                         )}
                         {answered && isSelected && !userAnswers[currentStep].isCorrect && (
-                          <XCircle className="h-5 w-5" style={{ color: colors.redz }} />
+                          <XCircle className="h-6 w-6" style={{ color: colors.coralz }} />
                         )}
                         {answered && !isSelected && isCorrect && (
-                          <CheckCircle className="h-5 w-5" style={{ color: colors.greenz, opacity: 0.5 }} />
+                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz, opacity: 0.5 }} />
                         )}
                       </div>
                     </div>
@@ -1291,13 +1177,14 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
               {/* Feedback */}
               {showFeedback && (
                 <div
-                  className="mt-4 p-4 rounded-lg"
+                  className="mt-4 p-4 rounded-xl border-2"
                   style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.greenz}10` : `${colors.redz}10`,
-                    color: userAnswers[currentStep]?.isCorrect ? colors.greenz : colors.redz,
+                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.emeraldz}10` : `${colors.coralz}10`,
+                    borderColor: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
+                    color: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
                   }}
                 >
-                  <p>{feedbackMessage}</p>
+                  <p className="font-medium">{feedbackMessage}</p>
                 </div>
               )}
 
@@ -1307,96 +1194,111 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
         )
 
       case "completion":
-        // Calculate final score
-        {const finalScore = Math.round((score / totalQuestions) * 100)
+        const finalScore = Math.round((score / totalQuestions) * 100)
 
         return (
           <div className="flex flex-col items-center space-y-6 text-center">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+            <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+                 style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})` }}>
+              <span className="text-3xl">🎉</span>
+            </div>
+            <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
               {step.title}
             </h2>
 
             <div
-              className="w-32 h-32 rounded-full flex items-center justify-center text-3xl font-bold"
+              className="w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg"
               style={{
-                backgroundColor: `${colors.bluez}20`,
-                color: colors.bluez,
+                background: `conic-gradient(${colors.emeraldz} ${finalScore * 3.6}deg, ${colors.offwhite} 0deg)`,
+                color: colors.emeraldz,
               }}
             >
-              {finalScore}%
+              <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center">
+                {finalScore}%
+              </div>
             </div>
 
-            <p className="text-lg" style={{ color: colors.grayz }}>
+            <p className="text-lg max-w-md" style={{ color: colors.grayz }}>
               {step.content}
             </p>
 
-            <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-              <h3 className="text-lg font-bold mb-4">Your Results:</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span>Questions Answered:</span>
-                  <span className="font-bold">
-                    {Object.keys(userAnswers).length} / {totalQuestions}
-                  </span>
+            <div className="rounded-xl shadow-lg overflow-hidden w-full max-w-md" 
+                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.cyanz}10)` }}>
+              <div className="p-6">
+                <h3 className="text-lg font-bold mb-4" style={{ color: colors.indigoz }}>Your Results:</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 rounded-lg" 
+                       style={{ backgroundColor: `${colors.skyz}10` }}>
+                    <span className="font-medium">Questions Answered:</span>
+                    <span className="font-bold" style={{ color: colors.indigoz }}>
+                      {Object.keys(userAnswers).length} / {totalQuestions}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 rounded-lg" 
+                       style={{ backgroundColor: `${colors.emeraldz}10` }}>
+                    <span className="font-medium">Correct Answers:</span>
+                    <span className="font-bold" style={{ color: colors.emeraldz }}>
+                      {score} / {totalQuestions}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 rounded-lg" 
+                       style={{ backgroundColor: `${colors.violetz}10` }}>
+                    <span className="font-medium">Final Score:</span>
+                    <span className="font-bold text-xl" style={{ color: colors.violetz }}>{finalScore}%</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span>Correct Answers:</span>
-                  <span className="font-bold">
-                    {score} / {totalQuestions}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span>Final Score:</span>
-                  <span className="font-bold">{finalScore}%</span>
-                </div>
-              </div>
 
-              <div
-                className="mt-6 p-4 rounded-lg"
-                style={{
-                  backgroundColor: finalScore >= 70 ? `${colors.greenz}10` : `${colors.yellowz}10`,
-                  color: finalScore >= 70 ? colors.greenz : colors.yellowz,
-                }}
-              >
-                <p className="font-bold">
-                  {finalScore >= 90
-                    ? "Excellent!"
-                    : finalScore >= 70
-                      ? "Good job!"
-                      : finalScore >= 50
-                        ? "Nice effort!"
-                        : "Keep practicing!"}
-                </p>
-                <p className="text-sm mt-1">
-                  {finalScore >= 90
-                    ? "You have mastered truth table construction!"
-                    : finalScore >= 70
-                      ? "You have a good understanding of truth tables."
-                      : finalScore >= 50
-                        ? "You're on the right track with truth tables."
-                        : "Truth tables take practice. Try again to improve your score."}
-                </p>
+                <div
+                  className="mt-6 p-4 rounded-xl border-2"
+                  style={{
+                    backgroundColor: finalScore >= 70 ? `${colors.emeraldz}10` : `${colors.ambez}10`,
+                    borderColor: finalScore >= 70 ? colors.emeraldz : colors.ambez,
+                    color: finalScore >= 70 ? colors.emeraldz : colors.ambez,
+                  }}
+                >
+                  <p className="font-bold">
+                    {finalScore >= 90
+                      ? "Excellent! 🌟"
+                      : finalScore >= 70
+                        ? "Good job! 👍"
+                        : finalScore >= 50
+                          ? "Nice effort! 💪"
+                          : "Keep practicing! 📚"}
+                  </p>
+                  <p className="text-sm mt-1">
+                    {finalScore >= 90
+                      ? "You have mastered truth table construction!"
+                      : finalScore >= 70
+                        ? "You have a good understanding of truth tables."
+                        : finalScore >= 50
+                          ? "You're on the right track with truth tables."
+                          : "Truth tables take practice. Try again to improve your score."}
+                  </p>
+                </div>
               </div>
             </div>
 
             <Button onClick={handleRestartAssessment} size="lg" className="mt-6">
-              Restart Assessment
+              🔄 Restart Assessment
             </Button>
           </div>
         )
-    }
+
+      default:
+        return <div>Unknown step type: {step.type}</div>
     }
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6">
+    <div className="max-w-4xl mx-auto p-4 md:p-6 min-h-screen" 
+         style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.cyanz}05)` }}>
       {/* Progress bar and step indicator */}
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <div className="text-sm font-medium">
+        <div className="flex justify-between items-center mb-3">
+          <div className="text-sm font-bold" style={{ color: colors.indigoz }}>
             Step {currentStep + 1} of {assessmentSteps.length}
           </div>
-          <div className="text-sm font-medium">
+          <div className="text-sm font-bold" style={{ color: colors.emeraldz }}>
             Score: {score} / {totalQuestions}
           </div>
         </div>
@@ -1404,10 +1306,11 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
       </div>
 
       {/* Main content */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
         <div className="p-6">{renderStepContent()}</div>
       </div>
     </div>
   )
 }
+
 export default TruthTableConstructionAssessment

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle, XCircle, ChevronLeft, ChevronRight, Clock, Award, BookOpen, ArrowRight, Info } from "lucide-react"
 
-// Custom color palette
+// Enhanced color palette matching the truth table assessment
 const colors = {
   greenz: "#27AE60",
   darkpurple: "#9B51E0",
@@ -16,6 +16,19 @@ const colors = {
   redz: "#F14E3A",
   white: "#FFFFFF",
   blackz: "#031926",
+  // New enhanced colors
+  pinkz: "#FF6B9D",
+  mintgreenz: "#51E5A8",
+  lavenderz: "#B794F6",
+  coralz: "#FF8A80",
+  tealz: "#26C6DA",
+  indigoz: "#5C7CFA",
+  emeraldz: "#10B981",
+  rosez: "#FB7185",
+  violetz: "#8B5CF6",
+  ambez: "#F59E0B",
+  limez: "#84CC16",
+  skyz: "#0EA5E9"
 }
 
 export default function HistoricalAssessment({ onComplete }) {
@@ -319,6 +332,22 @@ export default function HistoricalAssessment({ onComplete }) {
     setIsReviewMode(!isReviewMode)
   }
 
+  // Restart assessment
+  const handleRestartAssessment = () => {
+    setCurrentStep(0)
+    setUserAnswers([])
+    setIsReviewMode(false)
+    setIsCompleted(false)
+    setSelectedOption(null)
+    setShowFeedback(false)
+    setFeedbackMessage("")
+    setShowHistoryInfo(false)
+    setTimelineVisible(false)
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   // Custom Button component
   const Button = ({ children, onClick, disabled, variant, className, size }) => {
     const baseStyles = "rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
@@ -366,6 +395,21 @@ export default function HistoricalAssessment({ onComplete }) {
     )
   }
 
+  // Enhanced Progress Bar component
+  const ProgressBar = ({ value }) => {
+    return (
+      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500 ease-in-out"
+          style={{
+            width: `${value}%`,
+            background: `linear-gradient(90deg, ${colors.violetz}, ${colors.pinkz}, ${colors.cyanz})`,
+          }}
+        />
+      </div>
+    )
+  }
+
   // Render different content based on step type
   const renderStepContent = () => {
     const step = assessmentSteps[currentStep]
@@ -375,15 +419,21 @@ export default function HistoricalAssessment({ onComplete }) {
       case "intro":
         return (
           <div className="flex flex-col items-center space-y-6 text-center">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-4"
+                 style={{ background: `linear-gradient(135deg, ${colors.violetz}, ${colors.indigoz})` }}>
+              <span className="text-4xl">📚</span>
+            </div>
+            <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
               {step.title}
             </h2>
-            <img
-              src={step.image || "/api/placeholder/600/300"}
-              alt={step.imageAlt}
-              className="rounded-lg shadow-md w-full max-w-2xl"
-            />
-            <p className="text-lg" style={{ color: colors.grayz }}>
+            <div className="w-full max-w-2xl h-64 rounded-xl flex items-center justify-center"
+                 style={{ background: `linear-gradient(135deg, ${colors.lavenderz}20, ${colors.pinkz}20)` }}>
+              <div className="text-center">
+                <div className="text-6xl mb-4">⚡</div>
+                <p className="text-lg font-medium" style={{ color: colors.violetz }}>Journey Through Boolean History</p>
+              </div>
+            </div>
+            <p className="text-lg max-w-2xl" style={{ color: colors.grayz }}>
               {step.content}
             </p>
             <Button onClick={handleNext} size="lg" className="mt-6 flex items-center gap-1">
@@ -395,79 +445,100 @@ export default function HistoricalAssessment({ onComplete }) {
       case "timelineExploration":
         return (
           <div className="space-y-8">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ background: `linear-gradient(135deg, ${colors.ambez}, ${colors.orangez})` }}>
+                <span className="text-2xl">⏰</span>
+              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+                {step.title}
+              </h2>
+            </div>
 
             {/* Interactive Timeline */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <div className="relative pb-8">
-                {/* Timeline line */}
-                <div
-                  className="absolute h-1 top-8 left-0 right-0 z-0"
-                  style={{ backgroundColor: colors.lightpurple }}
-                ></div>
+            <div className="rounded-xl shadow-lg overflow-hidden" 
+                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.lavenderz}10)` }}>
+              <div className="p-6">
+                <div className="relative pb-8">
+                  {/* Timeline line */}
+                  <div
+                    className="absolute h-2 top-8 left-0 right-0 z-0 rounded-full"
+                    style={{ background: `linear-gradient(90deg, ${colors.violetz}, ${colors.pinkz})` }}
+                  ></div>
 
-                {/* Timeline events */}
-                <div
-                  className={`flex justify-between relative z-10 transition-opacity duration-1000 ${
-                    timelineVisible ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  {step.events?.map((event, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col items-center transition-all transform hover:scale-105 cursor-pointer w-24 group"
-                    >
-                      <div className="w-4 h-4 rounded-full mb-1" style={{ backgroundColor: colors.darkpurple }}></div>
-                      <p className="font-bold text-sm">{event.year}</p>
-                      <img
-                        src={event.image || "/api/placeholder/150/150"}
-                        alt={event.title}
-                        className="w-16 h-16 rounded-full my-2 object-cover border-2"
-                        style={{ borderColor: colors.bluez }}
-                      />
-                      <p className="text-xs font-semibold text-center">{event.title}</p>
+                  {/* Timeline events */}
+                  <div
+                    className={`flex justify-between relative z-10 transition-opacity duration-1000 ${
+                      timelineVisible ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    {step.events?.map((event, index) => (
                       <div
-                        className="absolute top-20 opacity-0 group-hover:opacity-100 bg-white p-2 rounded-lg shadow-lg text-xs w-48 text-center transition-opacity z-20"
-                        style={{ color: colors.grayz }}
+                        key={index}
+                        className="flex flex-col items-center transition-all transform hover:scale-105 cursor-pointer w-24 group"
                       >
-                        {event.description}
+                        <div className="w-6 h-6 rounded-full mb-1 shadow-lg" 
+                             style={{ background: `linear-gradient(135deg, ${colors.violetz}, ${colors.pinkz})` }}></div>
+                        <p className="font-bold text-sm" style={{ color: colors.indigoz }}>{event.year}</p>
+                        <img
+                          src={event.image || "/api/placeholder/150/150"}
+                          alt={event.title}
+                          className="w-16 h-16 rounded-full my-2 object-cover border-3 shadow-md"
+                          style={{ borderColor: colors.cyanz }}
+                        />
+                        <p className="text-xs font-semibold text-center" style={{ color: colors.violetz }}>{event.title}</p>
+                        <div
+                          className="absolute top-20 opacity-0 group-hover:opacity-100 bg-white p-3 rounded-xl shadow-xl text-xs w-48 text-center transition-opacity z-20 border-2"
+                          style={{ color: colors.grayz, borderColor: colors.cyanz }}
+                        >
+                          {event.description}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Floating Year Info Button */}
             <button
-              className="mt-2 flex items-center text-xs font-medium gap-1 text-bluez hover:underline"
+              className="mt-2 flex items-center text-xs font-medium gap-1 hover:underline transition-all"
+              style={{ color: colors.indigoz }}
               onClick={() => setShowHistoryInfo(!showHistoryInfo)}
             >
-              <Info className="h-3 w-3" /> Learn more about these events
+              <Info className="h-4 w-4" /> Learn more about these events
             </button>
             
-            {/* History Information Panel - Shown on Click */}
+            {/* History Information Panel */}
             {showHistoryInfo && (
-              <div className="mt-3 p-4 bg-white rounded-lg shadow-md text-sm" style={{ color: colors.grayz }}>
-                <h4 className="font-bold mb-2">Key Historical Facts</h4>
-                <ul className="space-y-2">
-                  <li>
-                    <span className="font-medium">1854:</span> George Boole published "An Investigation of the Laws of Thought", establishing Boolean logic as a mathematical system.
+              <div className="mt-3 p-6 rounded-xl shadow-lg text-sm border-2" 
+                   style={{ backgroundColor: colors.white, borderColor: colors.lavenderz, color: colors.grayz }}>
+                <h4 className="font-bold mb-3" style={{ color: colors.violetz }}>Key Historical Facts</h4>
+                <ul className="space-y-3">
+                  <li className="flex items-start">
+                    <span className="font-bold text-xs px-2 py-1 rounded-full mr-3" 
+                          style={{ backgroundColor: `${colors.ambez}20`, color: colors.ambez }}>1854</span>
+                    George Boole published "An Investigation of the Laws of Thought", establishing Boolean logic as a mathematical system.
                   </li>
-                  <li>
-                    <span className="font-medium">1938:</span> Claude Shannon's master's thesis at MIT demonstrated how electrical circuits could implement Boolean operations.
+                  <li className="flex items-start">
+                    <span className="font-bold text-xs px-2 py-1 rounded-full mr-3" 
+                          style={{ backgroundColor: `${colors.tealz}20`, color: colors.tealz }}>1938</span>
+                    Claude Shannon's master's thesis at MIT demonstrated how electrical circuits could implement Boolean operations.
                   </li>
-                  <li>
-                    <span className="font-medium">1940s:</span> Boolean Algebra became essential in the design of early electronic computers like ENIAC.
+                  <li className="flex items-start">
+                    <span className="font-bold text-xs px-2 py-1 rounded-full mr-3" 
+                          style={{ backgroundColor: `${colors.emeraldz}20`, color: colors.emeraldz }}>1940s</span>
+                    Boolean Algebra became essential in the design of early electronic computers like ENIAC.
                   </li>
-                  <li>
-                    <span className="font-medium">1970s:</span> The development of integrated circuits made complex Boolean operations possible in increasingly smaller devices.
+                  <li className="flex items-start">
+                    <span className="font-bold text-xs px-2 py-1 rounded-full mr-3" 
+                          style={{ backgroundColor: `${colors.pinkz}20`, color: colors.pinkz }}>1970s</span>
+                    The development of integrated circuits made complex Boolean operations possible in increasingly smaller devices.
                   </li>
                 </ul>
                 <button 
-                  className="mt-2 text-bluez hover:underline"
+                  className="mt-4 px-4 py-2 rounded-lg font-medium transition-all hover:shadow-md"
+                  style={{ backgroundColor: `${colors.lavenderz}20`, color: colors.violetz }}
                   onClick={() => setShowHistoryInfo(false)}
                 >
                   Close
@@ -483,19 +554,30 @@ export default function HistoricalAssessment({ onComplete }) {
       case "contextMatching":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ background: `linear-gradient(135deg, ${colors.tealz}, ${colors.cyanz})` }}>
+                <span className="text-2xl">🔗</span>
+              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+                {step.title}
+              </h2>
+            </div>
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
             {/* Context cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {step.pairs?.map((pair, idx) => (
-                <div key={idx} className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-all">
-                  <h3 className="font-bold" style={{ color: colors.bluez }}>
+                <div key={idx} className="p-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105 border-l-4" 
+                     style={{ 
+                       backgroundColor: colors.white,
+                       borderLeftColor: [colors.violetz, colors.tealz, colors.pinkz, colors.ambez][idx % 4]
+                     }}>
+                  <h3 className="font-bold text-lg mb-2" 
+                      style={{ color: [colors.violetz, colors.tealz, colors.pinkz, colors.ambez][idx % 4] }}>
                     {pair.context}
                   </h3>
-                  <p className="text-sm mt-2" style={{ color: colors.grayz }}>
+                  <p className="text-sm" style={{ color: colors.grayz }}>
                     {pair.booleanRelation}
                   </p>
                 </div>
@@ -510,9 +592,15 @@ export default function HistoricalAssessment({ onComplete }) {
       case "applicationSpotting":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.mintgreenz})` }}>
+                <span className="text-2xl">🔍</span>
+              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+                {step.title}
+              </h2>
+            </div>
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
             {/* Application scenarios */}
@@ -520,17 +608,27 @@ export default function HistoricalAssessment({ onComplete }) {
               {step.scenarios?.map((item, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-lg shadow-md hover:shadow-lg transition-all border-l-4"
+                  className="p-6 rounded-xl shadow-lg hover:shadow-xl transition-all border-l-4"
                   style={{
                     backgroundColor: colors.white,
-                    borderLeftColor: item.hasBoolean ? colors.bluez : colors.grayz,
+                    borderLeftColor: item.hasBoolean ? colors.emeraldz : colors.coralz,
                   }}
                 >
-                  <p className="font-medium" style={{ color: colors.grayz }}>
+                  <p className="font-medium mb-2" style={{ color: colors.grayz }}>
                     {item.scenario}
                   </p>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-1 text-xs font-bold rounded-full"
+                          style={{ 
+                            backgroundColor: item.hasBoolean ? `${colors.emeraldz}20` : `${colors.coralz}20`,
+                            color: item.hasBoolean ? colors.emeraldz : colors.coralz
+                          }}>
+                      {item.hasBoolean ? "Boolean Logic ✓" : "No Boolean Logic"}
+                    </span>
+                  </div>
                   {(isReviewMode || showFeedback) && (
-                    <p className="mt-2 text-sm" style={{ color: colors.grayz, opacity: 0.7 }}>
+                    <p className="mt-3 text-sm p-3 rounded-lg" 
+                       style={{ backgroundColor: `${colors.skyz}10`, color: colors.grayz }}>
                       {item.explanation}
                     </p>
                   )}
@@ -546,9 +644,15 @@ export default function HistoricalAssessment({ onComplete }) {
       case "pioneersFocus":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ background: `linear-gradient(135deg, ${colors.rosez}, ${colors.pinkz})` }}>
+                <span className="text-2xl">👥</span>
+              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+                {step.title}
+              </h2>
+            </div>
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
             {/* Pioneers gallery */}
@@ -556,19 +660,23 @@ export default function HistoricalAssessment({ onComplete }) {
               {step.pioneers?.map((pioneer, idx) => (
                 <div
                   key={idx}
-                  className="w-64 bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all"
+                  className="w-72 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all transform hover:scale-105"
+                  style={{ background: `linear-gradient(135deg, ${colors.white}, ${[colors.violetz, colors.tealz, colors.ambez][idx]}10)` }}
                 >
                   <img
                     src={pioneer.image || "/api/placeholder/150/150"}
                     alt={pioneer.name}
-                    className="w-full h-40 object-cover"
+                    className="w-full h-48 object-cover"
                   />
-                  <div className="p-4">
-                    <h3 className="font-bold" style={{ color: colors.bluez }}>
+                  <div className="p-6">
+                    <h3 className="font-bold text-lg" 
+                        style={{ color: [colors.violetz, colors.tealz, colors.ambez][idx] }}>
                       {pioneer.name}
                     </h3>
-                    <p className="text-xs text-gray-500">{pioneer.years}</p>
-                    <p className="mt-2 text-sm" style={{ color: colors.grayz }}>
+                    <p className="text-sm font-medium mb-2" style={{ color: colors.grayz }}>
+                      {pioneer.years}
+                    </p>
+                    <p className="text-sm" style={{ color: colors.grayz }}>
                       {pioneer.contribution}
                     </p>
                   </div>
@@ -584,26 +692,33 @@ export default function HistoricalAssessment({ onComplete }) {
       case "reflection":
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-              {step.title}
-            </h2>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   style={{ background: `linear-gradient(135deg, ${colors.limez}, ${colors.emeraldz})` }}>
+                <span className="text-2xl">💭</span>
+              </div>
+              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+                {step.title}
+              </h2>
+            </div>
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
             {/* Reflection points */}
-            <div className="p-6 rounded-lg" style={{ backgroundColor: `${colors.lightpurple}30` }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
+            <div className="p-6 rounded-xl shadow-lg" 
+                 style={{ background: `linear-gradient(135deg, ${colors.emeraldz}10, ${colors.mintgreenz}10)` }}>
+              <h3 className="text-lg font-bold mb-4" style={{ color: colors.emeraldz }}>
                 Key Takeaways:
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-4">
                 {step.reflectionPoints?.map((point, idx) => (
                   <li key={idx} className="flex items-start">
                     <div
-                      className="flex-shrink-0 h-5 w-5 rounded-full flex items-center justify-center mt-0.5"
-                      style={{ backgroundColor: colors.greenz }}
+                      className="flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center mt-0.5 shadow-sm"
+                      style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.mintgreenz})` }}
                     >
-                      <span className="text-white text-xs">✓</span>
+                      <span className="text-white text-xs font-bold">✓</span>
                     </div>
-                    <span className="ml-2" style={{ color: colors.grayz }}>
+                    <span className="ml-3 font-medium" style={{ color: colors.grayz }}>
                       {point}
                     </span>
                   </li>
@@ -617,53 +732,84 @@ export default function HistoricalAssessment({ onComplete }) {
         )
 
       case "completion": {
-        const finalScore = (score / totalQuestions) * 100
+        const finalScore = Math.round((score / totalQuestions) * 100)
 
         return (
-          <div className="flex flex-col items-center space-y-8 text-center">
-            <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+          <div className="flex flex-col items-center space-y-6 text-center">
+            <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+                 style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})` }}>
+              <span className="text-3xl">🎉</span>
+            </div>
+            <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
               {step.title}
             </h2>
 
             <div
-              className="w-32 h-32 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: colors.lightpurple }}
+              className="w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg"
+              style={{
+                background: `conic-gradient(${colors.emeraldz} ${finalScore * 3.6}deg, ${colors.offwhite} 0deg)`,
+                color: colors.emeraldz,
+              }}
             >
-              <span className="text-3xl font-bold" style={{ color: colors.darkpurple }}>
-                {Math.round(finalScore)}%
-              </span>
+              <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center">
+                {finalScore}%
+              </div>
             </div>
 
-            <div className="max-w-md">
-              <p className="text-lg mb-4" style={{ color: colors.grayz }}>
-                {step.content}
-              </p>
-              <p className="font-semibold" style={{ color: colors.grayz }}>
-                You answered {score} out of {totalQuestions} questions correctly.
-              </p>
+            <p className="text-lg max-w-md" style={{ color: colors.grayz }}>
+              {step.content}
+            </p>
 
-              {finalScore >= 80 ? (
-                <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: `${colors.greenz}20` }}>
-                  <p style={{ color: colors.greenz }}>
-                    <strong>Excellent work!</strong> You have a strong understanding of Boolean Algebra's history and significance. 
-                    You clearly understand how this mathematical system evolved from abstract theory to the foundation of modern computing.
+            <div className="rounded-xl shadow-lg overflow-hidden w-full max-w-md" 
+                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.cyanz}10)` }}>
+              <div className="p-6">
+                <h3 className="text-lg font-bold mb-4" style={{ color: colors.indigoz }}>Your Results:</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 rounded-lg" 
+                       style={{ backgroundColor: `${colors.skyz}10` }}>
+                    <span className="font-medium">Questions Answered:</span>
+                    <span className="font-bold" style={{ color: colors.indigoz }}>
+                      {Object.keys(userAnswers).length} / {totalQuestions}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 rounded-lg" 
+                       style={{ backgroundColor: `${colors.emeraldz}10` }}>
+                    <span className="font-medium">Correct Answers:</span>
+                    <span className="font-bold" style={{ color: colors.emeraldz }}>
+                      {score} / {totalQuestions}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 rounded-lg" 
+                       style={{ backgroundColor: `${colors.violetz}10` }}>
+                    <span className="font-medium">Final Score:</span>
+                    <span className="font-bold text-xl" style={{ color: colors.violetz }}>{finalScore}%</span>
+                  </div>
+                </div>
+
+                <div
+                  className="mt-6 p-4 rounded-xl border-2"
+                  style={{
+                    backgroundColor: finalScore >= 80 ? `${colors.emeraldz}10` : finalScore >= 60 ? `${colors.cyanz}10` : `${colors.ambez}10`,
+                    borderColor: finalScore >= 80 ? colors.emeraldz : finalScore >= 60 ? colors.cyanz : colors.ambez,
+                    color: finalScore >= 80 ? colors.emeraldz : finalScore >= 60 ? colors.cyanz : colors.ambez,
+                  }}
+                >
+                  <p className="font-bold">
+                    {finalScore >= 80
+                      ? "Excellent work! 🌟"
+                      : finalScore >= 60
+                        ? "Good job! 👍"
+                        : "Keep learning! 📚"}
+                  </p>
+                  <p className="text-sm mt-1">
+                    {finalScore >= 80
+                      ? "You have a strong understanding of Boolean Algebra's history and significance. You clearly understand how this mathematical system evolved from abstract theory to the foundation of modern computing."
+                      : finalScore >= 60
+                        ? "You understand many key aspects of Boolean Algebra's history. With a bit more study on the pioneers and applications, you'll have a comprehensive understanding of this topic."
+                        : "You might benefit from reviewing the material again to strengthen your understanding. Focus particularly on the timeline of Boolean Algebra's development and how it transitioned from theory to practice."}
                   </p>
                 </div>
-              ) : finalScore >= 60 ? (
-                <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: `${colors.bluez}20` }}>
-                  <p style={{ color: colors.bluez }}>
-                    <strong>Good job!</strong> You understand many key aspects of Boolean Algebra's history. 
-                    With a bit more study on the pioneers and applications, you'll have a comprehensive understanding of this topic.
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: `${colors.orangez}20` }}>
-                  <p style={{ color: colors.orangez }}>
-                    <strong>Keep learning!</strong> You might benefit from reviewing the material again to strengthen your understanding.
-                    Focus particularly on the timeline of Boolean Algebra's development and how it transitioned from theory to practice.
-                  </p>
-                </div>
-              )}
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
@@ -671,17 +817,10 @@ export default function HistoricalAssessment({ onComplete }) {
                 <BookOpen className="h-4 w-4" />
                 {isReviewMode ? "Hide Review" : "Review Answers"}
               </Button>
-              <Button
-                onClick={() => {
-                    setCurrentStep(0);
-                    window.location.reload();
-                }}
-                variant="outline"
-                className="flex items-center gap-2"
-                >
+              <Button onClick={handleRestartAssessment} variant="outline" className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                Restart Assessment
-                </Button>
+                🔄 Restart Assessment
+              </Button>
               <Button className="flex items-center gap-2">
                 <Award className="h-4 w-4" />
                 Continue to Next Topic
@@ -704,7 +843,7 @@ export default function HistoricalAssessment({ onComplete }) {
     const answered = hasAnsweredCurrent()
 
     return (
-      <div className="p-6 rounded-lg shadow-md" style={{ backgroundColor: colors.offwhite }}>
+      <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: colors.offwhite }}>
         <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
           {step.question}
         </h3>
@@ -717,27 +856,27 @@ export default function HistoricalAssessment({ onComplete }) {
             const isIncorrect = isReviewMode && currentAnswer?.selectedAnswer === idx && !currentAnswer.isCorrect
 
             let bgColor = colors.white
-            let borderColor = "#e5e7eb" // Default gray border
+            let borderColor = colors.cyanz
 
             if (isSelected) {
-              bgColor = `${colors.lightpurple}50` // 50% opacity
-              borderColor = colors.bluez
+              bgColor = `${colors.lavenderz}20`
+              borderColor = colors.violetz
             }
             if (isCorrect) {
-              bgColor = `${colors.greenz}20` // 20% opacity
-              borderColor = colors.greenz
+              bgColor = `${colors.emeraldz}20`
+              borderColor = colors.emeraldz
             }
             if (isIncorrect) {
-              bgColor = `${colors.redz}20` // 20% opacity
-              borderColor = colors.redz
+              bgColor = `${colors.coralz}20`
+              borderColor = colors.coralz
             }
 
             return (
               <div
                 key={idx}
                 onClick={() => !isAnswered && handleAnswerSelect(idx)}
-                className={`p-3 border rounded-lg transition-all ${
-                  isAnswered ? "cursor-default" : "cursor-pointer hover:bg-opacity-50"
+                className={`p-4 border-2 rounded-xl transition-all transform ${
+                  isAnswered ? "cursor-default" : "cursor-pointer hover:scale-105 hover:shadow-md"
                 }`}
                 style={{
                   backgroundColor: bgColor,
@@ -746,11 +885,11 @@ export default function HistoricalAssessment({ onComplete }) {
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span>{option}</span>
+                  <span className="font-medium">{option}</span>
                   {isReviewMode && isCorrect && (
-                    <CheckCircle className="h-5 w-5" style={{ color: colors.greenz }} />
+                    <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz }} />
                   )}
-                  {isReviewMode && isIncorrect && <XCircle className="h-5 w-5" style={{ color: colors.redz }} />}
+                  {isReviewMode && isIncorrect && <XCircle className="h-6 w-6" style={{ color: colors.coralz }} />}
                 </div>
               </div>
             )
@@ -760,32 +899,18 @@ export default function HistoricalAssessment({ onComplete }) {
         {/* Feedback area */}
         {showFeedback && (
           <div 
-            className="mt-4 p-4 rounded-lg" 
+            className="mt-4 p-4 rounded-xl border-2" 
             style={{ 
-              backgroundColor: currentAnswer?.isCorrect ? `${colors.greenz}20` : `${colors.redz}20`,
-              color: currentAnswer?.isCorrect ? colors.greenz : colors.redz 
+              backgroundColor: currentAnswer?.isCorrect ? `${colors.emeraldz}10` : `${colors.coralz}10`,
+              borderColor: currentAnswer?.isCorrect ? colors.emeraldz : colors.coralz,
+              color: currentAnswer?.isCorrect ? colors.emeraldz : colors.coralz 
             }}
           >
-            <p>{feedbackMessage}</p>
+            <p className="font-medium">{feedbackMessage}</p>
           </div>
         )}
 
         {renderNavigation()}
-      </div>
-    )
-  }
-
-  // Custom progress bar component
-  const ProgressBar = ({ value }) => {
-    return (
-      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-500 ease-in-out"
-          style={{
-            width: `${value}%`,
-            backgroundColor: colors.greenz,
-          }}
-        ></div>
       </div>
     )
   }
@@ -817,7 +942,7 @@ export default function HistoricalAssessment({ onComplete }) {
             disabled={selectedOption === null} 
             className="flex items-center gap-1"
             style={{
-              backgroundColor: selectedOption === null ? "#ccc" : colors.darkpurple,
+              backgroundColor: selectedOption === null ? "#ccc" : colors.violetz,
               color: colors.white,
             }}
           >
@@ -836,20 +961,26 @@ export default function HistoricalAssessment({ onComplete }) {
   }
 
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto pb-16 px-4">
+    <div className="flex flex-col w-full max-w-4xl mx-auto pb-16 px-4 min-h-screen" 
+         style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.cyanz}05)` }}>
       {/* Progress bar */}
       <div className="p-4 mb-4">
         <ProgressBar value={progress} />
-        <div className="flex justify-between mt-2 text-sm" style={{ color: colors.grayz }}>
-          <span>
+        <div className="flex justify-between mt-3 text-sm">
+          <span className="font-bold" style={{ color: colors.indigoz }}>
             Step {currentStep + 1} of {assessmentSteps.length}
           </span>
-          {isReviewMode && <Badge variant="outline">Review Mode</Badge>}
+          <div className="flex gap-2">
+            {isReviewMode && <Badge variant="outline">Review Mode</Badge>}
+            <span className="font-bold" style={{ color: colors.emeraldz }}>
+              Score: {score} / {totalQuestions}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="rounded-lg shadow-lg p-6" style={{ backgroundColor: colors.white }}>
+      <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
