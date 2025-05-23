@@ -147,8 +147,7 @@ const DashboardSidebar = ({ user }) => {
       )}
 
       <div className="bg-white w-full absolute flex items-center p-4 px-6 space-x-4">
-        <img src={Bell} className="ml-auto" />
-        <div className="h-8 w-8 bg-gray-300 rounded-full"></div>
+        <div className="h-8 w-8 bg-gray-300 rounded-full ml-auto"></div>
 
         <div
           className="relative"
@@ -189,14 +188,6 @@ const DashboardSidebar = ({ user }) => {
                     className="block px-4 py-2 hover:bg-gray-100"
                   >
                     Profile
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/settings"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                  >
-                    Settings
                   </Link>
                 </li>
                 <li>
