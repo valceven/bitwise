@@ -52,7 +52,7 @@ const router = createBrowserRouter([
     errorElement: <PageNotFound />,
     children: [
       { index: true, element: <DashboardHome /> },
-      { path: "classroom", element: <StudentClassroom />},
+      { path: "classroom", element: <DashboardClassroom />},
       { path: "profile", element: <ProfilePage /> },
       
       // Teacher routes

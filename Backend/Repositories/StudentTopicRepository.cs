@@ -4,6 +4,7 @@ using backend.DTOs.StudentTopic;
 using backend.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using backend.DTOs.StudentLesson;
+
 namespace backend.Repositories
 {
     public class StudentTopicRepository : IStudentTopicRepository
@@ -67,6 +68,14 @@ namespace backend.Repositories
         private async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<List<int>> GetStudentTopicIdsAsync(int StudentId)
+        {
+            return await _context.StudentTopics
+                .Where(st => st.StudentId == StudentId)
+                .Select(st => st.StudentTopicId)
+                .ToListAsync();
         }
     }
 }

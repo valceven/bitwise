@@ -55,5 +55,10 @@ namespace backend.Services
             
             return (float)Math.Round(completionRate, 0);
         }
+
+        public async Task<List<int>> GetStudentTopicIdsAsync(int StudentId)
+        {
+            return await _studentTopicRepository.GetStudentTopicIdsAsync(StudentId);
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace backend.Services.Interfaces
         Task<bool> ViewStudentTopicAsync(StudentTopicDto studentTopicDto);
         Task<bool> CompleteStudentTopicAsync(StudentTopicDto studentTopicDto);
         Task<float> GetALlStudentsTopicCompletionProgressAsync(StudentTopicProgress studentTopicProgress);
+        Task<List<int>> GetStudentTopicIdsAsync(int StudentId);
     }
 }

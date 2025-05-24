@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, FreeMode } from 'swiper/modules';
 import AnimatedLessonButton from "../../../components/buttons/AnimatedLessonButton.jsx";
 import { studentApi } from "../../../api/student/studentApi.js";
 import { studentLessonApi } from "../../../api/studentLesson/studentLesson.js";
 import gridBox from "../../../assets/gridbox.svg";
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/free-mode';
 
 const ClassroomView = ({ classroom, user }) => {
   const navigate = useNavigate();
@@ -12,6 +20,9 @@ const ClassroomView = ({ classroom, user }) => {
   const [selectedLessonData, setSelectedLessonData] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Swiper instance ref
+  const swiperRef = useRef(null);
 
   // Mock sub-lesson data - now using topic numbers instead of letters
   const subLessonInfo = {
@@ -36,7 +47,6 @@ const ClassroomView = ({ classroom, user }) => {
       duration: "30 min",
       difficulty: "Advanced",
     },
-    // Add more topic info as needed for additional lessons
     4: {
       title: "Foundation Building",
       description:
@@ -74,6 +84,13 @@ const ClassroomView = ({ classroom, user }) => {
         difficulty: "Intermediate",
       }
     );
+  };
+
+  // Function to slide to specific lesson
+  const slideToLesson = (lessonIndex) => {
+    if (swiperRef.current && swiperRef.current.swiper) {
+      swiperRef.current.swiper.slideTo(lessonIndex, 800); // 800ms animation
+    }
   };
 
   useEffect(() => {
@@ -149,6 +166,10 @@ const ClassroomView = ({ classroom, user }) => {
     topicNumber
   ) => {
     setSelectedButton(buttonId);
+    
+    // Slide to center the lesson
+    slideToLesson(lessonNumber - 1);
+    
     if (subLesson !== null) {
       // If it's a sub-lesson button, update the selected lesson data
       setSelectedLessonData({
@@ -288,91 +309,117 @@ const ClassroomView = ({ classroom, user }) => {
         )}
       </div>
 
-      <div className="w-150 flex flex-col z-0 pt-7 mr-20 overflow-visible relative">
-        {isLoading ? (
-          <div className="text-center text-gray-500">Loading lessons...</div>
-        ) : (
-          lessons.map((lesson, index) => (
-            <div
-              key={lesson.lessonId}
-              className={`w-full flex mx-auto overflow-visible relative ${
-                index % 2 === 0 ? "justify-start" : "justify-end pr-20"
-              }`}
-            >
-              <div
-                key={lesson.lessonId}
-                className={`w-full flex mx-auto overflow-visible relative flex-col ${
-                  index % 2 === 0 ? "items-start" : "items-end pr-7"
-                }`}
-              >
-                {/* Big button */}
-                <AnimatedLessonButton
-                  label={"Lesson No " + (index + 1)}
-                  onClick={() =>
-                    handleButtonClick(
-                      `lesson-${lesson.lessonId}-main`,
-                      lesson.lessonId,
-                      null,
-                      index + 1,
-                      null
-                    )
-                  }
-                  onEnterLesson={() => {}}
-                  isSelected={
-                    selectedButton === `lesson-${lesson.lessonId}-main` ||
-                    selectedButton?.startsWith(`lesson-${lesson.lessonId}-sub`)
-                  }
-                  className="w-full"
-                  locked={false}
-                />
-
-                {/* Small buttons with topic numbers */}
-                <div
-                  className={`flex flex-col gap-2 ${
-                    index % 2 !== 0 ? "items-end" : "items-start"
-                  }`}
-                >
-                  {Array.from({ length: 3 }).map((_, idx) => {
-                    const topicNumber = getTopicNumber(index, idx);
-                    const buttonId = `lesson-${lesson.lessonId}-sub-${topicNumber}`;
-
-                    return (
-                      <div
-                        key={idx}
-                        className={`${
-                          index % 2 === 0 ? "" : "flex justify-end w-full"
-                        }`}
-                        style={
-                          index % 2 === 0
-                            ? { marginLeft: `${(idx + 1) * 102}px` }
-                            : { marginRight: `${(idx + 1) * 102}px` }
-                        }
-                      >
-                        <AnimatedLessonButton
-                          label={`Topic ${topicNumber}`}
-                          onClick={() =>
-                            handleButtonClick(
-                              buttonId,
-                              lesson.lessonId,
-                              topicNumber,
-                              index + 1,
-                              topicNumber
-                            )
-                          }
-                          onEnterLesson={() => handleEnterLesson()}
-                          isSelected={selectedButton === buttonId}
-                          className="scale-75 h-15"
-                          isLesson={true}
-                          locked={false}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+      {/* Swiper Slider Container */}
+      <div className="flex-1 flex flex-col relative ml-8">
+        <div className="flex justify-center mb-4">
+          <div className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow">
+            Navigate through lessons
+          </div>
+        </div>
+        
+        <div className="flex-1 relative">
+          {isLoading ? (
+            <div className="text-center text-gray-500 flex items-center justify-center h-full">
+              Loading lessons...
             </div>
-          ))
-        )}
+          ) : (
+            <Swiper
+              ref={swiperRef}
+              modules={[Navigation, Pagination, FreeMode]}
+              spaceBetween={50}
+              slidesPerView={'auto'}
+              centeredSlides={true}
+              freeMode={true}
+              navigation={{
+                nextEl: '.swiper-button-next-custom',
+                prevEl: '.swiper-button-prev-custom',
+              }}
+              pagination={{
+                clickable: true,
+                dynamicBullets: true,
+              }}
+              className="w-full h-full"
+              style={{
+                paddingBottom: '50px',
+              }}
+            >
+              {lessons.map((lesson, index) => (
+                <SwiperSlide key={lesson.lessonId} style={{ width: 'auto' }}>
+                  <div className="flex flex-col items-center space-y-4 px-8 py-4">
+                    {/* Big button */}
+                    <AnimatedLessonButton
+                      label={"Lesson No " + (index + 1)}
+                      onClick={() =>
+                        handleButtonClick(
+                          `lesson-${lesson.lessonId}-main`,
+                          lesson.lessonId,
+                          null,
+                          index + 1,
+                          null
+                        )
+                      }
+                      onEnterLesson={() => {}}
+                      isSelected={
+                        selectedButton === `lesson-${lesson.lessonId}-main` ||
+                        selectedButton?.startsWith(`lesson-${lesson.lessonId}-sub`)
+                      }
+                      className="w-full min-w-[200px]"
+                      locked={false}
+                    />
+
+                    {/* Small buttons with topic numbers */}
+                    <div className="flex space-x-2 justify-center">
+                      {Array.from({ length: 3 }).map((_, idx) => {
+                        const topicNumber = getTopicNumber(index, idx);
+                        const buttonId = `lesson-${lesson.lessonId}-sub-${topicNumber}`;
+
+                        return (
+                          <div
+                            key={idx}
+                            className="flex justify-center"
+                            style={{
+                              transform: `translateY(${idx * 8}px) translateX(${(idx - 1) * 15}px)`
+                            }}
+                          >
+                            <AnimatedLessonButton
+                              label={`Topic ${topicNumber}`}
+                              onClick={() =>
+                                handleButtonClick(
+                                  buttonId,
+                                  lesson.lessonId,
+                                  topicNumber,
+                                  index + 1,
+                                  topicNumber
+                                )
+                              }
+                              onEnterLesson={() => handleEnterLesson()}
+                              isSelected={selectedButton === buttonId}
+                              className="scale-75 h-15"
+                              isLesson={true}
+                              locked={false}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
+          
+          {/* Custom Navigation Buttons */}
+          <div className="swiper-button-prev-custom absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-100 transition-colors">
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </div>
+          <div className="swiper-button-next-custom absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-100 transition-colors">
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </div>
       </div>
 
       {showConfirmation && (

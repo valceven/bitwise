@@ -44,8 +44,8 @@ const TopicView = () => {
   });
 
   useEffect(() => {
-    localStorage.setItem(`topicIndex-${topicId}`, currentIndex);
-  }, [currentIndex, topicId]);
+    
+  })
 
   const handleNext = () => {
     if (currentIndex < topicSections.length - 1) {

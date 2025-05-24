@@ -67,5 +67,18 @@ namespace backend.Presentation
 
             return BadRequest(new { message = "Failed to complete student topic" });
         }
+
+        [HttpGet("get-student-topics")]
+        public async Task<IActionResult> GetStudentTopicIds([FromQuery] int studentId)
+        {
+            var result = await _studentTopicService.GetStudentTopicIdsAsync(studentId);
+
+            if (result != null && result.Any())
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(new { message = "Failed to get StudentTopicIds" });
+        }
     }
 }

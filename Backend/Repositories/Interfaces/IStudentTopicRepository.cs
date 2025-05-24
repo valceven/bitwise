@@ -10,5 +10,6 @@ namespace backend.Repositories.Interfaces
         Task<bool> AddStudentTopicAsync(StudentTopic StudentTopic);
         Task<bool> UpdateStudentTopicAsync(StudentTopic StudentTopic);
         Task<bool> DeleteStudentTopicAsync(int StudentTopicId);
+        Task<List<int>> GetStudentTopicIdsAsync(int StudentId);
     }
 }
