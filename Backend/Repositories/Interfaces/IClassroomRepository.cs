@@ -13,5 +13,7 @@ namespace backend.Repositories.Interfaces
         Task<bool> LeaveClassroomAsync(int studentId);
         Task<Classroom> GetClassroomByClassCodeAsync(string classCode);
         Task<bool> SubmitLeaveRequestAsync(PendingStudents pendingStudent);
+        Task<bool> DeleteClassroomAsync(int classroomId);
+        Task<bool> UpdateClassroomAsync(Classroom classroom);
     }
 }

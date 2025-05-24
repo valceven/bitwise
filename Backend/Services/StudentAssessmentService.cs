@@ -20,7 +20,7 @@ namespace backend.Services
             var studentAssessment = await _studentAssessmentRepository.GetStudentAssessmentById(recordStudentAssessmentDto.StudentAssessmentId);
 
             studentAssessment.Score = recordStudentAssessmentDto.Score;
-            studentAssessment.SubmittedAt = DateTime.Now;
+            studentAssessment.SubmittedAt = DateTime.UtcNow;
             studentAssessment.IsCompleted = true;
 
             return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);

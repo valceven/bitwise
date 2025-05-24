@@ -18,73 +18,70 @@ namespace backend.Repositories
         {
             try
             {
-                // Remove from PendingStudents
                 var pending = await _context.PendingStudents
                     .FirstOrDefaultAsync(p => p.StudentId == dto.StudentId && p.ClassroomId == dto.ClassroomId);
 
-                if (pending != null)
-                {
-                    _context.PendingStudents.Remove(pending);
+                if (pending == null) return false;
 
-                    var exists = await _context.StudentClassrooms
+                _context.PendingStudents.Remove(pending);
+
+                var exists = await _context.StudentClassrooms
                     .AnyAsync(sc => sc.StudentId == dto.StudentId && sc.ClassroomId == dto.ClassroomId);
 
-                    if (!exists)
+                if (exists) return false;
+
+                var studentClassroom = new StudentClassroom
+                {
+                    StudentId = dto.StudentId,
+                    ClassroomId = dto.ClassroomId,
+                    ClassCode = dto.ClassCode
+                };
+
+                _context.StudentClassrooms.Add(studentClassroom);
+                await _context.SaveChangesAsync(); // Needed to generate StudentClassroomId
+
+                for (int i = 1; i <= 4; i++)
+                {
+                    _context.StudentLessons.Add(new StudentLesson
                     {
-                        // Add to StudentClassroom
-                        var studentClassroom = new StudentClassroom
-                        {
-                            StudentId = dto.StudentId,
-                            ClassroomId = dto.ClassroomId,
-                            ClassCode = dto.ClassCode
-                        };
-                        for(int i = 1; i <= 4; i++)
-                        {
-                            var studentLesson = new StudentLesson
-                            {
-                                StudentId = dto.StudentId,
-                                LessonId = i,
-                                IsCompleted = false,
-                                IsViewed = false,
-                                ViewedAt = DateTime.MinValue,
-                            CompletedAt = DateTime.MinValue
-                            };
-                        _context.StudentLessons.AddAsync(studentLesson);
-                        }
-                        for(int i = 1; i <= 9; i++)
-                        {
-                            var studentTopic = new StudentTopic
-                            {
-                                StudentId = dto.StudentId,
-                                TopicId = i,
-                                IsCompleted = false,
-                                IsViewed = false,
-                                ViewedAt = DateTime.MinValue,
-                                CompletedAt = DateTime.MinValue
-                            };
-                        _context.StudentTopics.AddAsync(studentTopic);
-                        }
-                        for (int i = 1; i <= 9; i++)
-                        {
-                            var studentAssessment = new StudentAssessment
-                            {
-                                StudentId = dto.StudentId,
-                                AssessmentId = i,
-                                Score = 0,
-                                IsCompleted = false,
-                                SubmittedAt = DateTime.MinValue,
-                                StartTime = DateTime.MinValue
-                            };
-                            _context.StudentAssessments.AddAsync(studentAssessment);
-                        } 
-                        _context.StudentClassrooms.Add(studentClassroom);
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
+                        StudentClassroomId = studentClassroom.StudentClassroomId,
+                        LessonId = i,
+                        IsCompleted = false,
+                        IsViewed = false,
+                        ViewedAt = DateTime.MinValue,
+                        CompletedAt = DateTime.MinValue
+                    });
+                    await _context.SaveChangesAsync();
                 }
-    
+
+                for (int i = 1; i <= 9; i++)
+                {
+                    _context.StudentTopics.Add(new StudentTopic
+                    {
+                        StudentClassroomId = studentClassroom.StudentClassroomId,
+                        TopicId = i,
+                        IsCompleted = false,
+                        IsViewed = false,
+                        ViewedAt = DateTime.MinValue,
+                        CompletedAt = DateTime.MinValue
+                    });
+                    await _context.SaveChangesAsync();
+                }
+
+                for (int i = 1; i <= 9; i++)
+                {
+                    _context.StudentAssessments.Add(new StudentAssessment
+                    {
+                        StudentClassroomId = studentClassroom.StudentClassroomId,
+                        AssessmentId = i,
+                        Score = 0,
+                        IsCompleted = false,
+                        SubmittedAt = DateTime.MinValue,
+                        StartTime = DateTime.MinValue
+                    });
+                    await _context.SaveChangesAsync();
+                }
+
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -94,6 +91,7 @@ namespace backend.Repositories
                 return false;
             }
         }
+
         
         public async Task<Teacher?> AddAsync(Teacher teacher)
         {

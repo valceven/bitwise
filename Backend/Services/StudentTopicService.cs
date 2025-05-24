@@ -24,6 +24,7 @@ namespace backend.Services
             var studentTopic = await _studentTopicRepository.GetStudentTopicAsync(studentTopicDto);
 
             studentTopic.IsViewed = true;
+            studentTopic.ViewedAt = DateTime.UtcNow;
 
             return await _studentTopicRepository.UpdateStudentTopicAsync(studentTopic);
         }

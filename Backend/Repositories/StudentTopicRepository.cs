@@ -20,11 +20,9 @@ namespace backend.Repositories
         public async Task<StudentTopic> GetStudentTopicAsync(StudentTopicDto studentTopicDto)
         {
             var studentTopic = await _context.StudentTopics
-            .Where(st => st.TopicId == studentTopicDto.TopicId && 
-                        _context.StudentClassrooms
-                            .Any(sc => sc.ClassroomId == studentTopicDto.ClassroomId && 
-                                        sc.StudentId == st.StudentId))
-            .FirstOrDefaultAsync();
+                .Include(st => st.Topic)
+                .Include(st => st.StudentClassroom)
+                .FirstOrDefaultAsync(st => st.StudentClassroom.StudentId == studentTopicDto.StudentId && st.Topic.TopicId == studentTopicDto.TopicId);
 
             return studentTopic;
         }
@@ -53,14 +51,10 @@ namespace backend.Repositories
         }
         public async Task<ICollection<StudentTopic>> GetAllStudentTopicProgressdAsync(StudentTopicProgress studentTopicProgress)
         {
-            // Get all student topics for the given topic ID and classroom ID
-            // that are associated with the students in the specified classroom
             var studentTopics = await _context.StudentTopics
-            .Where(st => st.TopicId == studentTopicProgress.TopicId && 
-                        _context.StudentClassrooms
-                            .Any(sc => sc.ClassroomId == studentTopicProgress.ClassroomId && 
-                                        sc.StudentId == st.StudentId))
-            .ToListAsync();
+                .Include(st => st.Topic)
+                .Where(st => st.StudentClassroom.ClassroomId == studentTopicProgress.ClassroomId)
+                .ToListAsync();
 
             return studentTopics;
         }
@@ -73,7 +67,7 @@ namespace backend.Repositories
         public async Task<List<int>> GetStudentTopicIdsAsync(int StudentId)
         {
             return await _context.StudentTopics
-                .Where(st => st.StudentId == StudentId)
+                .Where(st => st.StudentClassroom.StudentId == StudentId)
                 .Select(st => st.StudentTopicId)
                 .ToListAsync();
         }

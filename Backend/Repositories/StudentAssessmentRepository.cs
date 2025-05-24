@@ -17,7 +17,7 @@ namespace backend.Repositories
         public async Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsAsync()
         {
             return await _context.StudentAssessments
-                .Include(sa => sa.Student)
+                .Include(sa => sa.StudentClassroom)
                 .ToListAsync();
         }
         public async Task<StudentAssessment> GetStudentAssessmentById(int StudentAssessmentId)
@@ -56,8 +56,8 @@ namespace backend.Repositories
         public async Task<StudentAssessment> GetStudentAssessmentsByStudentId(int studentId)
         {
             var studentAssessment = await _context.StudentAssessments
-                .Include(sa => sa.Student)
-                .FirstOrDefaultAsync(sa => sa.StudentId == studentId);
+                .Include(sa => sa.StudentClassroom)
+                .FirstOrDefaultAsync(sa => sa.StudentClassroom.StudentId == studentId);
             if (studentAssessment == null)
             {
                 throw new Exception($"StudentAssessment with Student ID {studentId} not found.");
@@ -67,7 +67,7 @@ namespace backend.Repositories
         public async Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsByAssessmentId(int AssessmentId)
         {
             var studentAssessments = await _context.StudentAssessments
-                .Include(sa => sa.Student)
+                .Include(sa => sa.StudentClassroom)
                 .Where(sa => sa.AssessmentId == AssessmentId)
                 .ToListAsync();
             if (studentAssessments == null)
@@ -78,14 +78,9 @@ namespace backend.Repositories
         }
         public async Task<ICollection<StudentAssessment>> GetStudentAssessmentsByClassroomId(int classroomId)
         {
-            var students = await _context.StudentClassrooms
-                .Where(sc => sc.ClassroomId == classroomId)
-                .Select(sc => sc.StudentId)
-                .ToListAsync();
-
             var studentAssessments = await _context.StudentAssessments
-                .Include(sa => sa.Student)
-                .Where(sa => students.Contains(sa.StudentId))
+                .Include(sa => sa.StudentClassroom)
+                .Where(sa => sa.StudentClassroom.ClassroomId == classroomId)
                 .ToListAsync();
             if (studentAssessments == null)
             {
