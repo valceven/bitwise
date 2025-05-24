@@ -74,35 +74,6 @@ const DashboardSidebar = ({ user }) => {
               );
             })()}
 
-          {/* Student Report */}
-          {user.userType === 2 &&
-            (() => {
-              const isActive = currentPath.includes("/student-report");
-              return (
-                <Link
-                  to="student-report"
-                  onMouseEnter={() => setHovered("student-report")}
-                  onMouseLeave={() => setHovered("")}
-                  className={`flex items-center py-2 px-3 rounded-md text-xs whitespace-nowrap overflow-hidden text-ellipsis border-black border-0
-                  ${
-                    isActive
-                      ? "bg-bluez text-white border-2"
-                      : "hover:bg-gray-200"
-                  }
-                `}
-                >
-                  <img
-                    src={
-                      isActive ? StudentReportIconWhite : StudentReportIconBlack
-                    }
-                    alt="Student Report"
-                    className="h-5 w-5"
-                  />
-                  {isOpen && <span className="ml-3">Student Report</span>}
-                </Link>
-              );
-            })()}
-
           {/* Student Pending */}
           {user.userType === 2 &&
             (() => {
@@ -129,7 +100,7 @@ const DashboardSidebar = ({ user }) => {
                     alt="Pending Students"
                     className="h-5 w-5"
                   />
-                  {isOpen && <span className="ml-3">Pending Join</span>}
+                  {isOpen && <span className="ml-3">Pending Students</span>}
                 </Link>
               );
             })()}

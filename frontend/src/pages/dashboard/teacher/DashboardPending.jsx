@@ -125,8 +125,10 @@ const DashboardPending = () => {
         classCode: classroom.classCode
       }; 
 
+
       if (requestType === "join") {
         try {
+          console.log(data);
           await teacherApi.acceptPendingStudent(data);
         } catch (error) {
           console.error("Error acceptinig student", error.message);

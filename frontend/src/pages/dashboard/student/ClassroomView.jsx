@@ -1,17 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, FreeMode } from 'swiper/modules';
+import Slider from "react-slick";
 import AnimatedLessonButton from "../../../components/buttons/AnimatedLessonButton.jsx";
 import { studentApi } from "../../../api/student/studentApi.js";
 import { studentLessonApi } from "../../../api/studentLesson/studentLesson.js";
 import gridBox from "../../../assets/gridbox.svg";
 
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/free-mode';
+// Import slick carousel CSS
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const ClassroomView = ({ classroom, user }) => {
   const navigate = useNavigate();
@@ -21,8 +18,8 @@ const ClassroomView = ({ classroom, user }) => {
   const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Swiper instance ref
-  const swiperRef = useRef(null);
+  // Slider ref
+  const sliderRef = useRef(null);
 
   // Mock sub-lesson data - now using topic numbers instead of letters
   const subLessonInfo = {
@@ -88,9 +85,37 @@ const ClassroomView = ({ classroom, user }) => {
 
   // Function to slide to specific lesson
   const slideToLesson = (lessonIndex) => {
-    if (swiperRef.current && swiperRef.current.swiper) {
-      swiperRef.current.swiper.slideTo(lessonIndex, 800); // 800ms animation
+    if (sliderRef.current) {
+      sliderRef.current.slickGoTo(lessonIndex);
     }
+  };
+
+  // Slider settings
+  const sliderSettings = {
+    dots: true,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    centerMode: true,
+    centerPadding: '60px',
+    focusOnSelect: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          centerPadding: '40px',
+        }
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 1,
+          centerPadding: '20px',
+        }
+      }
+    ]
   };
 
   useEffect(() => {
@@ -309,7 +334,7 @@ const ClassroomView = ({ classroom, user }) => {
         )}
       </div>
 
-      {/* Swiper Slider Container */}
+      {/* React Slick Slider Container */}
       <div className="flex-1 flex flex-col relative ml-8">
         <div className="flex justify-center mb-4">
           <div className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow">
@@ -317,35 +342,16 @@ const ClassroomView = ({ classroom, user }) => {
           </div>
         </div>
         
-        <div className="flex-1 relative">
+        <div className="flex-1 relative roadmap-slider">
           {isLoading ? (
             <div className="text-center text-gray-500 flex items-center justify-center h-full">
               Loading lessons...
             </div>
           ) : (
-            <Swiper
-              ref={swiperRef}
-              modules={[Navigation, Pagination, FreeMode]}
-              spaceBetween={50}
-              slidesPerView={'auto'}
-              centeredSlides={true}
-              freeMode={true}
-              navigation={{
-                nextEl: '.swiper-button-next-custom',
-                prevEl: '.swiper-button-prev-custom',
-              }}
-              pagination={{
-                clickable: true,
-                dynamicBullets: true,
-              }}
-              className="w-full h-full"
-              style={{
-                paddingBottom: '50px',
-              }}
-            >
+            <Slider ref={sliderRef} {...sliderSettings}>
               {lessons.map((lesson, index) => (
-                <SwiperSlide key={lesson.lessonId} style={{ width: 'auto' }}>
-                  <div className="flex flex-col items-center space-y-4 px-8 py-4">
+                <div key={lesson.lessonId} className="px-4">
+                  <div className="flex flex-col items-center space-y-4 py-8">
                     {/* Big button */}
                     <AnimatedLessonButton
                       label={"Lesson No " + (index + 1)}
@@ -363,7 +369,7 @@ const ClassroomView = ({ classroom, user }) => {
                         selectedButton === `lesson-${lesson.lessonId}-main` ||
                         selectedButton?.startsWith(`lesson-${lesson.lessonId}-sub`)
                       }
-                      className="w-full min-w-[200px]"
+                      className="w-full max-w-[250px]"
                       locked={false}
                     />
 
@@ -403,24 +409,56 @@ const ClassroomView = ({ classroom, user }) => {
                       })}
                     </div>
                   </div>
-                </SwiperSlide>
+                </div>
               ))}
-            </Swiper>
+            </Slider>
           )}
-          
-          {/* Custom Navigation Buttons */}
-          <div className="swiper-button-prev-custom absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-100 transition-colors">
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </div>
-          <div className="swiper-button-next-custom absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-100 transition-colors">
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
         </div>
       </div>
+
+      {/* Custom CSS for the slider */}
+      <style jsx>{`
+        .roadmap-slider .slick-dots {
+          bottom: -45px;
+        }
+        
+        .roadmap-slider .slick-dots li button:before {
+          font-size: 12px;
+          color: #94a3b8;
+        }
+        
+        .roadmap-slider .slick-dots li.slick-active button:before {
+          color: #3b82f6;
+        }
+        
+        .roadmap-slider .slick-prev,
+        .roadmap-slider .slick-next {
+          width: 40px;
+          height: 40px;
+          background: white;
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          z-index: 10;
+        }
+        
+        .roadmap-slider .slick-prev:before,
+        .roadmap-slider .slick-next:before {
+          font-size: 20px;
+          color: #64748b;
+        }
+        
+        .roadmap-slider .slick-prev {
+          left: -50px;
+        }
+        
+        .roadmap-slider .slick-next {
+          right: -50px;
+        }
+        
+        .roadmap-slider .slick-slide {
+          outline: none;
+        }
+      `}</style>
 
       {showConfirmation && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
