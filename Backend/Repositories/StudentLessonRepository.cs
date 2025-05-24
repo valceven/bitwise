@@ -17,11 +17,9 @@ namespace backend.Repositories
         public async Task<ICollection<StudentLesson>> GetAllStudentLessonProgressAsync(GetStudentLessonProgressDto getStudentLessonProgressDto)
         {
             var studentLessons = await _context.StudentLessons
-            .Where(st => st.LessonId == getStudentLessonProgressDto.LessonId && 
-                        _context.StudentClassrooms
-                            .Any(sc => sc.ClassroomId == getStudentLessonProgressDto.ClassroomId && 
-                                        sc.StudentId == st.StudentId))
-            .ToListAsync();
+                .Include(sl => sl.Lesson)
+                .Where(sl => sl.StudentClassroom.ClassroomId == getStudentLessonProgressDto.ClassroomId)
+                .ToListAsync();
 
             return studentLessons;
         }
@@ -44,11 +42,9 @@ namespace backend.Repositories
         public async Task<StudentLesson> GetStudentLessonAsync(StudentLessonDto studentLessonDto)
         {
             var studentLesson = await _context.StudentLessons
-            .Where(st => st.LessonId == studentLessonDto.LessonId && 
-                        _context.StudentClassrooms
-                            .Any(sc => sc.ClassroomId == studentLessonDto.ClassroomId && 
-                                        sc.StudentId == st.StudentId))
-            .FirstOrDefaultAsync();
+                .Include(sl => sl.Lesson)
+                .Include(sl => sl.StudentClassroom)
+                .FirstOrDefaultAsync(sl => sl.StudentClassroom.StudentId == studentLessonDto.StudentId && sl.Lesson.LessonId == studentLessonDto.LessonId);
 
             return studentLesson;
         }

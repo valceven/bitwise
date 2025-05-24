@@ -18,7 +18,7 @@ namespace backend.Services
         }
 
         public async Task<Classroom> CreateClassroomAsync(CreateClassroomDTO classroomDTO)
-        {   
+        {
             var classroom = new Classroom
             {
                 ClassName = classroomDTO.ClassName,
@@ -63,7 +63,7 @@ namespace backend.Services
             return classroomResponseDtos;
         }
 
-       public async Task<ViewClassroomResponseDto> ViewClassroomAsync(ViewClassroomDto viewClassroomDto)
+        public async Task<ViewClassroomResponseDto> ViewClassroomAsync(ViewClassroomDto viewClassroomDto)
         {
             int classroomId = viewClassroomDto.ClassroomId;
 
@@ -147,6 +147,20 @@ namespace backend.Services
             }
 
             return false;
+        }
+        public async Task<bool> DeleteClassroomAsync(int classroomId)
+        {
+            var result = await _classroomRepository.DeleteClassroomAsync(classroomId);
+            return result;
+        }
+        public async Task<bool> ArchiveClassroomAsync(ArchiveClassroomDTO classroomDTO)
+        {
+            var classroom = await _classroomRepository.ViewClassroomAsync(classroomDTO.ClassroomId);
+            if (classroom == null)
+                return false;
+
+            classroom.isArchived = true;
+            return await _classroomRepository.UpdateClassroomAsync(classroom);
         }
     }
 

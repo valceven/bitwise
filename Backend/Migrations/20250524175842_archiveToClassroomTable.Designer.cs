@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    partial class bitwiseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250524175842_archiveToClassroomTable")]
+    partial class archiveToClassroomTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -319,7 +322,7 @@ namespace backend.Migrations
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("StudentClassroomId")
+                    b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("SubmittedAt")
@@ -329,7 +332,7 @@ namespace backend.Migrations
 
                     b.HasIndex("AssessmentId");
 
-                    b.HasIndex("StudentClassroomId");
+                    b.HasIndex("StudentId");
 
                     b.ToTable("StudentAssessments");
                 });
@@ -381,17 +384,13 @@ namespace backend.Migrations
                     b.Property<int>("LessonId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("StudentClassroomId")
+                    b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("ViewedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("StudentLessonId");
-
-                    b.HasIndex("LessonId");
-
-                    b.HasIndex("StudentClassroomId");
 
                     b.ToTable("StudentLessons");
                 });
@@ -413,7 +412,7 @@ namespace backend.Migrations
                     b.Property<bool>("IsViewed")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("StudentClassroomId")
+                    b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
                     b.Property<int>("TopicId")
@@ -424,9 +423,7 @@ namespace backend.Migrations
 
                     b.HasKey("StudentTopicId");
 
-                    b.HasIndex("StudentClassroomId");
-
-                    b.HasIndex("TopicId");
+                    b.HasIndex("StudentId");
 
                     b.ToTable("StudentTopics");
                 });
@@ -663,15 +660,15 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.StudentClassroom", "StudentClassroom")
+                    b.HasOne("backend.Models.Student", "Student")
                         .WithMany()
-                        .HasForeignKey("StudentClassroomId")
+                        .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Assessment");
 
-                    b.Navigation("StudentClassroom");
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("backend.Models.StudentClassroom", b =>
@@ -693,42 +690,15 @@ namespace backend.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("backend.Models.StudentLesson", b =>
-                {
-                    b.HasOne("backend.Models.Lesson", "Lesson")
-                        .WithMany()
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("backend.Models.StudentClassroom", "StudentClassroom")
-                        .WithMany()
-                        .HasForeignKey("StudentClassroomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("StudentClassroom");
-                });
-
             modelBuilder.Entity("backend.Models.StudentTopic", b =>
                 {
-                    b.HasOne("backend.Models.StudentClassroom", "StudentClassroom")
+                    b.HasOne("backend.Models.Student", "Student")
                         .WithMany()
-                        .HasForeignKey("StudentClassroomId")
+                        .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.Topic", "Topic")
-                        .WithMany()
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("StudentClassroom");
-
-                    b.Navigation("Topic");
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("backend.Models.Teacher", b =>

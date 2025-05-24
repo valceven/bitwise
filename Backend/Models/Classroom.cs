@@ -21,6 +21,7 @@ namespace backend.Models
         public string ClassCode { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         // One-to-many: Classroom has many Lessons (assuming Lesson model exists)
+        public bool isArchived { get; set; } = false;
 
         public List<ClassroomLesson>? Lessons { get; set; } = new List<ClassroomLesson>();
 

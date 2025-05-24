@@ -14,8 +14,6 @@ namespace backend.Repositories
         }
         public async Task<bool> RemoveStudentFromClassroomAsync(int studentId, int classroomId)
         {
-            // Use a transaction to ensure all operations succeed or fail together
-            using var transaction = await _context.Database.BeginTransactionAsync();
             
             try
             {
@@ -28,37 +26,6 @@ namespace backend.Repositories
                 {
                     return false; // No student found in this classroom
                 }
-                
-                // 1. Remove from StudentLessons
-                var studentLessons = await _context.StudentLessons
-                    .Where(sl => sl.StudentId == studentId)
-                    .ToListAsync();
-                    
-                if (studentLessons.Any())
-                {
-                    _context.StudentLessons.RemoveRange(studentLessons);
-                }
-                
-                // 2. Remove from StudentTopics
-                var studentTopics = await _context.StudentTopics
-                    .Where(st => st.StudentId == studentId)
-                    .ToListAsync();
-                    
-                if (studentTopics.Any())
-                {
-                    _context.StudentTopics.RemoveRange(studentTopics);
-                }
-
-                var studentAssessments = await _context.StudentAssessments
-                    .Where(sa => sa.StudentId == studentId)
-                    .ToListAsync();
-
-                if (studentAssessments.Any())
-                {
-                    _context.StudentAssessments.RemoveRange(studentAssessments);
-                }
-                
-                // 3. Remove from StudentClassrooms
                     _context.StudentClassrooms.Remove(studentClassroom);
                 
                 // 4. Remove any pending request for this student and classroom
@@ -72,20 +39,14 @@ namespace backend.Repositories
                 
                 // Save all changes
                 await _context.SaveChangesAsync();
-                
-                // Commit the transaction
-                await transaction.CommitAsync();
+            
                 
                 return true;
             }
             catch (Exception ex)
             {
                 // Log the error
-                Console.WriteLine($"Error removing student from classroom: {ex.Message}");
-                
-                // Roll back the transaction on error
-                await transaction.RollbackAsync();
-                
+                Console.WriteLine($"Error removing student from classroom: {ex.Message}");     
                 return false;
             }
         }

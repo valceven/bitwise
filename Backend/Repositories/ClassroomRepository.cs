@@ -25,7 +25,7 @@ namespace backend.Repositories
                 {
                     classroom.ClassCode = CodeGenerator.GenerateClassCode();
                 }
-                
+
                 _context.Classrooms.Add(classroom);
                 await _context.SaveChangesAsync();
 
@@ -118,7 +118,7 @@ namespace backend.Repositories
         {
             // Use a transaction to ensure all operations succeed or fail together
             using var transaction = await _context.Database.BeginTransactionAsync();
-            
+
             try
             {
                 // Find the student classroom record
@@ -129,55 +129,34 @@ namespace backend.Repositories
                 {
                     return false; // Student not found in this classroom
                 }
-                
-                // 1. Remove from StudentLessons
-                var studentLessons = await _context.StudentLessons
-                    .Where(sl => sl.StudentId == studentId)
-                    .ToListAsync();
-                    
-                if (studentLessons.Any())
-                {
-                    _context.StudentLessons.RemoveRange(studentLessons);
-                }
-                
-                // 2. Remove from StudentTopics
-                var studentTopics = await _context.StudentTopics
-                    .Where(st => st.StudentId == studentId)
-                    .ToListAsync();
-                    
-                if (studentTopics.Any())
-                {
-                    _context.StudentTopics.RemoveRange(studentTopics);
-                }
-                
-                // 3. Remove from StudentClassrooms
+
                 _context.StudentClassrooms.Remove(studentClassroom);
-                
+
                 // 4. Remove any pending request for this student and classroom
                 var pendingStudent = await _context.PendingStudents
                     .FirstOrDefaultAsync(ps => ps.StudentId == studentId);
-                    
+
                 if (pendingStudent != null)
                 {
                     _context.PendingStudents.Remove(pendingStudent);
                 }
-                
+
                 // Save all changes
                 await _context.SaveChangesAsync();
-                
+
                 // Commit the transaction
                 await transaction.CommitAsync();
-                
+
                 return true;
             }
             catch (Exception ex)
             {
                 // Log the error
                 Console.WriteLine($"Error leaving classroom: {ex.Message}");
-                
+
                 // Roll back the transaction on error
                 await transaction.RollbackAsync();
-                
+
                 throw new Exception("An error occurred while leaving the classroom.", ex);
             }
         }
@@ -230,6 +209,51 @@ namespace backend.Repositories
             {
                 Console.WriteLine($"Error joining classroom: {ex.Message}");
                 throw new Exception("An error occured while submitting leave.", ex);
+            }
+        }
+        public async Task<bool> DeleteClassroomAsync(int classroomId)
+        {
+            try
+            {
+                var classroom = await _context.Classrooms
+                    .FirstOrDefaultAsync(c => c.ClassroomID == classroomId);
+
+                if (classroom == null)
+                {
+                    return false;
+                }
+
+                _context.Classrooms.Remove(classroom);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting classroom: {ex.Message}");
+                throw new Exception("An error occurred while deleting the classroom.", ex);
+            }
+        }
+        public async Task<bool> UpdateClassroomAsync(Classroom classroom)
+        {
+            try
+            {
+                var existingClassroom = await _context.Classrooms
+                    .FirstOrDefaultAsync(c => c.ClassroomID == classroom.ClassroomID);
+
+                if (existingClassroom == null)
+                {
+                    return false; // Classroom not found
+                }
+                _context.Classrooms.Update(existingClassroom);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating classroom: {ex.Message}");
+                throw new Exception("An error occurred while updating the classroom.", ex);
             }
         }
     }

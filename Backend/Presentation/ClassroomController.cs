@@ -83,5 +83,30 @@ namespace backend.Controllers
 
             return BadRequest(result);
         }
+        [HttpDelete("delete-classroom")]
+        public async Task<IActionResult> DeleteClassroom([FromQuery] int classroomId)
+        {
+            var result = await _classroomService.DeleteClassroomAsync(classroomId);
+
+            if (result)
+                return Ok(result);
+
+            return BadRequest("Failed to delete classroom.");
+        }
+        [HttpPost("archive-classroom")]
+        public async Task<IActionResult> ArchiveClassroom([FromBody] ArchiveClassroomDTO classroomDTO)
+        {
+            if (classroomDTO == null)
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            var result = await _classroomService.ArchiveClassroomAsync(classroomDTO);
+
+            if (result)
+                return Ok(result);
+
+            return BadRequest("Failed to archive classroom.");
+        }
     }
 }
