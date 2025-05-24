@@ -214,7 +214,7 @@ const LogicGate = ({
       whileHover={{ scale: isConnecting ? 1 : 1.05 }}
       whileDrag={{ scale: isConnecting ? 1 : 1.1, zIndex: 20 }}
     >
-      <svg width="60" height="40" viewBox="-10 -5 50 40">
+      <svg width="100" height="60" viewBox="-15 -10 100 70">
         {gateSymbols[type]}
         {/* Render connection points */}
         {connectionPoints.map(point => {
@@ -244,12 +244,16 @@ const LogicGate = ({
 const ConnectionWire = ({ from, to, isValid = true, onClick }) => {
   if (!from || !to) return null
   
-  // Calculate control points for a curved wire
+  // Calculate control points for a smooth S-curve
   const dx = to.x - from.x
   const dy = to.y - from.y
-  const cp1x = from.x + dx * 0.5
+  const distance = Math.sqrt(dx * dx + dy * dy)
+  
+  // Create smooth curves based on distance
+  const curve = Math.min(distance * 0.4, 100)
+  const cp1x = from.x + curve
   const cp1y = from.y
-  const cp2x = to.x - dx * 0.5  
+  const cp2x = to.x - curve
   const cp2y = to.y
   
   const pathD = `M ${from.x} ${from.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${to.x} ${to.y}`
@@ -261,37 +265,71 @@ const ConnectionWire = ({ from, to, isValid = true, onClick }) => {
       height="100%"
       style={{ zIndex: 0 }}
     >
-      <path
-        d={pathD}
-        stroke={isValid ? colors.emeraldz : colors.coralz}
-        strokeWidth="3"
-        fill="none"
-        strokeDasharray={isValid ? "none" : "8,4"}
-        className="cursor-pointer pointer-events-auto"
-        onClick={onClick}
-      />
-      {/* Add arrowhead */}
       <defs>
         <marker
-          id="arrowhead"
-          markerWidth="10"
-          markerHeight="7"
-          refX="9"
-          refY="3.5"
+          id={`arrowhead-${isValid ? 'valid' : 'invalid'}`}
+          markerWidth="12"
+          markerHeight="8"
+          refX="4"
+          refY="5"
           orient="auto"
         >
           <polygon
-            points="0 0, 10 3.5, 0 7"
+            points="1 4, 4 5, 1 6"
             fill={isValid ? colors.emeraldz : colors.coralz}
+            stroke={isValid ? colors.emeraldz : colors.coralz}
+            strokeWidth="1"
           />
         </marker>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge> 
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
+      
+      {/* Glow effect background */}
       <path
         d={pathD}
-        stroke="transparent"
-        strokeWidth="3"
+        stroke={isValid ? colors.emeraldz : colors.coralz}
+        strokeWidth="8"
         fill="none"
-        markerEnd="url(#arrowhead)"
+        opacity="0.3"
+        filter="url(#glow)"
+      />
+      
+      {/* Main wire */}
+      <path
+        d={pathD}
+        stroke={isValid ? colors.emeraldz : colors.coralz}
+        strokeWidth="4"
+        fill="none"
+        strokeDasharray={isValid ? "none" : "10,5"}
+        markerEnd={`url(#arrowhead-${isValid ? 'valid' : 'invalid'})`}
+        className="cursor-pointer pointer-events-auto hover:stroke-width-6 transition-all"
+        onClick={onClick}
+        style={{
+          filter: "drop-shadow(2px 2px 4px rgba(0,0,0,0.3))"
+        }}
+      />
+      
+      {/* Signal flow animation */}
+      {isValid && (
+        <circle r="3" fill={colors.yellowz} opacity="0.8">
+          <animateMotion dur="2s" repeatCount="indefinite">
+            <mpath href={`#path-${from.x}-${from.y}-${to.x}-${to.y}`}/>
+          </animateMotion>
+        </circle>
+      )}
+      
+      {/* Hidden path for animation reference */}
+      <path
+        id={`path-${from.x}-${from.y}-${to.x}-${to.y}`}
+        d={pathD}
+        fill="none"
+        stroke="none"
       />
     </svg>
   )
@@ -545,7 +583,7 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
         initialGates.push({
           id: input,
           type: 'INPUT',
-          position: { x: 50, y: 100 + idx * 60 },
+          position: { x: 40, y: 50 + idx * 80 },
           isFixed: true
         })
       })
@@ -554,7 +592,7 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
       initialGates.push({
         id: 'Y',
         type: 'OUTPUT', 
-        position: { x: 500, y: 150 },
+        position: { x: 580, y: 120 },
         isFixed: true
       })
       
@@ -581,7 +619,7 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
     const newGate = {
       id: `${gateType}_${Date.now()}`,
       type: gateType,
-      position: { x: 200 + Math.random() * 100, y: 100 + Math.random() * 100 },
+      position: { x: 180 + Math.random() * 320, y: 80 + Math.random() * 180 },
       isFixed: false
     }
     setGates([...gates, newGate])
@@ -666,36 +704,36 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
     const baseY = gate.position.y
     
     const connectionMap = {
-      'INPUT': { 'out': { x: baseX + 23, y: baseY + 15 } },
-      'OUTPUT': { 'in1': { x: baseX + 7, y: baseY + 15 } },
+      'INPUT': { 'out': { x: baseX + 40, y: baseY + 25 } },
+      'OUTPUT': { 'in1': { x: baseX + 10, y: baseY + 25 } },
       'AND': { 
-        'in1': { x: baseX - 3, y: baseY + 10 },
-        'in2': { x: baseX - 3, y: baseY + 20 },
-        'out': { x: baseX + 38, y: baseY + 15 }
+        'in1': { x: baseX - 5, y: baseY + 15 },
+        'in2': { x: baseX - 5, y: baseY + 35 },
+        'out': { x: baseX + 65, y: baseY + 25 }
       },
       'NAND': { 
-        'in1': { x: baseX - 3, y: baseY + 10 },
-        'in2': { x: baseX - 3, y: baseY + 20 },
-        'out': { x: baseX + 42, y: baseY + 15 }
+        'in1': { x: baseX - 5, y: baseY + 15 },
+        'in2': { x: baseX - 5, y: baseY + 35 },
+        'out': { x: baseX + 70, y: baseY + 25 }
       },
       'OR': { 
-        'in1': { x: baseX - 3, y: baseY + 10 },
-        'in2': { x: baseX - 3, y: baseY + 20 },
-        'out': { x: baseX + 28, y: baseY + 15 }
+        'in1': { x: baseX - 5, y: baseY + 15 },
+        'in2': { x: baseX - 5, y: baseY + 35 },
+        'out': { x: baseX + 50, y: baseY + 25 }
       },
       'NOR': { 
-        'in1': { x: baseX - 3, y: baseY + 10 },
-        'in2': { x: baseX - 3, y: baseY + 20 },
-        'out': { x: baseX + 32, y: baseY + 15 }
+        'in1': { x: baseX - 5, y: baseY + 15 },
+        'in2': { x: baseX - 5, y: baseY + 35 },
+        'out': { x: baseX + 55, y: baseY + 25 }
       },
       'XOR': { 
-        'in1': { x: baseX - 8, y: baseY + 10 },
-        'in2': { x: baseX - 8, y: baseY + 20 },
-        'out': { x: baseX + 28, y: baseY + 15 }
+        'in1': { x: baseX - 10, y: baseY + 15 },
+        'in2': { x: baseX - 10, y: baseY + 35 },
+        'out': { x: baseX + 50, y: baseY + 25 }
       },
       'NOT': { 
-        'in1': { x: baseX - 3, y: baseY + 15 },
-        'out': { x: baseX + 27, y: baseY + 15 }
+        'in1': { x: baseX - 5, y: baseY + 25 },
+        'out': { x: baseX + 50, y: baseY + 25 }
       }
     }
     
@@ -1122,29 +1160,33 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="p-4 rounded-xl" 
+        className="p-6 rounded-xl" 
         style={{ backgroundColor: `${colors.tealz}10` }}
       >
-        <h4 className="font-bold mb-3" style={{ color: colors.tealz }}>
-          🔧 Gate Palette - Drag gates to the canvas
+        <h4 className="font-bold mb-4 text-center" style={{ color: colors.tealz }}>
+          🔧 Gate Palette - Click to add gates to your circuit
         </h4>
-        <div className="flex gap-3 flex-wrap">
+        <div className="flex gap-4 justify-center flex-wrap">
           {["AND", "OR", "NOT", "NAND", "NOR", "XOR"].map(gateType => (
             <motion.button
               key={gateType}
               onClick={() => addGate(gateType)}
-              className="px-4 py-2 rounded-lg border-2 transition-all hover:scale-105"
+              className="px-6 py-3 rounded-lg border-2 transition-all hover:scale-105 font-bold"
               style={{ 
                 backgroundColor: colors.white,
                 borderColor: colors.tealz,
-                color: colors.grayz
+                color: colors.grayz,
+                minWidth: '80px'
               }}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, borderColor: colors.indigoz }}
               whileTap={{ scale: 0.95 }}
             >
               {gateType}
             </motion.button>
           ))}
+        </div>
+        <div className="text-center mt-3 text-sm" style={{ color: colors.grayz }}>
+          💡 Click a gate type to add it to your circuit, then drag it to position
         </div>
       </motion.div>
 
@@ -1157,12 +1199,13 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
       >
         <div 
           ref={canvasRef}
-          className="w-full h-80 rounded-xl border-2 relative overflow-hidden"
+          className="w-full h-96 rounded-xl border-2 relative overflow-hidden"
           style={{ 
             backgroundColor: `${colors.white}`,
             borderColor: colors.indigoz,
-            backgroundImage: `radial-gradient(circle, ${colors.grayz}20 1px, transparent 1px)`,
-            backgroundSize: '20px 20px'
+            backgroundImage: `radial-gradient(circle, ${colors.grayz}15 1px, transparent 1px)`,
+            backgroundSize: '25px 25px',
+            minHeight: '400px'
           }}
         >
           {/* Render gates */}
@@ -1175,8 +1218,8 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
               onDrag={(event, info) => {
                 if (!gate.isFixed && !isConnecting) {
                   updateGatePosition(gate.id, {
-                    x: Math.max(0, Math.min(540, gate.position.x + info.delta.x)),
-                    y: Math.max(0, Math.min(340, gate.position.y + info.delta.y))
+                    x: Math.max(0, Math.min(700, gate.position.x + info.delta.x)),
+                    y: Math.max(0, Math.min(320, gate.position.y + info.delta.y))
                   })
                 }
               }}
@@ -1230,32 +1273,32 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
         </div>
         
         {/* Canvas Controls */}
-        <div className="flex justify-between items-center mt-4">
-          <div className="flex gap-2">
+        <div className="flex justify-between items-center mt-6 bg-gray-50 p-4 rounded-lg">
+          <div className="flex gap-3">
             <motion.button
               onClick={clearCircuit}
-              className="px-4 py-2 rounded-lg font-medium transition-all"
+              className="px-5 py-3 rounded-lg font-medium transition-all flex items-center gap-2"
               style={{ backgroundColor: colors.coralz, color: colors.white }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Trash2 className="h-4 w-4 mr-2 inline" />
-              Clear
+              <Trash2 className="h-4 w-4" />
+              Clear Circuit
             </motion.button>
             <motion.button
               onClick={testCircuit}
               disabled={testingMode}
-              className="px-4 py-2 rounded-lg font-medium transition-all"
+              className="px-5 py-3 rounded-lg font-medium transition-all flex items-center gap-2"
               style={{ 
                 backgroundColor: testingMode ? colors.grayz : colors.emeraldz, 
                 color: colors.white,
-                opacity: testingMode ? 0.5 : 1
+                opacity: testingMode ? 0.7 : 1
               }}
               whileHover={{ scale: testingMode ? 1 : 1.05 }}
               whileTap={{ scale: testingMode ? 1 : 0.95 }}
             >
-              <TestTube className="h-4 w-4 mr-2 inline" />
-              {testingMode ? "Testing..." : "Test Circuit"}
+              <TestTube className="h-4 w-4" />
+              {testingMode ? "Testing Circuit..." : "Test My Circuit"}
             </motion.button>
             {isConnecting && (
               <motion.button
@@ -1263,46 +1306,51 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
                   setIsConnecting(false)
                   setConnectFrom(null)
                 }}
-                className="px-4 py-2 rounded-lg font-medium transition-all"
+                className="px-5 py-3 rounded-lg font-medium transition-all flex items-center gap-2"
                 style={{ backgroundColor: colors.ambez, color: colors.white }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Cancel Connection
+                ❌ Cancel Connection
               </motion.button>
             )}
           </div>
           
           {/* Connection Instructions */}
-          <div className="text-sm max-w-xs text-right" style={{ color: colors.grayz }}>
-            {isConnecting ? 
-              "Click on an input connection point (red) to complete the wire" :
-              "Click on output points (green) to start wiring"
-            }
+          <div className="text-center px-4">
+            <div className="text-sm font-medium mb-1" style={{ color: colors.indigoz }}>
+              {isConnecting ? "🔗 Connecting Mode" : "🖱️ Connection Guide"}
+            </div>
+            <div className="text-xs" style={{ color: colors.grayz }}>
+              {isConnecting ? 
+                "Click a red input point to complete the wire connection" :
+                "Click green output points → red input points to create wires"
+              }
+            </div>
           </div>
           
           {/* Hint Button */}
           {!showHint ? (
             <button
               onClick={showHintHandler}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all hover:scale-105"
-              style={{ backgroundColor: `${colors.yellowz}20`, color: colors.ambez }}
+              className="flex items-center gap-2 px-5 py-3 rounded-lg font-medium transition-all hover:scale-105"
+              style={{ backgroundColor: `${colors.yellowz}30`, color: colors.ambez, border: `2px solid ${colors.yellowz}` }}
             >
               <Lightbulb className="h-4 w-4" />
-              Need a Hint? (-25 points)
+              💡 Need a Hint? (-25 pts)
             </button>
           ) : (
-            <div className="max-w-md p-3 rounded-lg border-2" 
+            <div className="max-w-xs p-4 rounded-lg border-2" 
                  style={{ 
                    backgroundColor: `${colors.yellowz}10`,
                    borderColor: colors.yellowz,
                    color: colors.ambez
                  }}>
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-2">
                 <Lightbulb className="h-4 w-4" />
-                <span className="font-bold text-sm">Architect Hint:</span>
+                <span className="font-bold text-sm">💡 Circuit Hint:</span>
               </div>
-              <p className="text-xs">{currentProblem.hint}</p>
+              <p className="text-xs leading-relaxed">{currentProblem.hint}</p>
             </div>
           )}
         </div>
@@ -1371,9 +1419,9 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
 
 export default function CircuitBuilderAcademyMain({ onComplete }) {
   return (
-    <div className="flex flex-col w-full max-w-6xl mx-auto pb-16 px-4 min-h-screen" 
+    <div className="flex flex-col w-full max-w-7xl mx-auto pb-16 px-4 min-h-screen" 
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.indigoz}05)` }}>
-      <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
+      <div className="rounded-2xl shadow-xl p-8" style={{ backgroundColor: colors.white }}>
         <CircuitBuilderAcademy onComplete={onComplete} />
       </div>
     </div>
