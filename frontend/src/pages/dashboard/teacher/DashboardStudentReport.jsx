@@ -38,6 +38,7 @@ const DashboardStudentReport = () => {
                 lessonId: i,
               };
 
+              console.log("mars", data);
               const lessonResponse = await classroomApi.fetchStudentLessonProgress(data); // Random percentage 0-100
               
               progressData[i] = lessonResponse;
@@ -45,7 +46,6 @@ const DashboardStudentReport = () => {
             } catch (error) {
               console.error(`Error fetching student lesson progress in lesson ${i}`, error?.message);
               toast.error(`Failed to fetch student lesson progress in lesson ${i}`);
-              
               progressData[i] = 0;
             }
           }
