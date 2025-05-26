@@ -12,8 +12,8 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(bitwiseDbContext))]
-    [Migration("20250524191455_UpdatedStudentRelatedTablesAddedStudentClassroomId")]
-    partial class UpdatedStudentRelatedTablesAddedStudentClassroomId
+    [Migration("20250526163519_ChangedCreatedByToStringInLessonModel")]
+    partial class ChangedCreatedByToStringInLessonModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -187,8 +187,8 @@ namespace backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("integer");
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -472,8 +472,6 @@ namespace backend.Migrations
 
                     b.HasKey("TopicId");
 
-                    b.HasIndex("LessonId");
-
                     b.ToTable("Topics");
                 });
 
@@ -745,25 +743,11 @@ namespace backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("backend.Models.Topic", b =>
-                {
-                    b.HasOne("backend.Models.Lesson", null)
-                        .WithMany("Topics")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("backend.Models.Classroom", b =>
                 {
                     b.Navigation("Lessons");
 
                     b.Navigation("StudentClassrooms");
-                });
-
-            modelBuilder.Entity("backend.Models.Lesson", b =>
-                {
-                    b.Navigation("Topics");
                 });
 
             modelBuilder.Entity("backend.Models.Student", b =>
