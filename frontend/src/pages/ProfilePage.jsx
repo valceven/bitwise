@@ -1,10 +1,5 @@
 import React from "react";
-import Button from "../components/buttons/PurpleButton";
 import EditProfileForm from "../components/forms/EditProfileForm";
-import Background from "../components/Background";
-import Ellipse from "../assets/Ellipse.svg";
-import Polygon from "../assets/Polygon.svg";
-import Zigzag from "../assets/zig-zag.svg";
 import EditBackground from "../components/EditBackgroud";
 import { useAuthGuard } from "../hooks/useAuthGuard";
 import MuLoading from "../components/MuLoading";
@@ -12,47 +7,63 @@ import { useEffect } from "react";
 
 const ProfilePage = () => {
   const { user, isRedirecting, isCheckingAuth } = useAuthGuard();
-
+  
   useEffect(() => {
-    document.title = user.name;
-  }, []);
+    document.title = user?.name || "Profile";
+  }, [user]);
 
   if (isCheckingAuth || isRedirecting) {
     return (
-      <div className="w-full min-h-screen flex items-center justify-center">
-        <p className="text-xl text-center">
+      <div className="w-full h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
           {isCheckingAuth ? (
-            "Checking authentication..."
+            <div className="space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+              <p className="text-xl text-gray-600">Checking authentication...</p>
+            </div>
           ) : (
             <MuLoading
               text={"You are already logged in. Redirecting to profile..."}
             />
           )}
-        </p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full py-20">
+    <div className="h-max bg-gray-50 relative overflow-hidden">
       <EditBackground />
+      
+      <div className="relative z-10 h-max flex flex-col">
 
-      <div className="w-1/2 flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] mx-auto">
-        <div className="w-full flex flex-col my-5">
-          <h1 className="text-3xl font-bold mb-4 addgrotesk">Account</h1>
-          <p className="text-md addgrotesk">
-            Welcome to your{" "}
-            {user.userType === 1
-              ? "student"
-              : user.userType === 2
-              ? "teacher"
-              : "user"}{" "}
-            profile!
-          </p>
-        </div>
+        {/* Main Content - Full height form */}
+        <div className="flex-1 px-4 sm:px-6 lg:px-8 pb-8">
+          <div className="max-w-7xl mx-auto h-full">
+            <div className="bg-slate-200 rounded-2xl shadow-lg border border-gray-200 h-full flex flex-col">
+              <div className="flex-shrink-0 bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4 rounded-t-2xl">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <span className="text-lg font-bold text-white">
+                      {user.name?.charAt(0)?.toUpperCase() || "U"}
+                    </span>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-white addgrotesk">
+                      {user.name || "User"}
+                    </h2>
+                    <p className="text-purple-100 text-sm">
+                      {user.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-        <div className="flex items-center w-full">
-          <EditProfileForm user={user} />
+              <div className="flex-1 p-6 overflow-hidden">
+                <EditProfileForm user={user} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

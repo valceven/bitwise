@@ -2,7 +2,6 @@ import apiService from "../apiService";
 
 const enterLesson = async (data) => {
     try {
-        console.log("NI SUDE KO", data);
         const response = await apiService.put("student-lesson/view-student-lesson", data)
         console.log(response)
 

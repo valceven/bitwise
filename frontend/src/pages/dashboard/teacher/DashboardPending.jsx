@@ -73,10 +73,10 @@ const DashboardPending = () => {
     return () => clearInterval(intervalId);
   }, [user.userID]);
 
-  const toggleSelectAll = (classIndex, checked, requestType) => {
+  const toggleSelectAll = (classroom, checked, requestType) => {
     setClassrooms((prev) =>
-      prev.map((cls, i) => {
-        if (i !== classIndex) return cls;
+      prev.map((cls) => {
+        if (cls.classroomId !== classroom.classroomId) return cls;
         
         if (requestType === "join") {
           const allIds = checked ? Array.from({ length: cls.joinRequests.length }, (_, i) => i) : [];
@@ -89,10 +89,10 @@ const DashboardPending = () => {
     );
   };
 
-  const toggleStudent = (classIndex, studentIndex, requestType) => {
+  const toggleStudent = (classroom, studentIndex, requestType) => {
     setClassrooms((prev) =>
-      prev.map((cls, i) => {
-        if (i !== classIndex) return cls;
+      prev.map((cls) => {
+        if (cls.classroomId !== classroom.classroomId) return cls;
         
         if (requestType === "join") {
           const alreadySelected = cls.selectedJoinStudents.includes(studentIndex);
@@ -111,12 +111,11 @@ const DashboardPending = () => {
     );
   };
 
-  const handleAccept = async (classIndex, studentIndex, requestType) => {
+  const handleAccept = async (student, classroom, requestType) => {
     try {
-      const classroom = classrooms[classIndex];
-      const student = requestType === "join" 
-        ? classroom.joinRequests[studentIndex] 
-        : classroom.leaveRequests[studentIndex];
+      console.log("Student:", student);
+      console.log("Classroom:", classroom);
+      console.log("Request Type:", requestType);
 
       const data = {
         status: true,
@@ -125,42 +124,40 @@ const DashboardPending = () => {
         classCode: classroom.classCode
       }; 
 
-
       if (requestType === "join") {
         try {
-          console.log(data);
+          console.log("Accepting student data:", data);
           await teacherApi.acceptPendingStudent(data);
         } catch (error) {
-          console.error("Error acceptinig student", error.message);
+          console.error("Error accepting student", error.message);
+          throw error;
         }
       } else {
         try {
           const response = await studentApi.leaveClassroom(data.studentId);
-          console.log("Successfully left the classroom:", response);
+          console.log("Successfully approved leave request:", response);
         } catch (error) {
-          console.error("Error leaving classroom: ", error.message);
+          console.error("Error approving leave request:", error.message);
+          throw error;
         }
       }
       
+      // Remove the student from the appropriate array by matching studentId
       setClassrooms(prev => 
-        prev.map((cls, i) => {
-          if (i !== classIndex) return cls;
+        prev.map((cls) => {
+          if (cls.classroomId !== classroom.classroomId) return cls;
           
           if (requestType === "join") {
             return {
               ...cls,
-              joinRequests: cls.joinRequests.filter((_, sIdx) => sIdx !== studentIndex),
-              selectedJoinStudents: cls.selectedJoinStudents
-                .filter(id => id !== studentIndex)
-                .map(id => id > studentIndex ? id - 1 : id)
+              joinRequests: cls.joinRequests.filter(s => s.studentId !== student.studentId),
+              selectedJoinStudents: [] // Clear selections after action
             };
           } else {
             return {
               ...cls,
-              leaveRequests: cls.leaveRequests.filter((_, sIdx) => sIdx !== studentIndex),
-              selectedLeaveStudents: cls.selectedLeaveStudents
-                .filter(id => id !== studentIndex)
-                .map(id => id > studentIndex ? id - 1 : id)
+              leaveRequests: cls.leaveRequests.filter(s => s.studentId !== student.studentId),
+              selectedLeaveStudents: [] // Clear selections after action
             };
           }
         })
@@ -173,16 +170,15 @@ const DashboardPending = () => {
       });
     } catch (error) {
       console.error(error.response?.data || error.message || "An unknown error occurred");
-      toast.error(`Failed to ${activeTab === "join" ? "accept" : "remove"} student`);
+      toast.error(`Failed to ${requestType === "join" ? "accept" : "remove"} student`);
     }
   };
 
-  const handleReject = async (classIndex, studentIndex, requestType) => {
+  const handleReject = async (student, classroom, requestType) => {
     try {
-      const classroom = classrooms[classIndex];
-      const student = requestType === "join" 
-        ? classroom.joinRequests[studentIndex] 
-        : classroom.leaveRequests[studentIndex];
+      console.log("Rejecting student:", student);
+      console.log("Classroom:", classroom);
+      console.log("Request Type:", requestType);
 
       const data = {
         status: false,
@@ -193,25 +189,22 @@ const DashboardPending = () => {
 
       await teacherApi.rejectPendingStudent(data);
       
+      // Remove the student from the appropriate array by matching studentId
       setClassrooms(prev => 
-        prev.map((cls, i) => {
-          if (i !== classIndex) return cls;
+        prev.map((cls) => {
+          if (cls.classroomId !== classroom.classroomId) return cls;
           
           if (requestType === "join") {
             return {
               ...cls,
-              joinRequests: cls.joinRequests.filter((_, sIdx) => sIdx !== studentIndex),
-              selectedJoinStudents: cls.selectedJoinStudents
-                .filter(id => id !== studentIndex)
-                .map(id => id > studentIndex ? id - 1 : id)
+              joinRequests: cls.joinRequests.filter(s => s.studentId !== student.studentId),
+              selectedJoinStudents: [] // Clear selections after action
             };
           } else {
             return {
               ...cls,
-              leaveRequests: cls.leaveRequests.filter((_, sIdx) => sIdx !== studentIndex),
-              selectedLeaveStudents: cls.selectedLeaveStudents
-                .filter(id => id !== studentIndex)
-                .map(id => id > studentIndex ? id - 1 : id)
+              leaveRequests: cls.leaveRequests.filter(s => s.studentId !== student.studentId),
+              selectedLeaveStudents: [] // Clear selections after action
             };
           }
         })
@@ -227,11 +220,9 @@ const DashboardPending = () => {
     }
   };
 
-  const handleBulkAction = async (classIndex, action, requestType) => {
-    const classroom = classrooms[classIndex];
-    const selectedIndexes = requestType === "join" 
-      ? [...classroom.selectedJoinStudents].sort((a, b) => b - a)
-      : [...classroom.selectedLeaveStudents].sort((a, b) => b - a);
+  const handleBulkAction = async (classroom, action, requestType) => {
+    const currentRequests = requestType === "join" ? classroom.joinRequests : classroom.leaveRequests;
+    const selectedIndexes = requestType === "join" ? classroom.selectedJoinStudents : classroom.selectedLeaveStudents;
     
     if (selectedIndexes.length === 0) {
       toast.info("Please select at least one student", {
@@ -241,12 +232,16 @@ const DashboardPending = () => {
       return;
     }
     
+    // Get selected students based on their indices
+    const selectedStudents = selectedIndexes.map(index => currentRequests[index]);
+    
     try {
-      for (const studentIndex of selectedIndexes) {
+      // Process each selected student
+      for (const student of selectedStudents) {
         if (action === 'accept') {
-          await handleAccept(classIndex, studentIndex, requestType);
+          await handleAccept(student, classroom, requestType);
         } else if (action === 'reject') {
-          await handleReject(classIndex, studentIndex, requestType);
+          await handleReject(student, classroom, requestType);
         }
       }
       
@@ -441,7 +436,7 @@ const DashboardPending = () => {
                               : 'bg-redz text-white hover:bg-red-600'
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
-                        onClick={() => handleBulkAction(classIndex, 'accept', activeTab)}
+                        onClick={() => handleBulkAction(cls, 'accept', activeTab)}
                         disabled={!hasSelected}
                       >
                         {activeTab === "join" ? (
@@ -456,7 +451,7 @@ const DashboardPending = () => {
                             ? 'bg-gray-700 text-white hover:bg-gray-800' 
                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         }`}
-                        onClick={() => handleBulkAction(classIndex, 'reject', activeTab)}
+                        onClick={() => handleBulkAction(cls, 'reject', activeTab)}
                         disabled={!hasSelected}
                       >
                         <UserX size={16} className="mr-1.5" />
@@ -475,7 +470,7 @@ const DashboardPending = () => {
                                 type="checkbox"
                                 className="h-4 w-4 text-bluez border-gray-300 rounded focus:ring-bluez focus:ring-offset-0"
                                 checked={isAllSelected}
-                                onChange={(e) => toggleSelectAll(classIndex, e.target.checked, activeTab)}
+                                onChange={(e) => toggleSelectAll(cls, e.target.checked, activeTab)}
                               />
                             </div>
                           </th>
@@ -502,7 +497,7 @@ const DashboardPending = () => {
                                   type="checkbox"
                                   className="h-4 w-4 text-bluez border-gray-300 rounded focus:ring-bluez focus:ring-offset-0"
                                   checked={currentSelected.includes(studentIndex)}
-                                  onChange={() => toggleStudent(classIndex, studentIndex, activeTab)}
+                                  onChange={() => toggleStudent(cls, studentIndex, activeTab)}
                                 />
                               </div>
                             </td>
@@ -530,7 +525,7 @@ const DashboardPending = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-center">
                               <div className="flex items-center justify-center space-x-3">
                                 <button
-                                  onClick={() => handleAccept(classIndex, studentIndex, activeTab)}
+                                  onClick={() => handleAccept(student, cls, activeTab)}
                                   className={`p-1.5 ${
                                     activeTab === "join" 
                                       ? "text-greenz hover:bg-green-50" 
@@ -541,7 +536,7 @@ const DashboardPending = () => {
                                   <Check size={18} className="stroke-2" />
                                 </button>
                                 <button
-                                  onClick={() => handleReject(classIndex, studentIndex, activeTab)}
+                                  onClick={() => handleReject(student, cls, activeTab)}
                                   className="p-1.5 text-gray-700 hover:bg-gray-100 rounded-full transition"
                                   title="Reject"
                                 >

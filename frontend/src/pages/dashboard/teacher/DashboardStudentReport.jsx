@@ -38,8 +38,7 @@ const DashboardStudentReport = () => {
                 lessonId: i,
               };
 
-              console.log("mars", data);
-              const lessonResponse = await classroomApi.fetchStudentLessonProgress(data); // Random percentage 0-100
+              const lessonResponse = await classroomApi.fetchStudentLessonProgress(data); 
               
               progressData[i] = lessonResponse;
               
