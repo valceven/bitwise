@@ -51,25 +51,25 @@ namespace backend.Repositories
                 return false;
             }
         }
-        public async Task<StudentProgress> GetStudentProgressByStudentClassroomIdAsync(int studentClassroomId)
+        public async Task<StudentProgress> GetStudentProgressByStudentClassroomIdAsync(int studentId)
         {
             try
             {
                 // sort each list by id in ascending order
                 var completedLessons = await _context.StudentLessons
-                    .Where(sl => sl.StudentClassroomId == studentClassroomId && sl.IsCompleted)
+                    .Where(sl => sl.StudentClassroom.StudentId == studentId && sl.IsCompleted)
                     .Select(sl => sl.LessonId)
                     .OrderBy(id => id)
                     .ToListAsync();
 
                 var completedTopics = await _context.StudentTopics
-                    .Where(st => st.StudentClassroomId == studentClassroomId && st.IsCompleted)
+                    .Where(st => st.StudentClassroom.StudentId == studentId && st.IsCompleted)
                     .Select(st => st.TopicId)
                     .OrderBy(id => id)
                     .ToListAsync();
 
                 var completedAssessments = await _context.StudentAssessments
-                    .Where(sa => sa.StudentClassroomId == studentClassroomId && sa.IsCompleted)
+                    .Where(sa => sa.StudentClassroom.StudentId == studentId && sa.IsCompleted)
                     .Select(sa => sa.AssessmentId)
                     .OrderBy(id => id)
                     .ToListAsync();

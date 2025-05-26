@@ -26,9 +26,9 @@ namespace backend.Presentation
             return BadRequest(new { message = "Unexpected Error Occurred" });
         }
         [HttpGet("get-student-progress-by-StudentClassroom-id")]
-        public async Task<IActionResult> GetStudentProgressByClassroomId([FromQuery] int studentClassroomId)
+        public async Task<IActionResult> GetStudentProgressByClassroomId([FromQuery] int studentId)
         {
-            var result = await _studentClassroomService.GetStudentProgressByClassroomIdAsync(studentClassroomId);
+            var result = await _studentClassroomService.GetStudentProgressByClassroomIdAsync(studentId);
 
             if (result != null)
             {
