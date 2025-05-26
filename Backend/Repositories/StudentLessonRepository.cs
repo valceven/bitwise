@@ -18,6 +18,7 @@ namespace backend.Repositories
         {
             var studentLessons = await _context.StudentLessons
                 .Include(sl => sl.Lesson)
+                .Include(sl => sl.StudentClassroom)
                 .Where(sl => sl.StudentClassroom.ClassroomId == getStudentLessonProgressDto.ClassroomId)
                 .ToListAsync();
 
