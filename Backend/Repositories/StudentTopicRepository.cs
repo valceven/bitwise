@@ -52,6 +52,7 @@ namespace backend.Repositories
         public async Task<ICollection<StudentTopic>> GetAllStudentTopicProgressdAsync(StudentTopicProgress studentTopicProgress)
         {
             var studentTopics = await _context.StudentTopics
+                .Include(st => st.Topic)
                 .Where(st => st.StudentClassroom.ClassroomId == studentTopicProgress.ClassroomId)
                 .ToListAsync();
 

@@ -457,9 +457,6 @@ namespace backend.Migrations
                     b.Property<int>("LessonId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
                     b.Property<string>("TopicName")
                         .IsRequired()
                         .HasColumnType("text");

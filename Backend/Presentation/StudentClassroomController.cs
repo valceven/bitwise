@@ -25,7 +25,18 @@ namespace backend.Presentation
 
             return BadRequest(new { message = "Unexpected Error Occurred" });
         }
+        [HttpGet("get-student-progress-by-StudentClassroom-id")]
+        public async Task<IActionResult> GetStudentProgressByClassroomId([FromQuery] int studentClassroomId)
+        {
+            var result = await _studentClassroomService.GetStudentProgressByClassroomIdAsync(studentClassroomId);
 
+            if (result != null)
+            {
+                return Ok(new { message = "Student Progress Fetched Successfully", progress = result });
+            }
+
+            return NotFound(new { message = "No Progress Found for this Student" });
+        }
         
     }
 }

@@ -44,6 +44,24 @@ namespace backend.Services
         {
             var result = await _studentLessonRepository.GetAllStudentLessonProgressAsync(getStudentLessonProgressDto);
 
+            // get result where result.LessonId == getStudentLessonProgressDto.LessonId
+            result = result.Where(r => r.LessonId == getStudentLessonProgressDto.LessonId).ToList();
+            if (!result.Any())
+            {
+                return 0.0f;
+            }
+
+            int totalRecords = result.Count();
+            int completedRecords = result.Count(r => r.IsCompleted);
+
+            float completionRate = (float)completedRecords / totalRecords * 100;
+
+            return (float)Math.Round(completionRate, 0);
+        }
+        public async Task<float> GetStudentLessonCompletionRateByClassroomId(int classroomId)
+        {
+            var result = await _studentLessonRepository.GetAllStudentLessonProgressAsync(new GetStudentLessonProgressDto { ClassroomId = classroomId });
+
             if (result == null || !result.Any())
             {
                 return 0.0f;
@@ -51,9 +69,9 @@ namespace backend.Services
 
             int totalRecords = result.Count();
             int completedRecords = result.Count(r => r.IsCompleted);
-            
+
             float completionRate = (float)completedRecords / totalRecords * 100;
-            
+
             return (float)Math.Round(completionRate, 0);
         }
     }
