@@ -80,5 +80,17 @@ namespace backend.Presentation
 
             return BadRequest(new { message = "Failed to get StudentTopicIds" });
         }
+        [HttpGet("get-student-topic-progress")]
+        public async Task<IActionResult> GetStudentTopicProgress([FromQuery] int classroomId)
+        {
+            var result = await _studentTopicService.GetStudentTopicProgressByClassroomIdAsync(classroomId);
+
+            if (result != null)
+            {
+                return Ok(result);
+            }
+
+            return NotFound(new { message = "No progress found for this student and topic" });
+        }
     }
 }

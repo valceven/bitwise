@@ -57,6 +57,23 @@ namespace backend.Services
             
             return (float)Math.Round(completionRate, 0);
         }
+        public async Task<float> GetStudentTopicProgressByClassroomIdAsync(int classroomId)
+        {
+            var studentTopics = await _studentTopicRepository.GetAllStudentTopics();
+            if (studentTopics == null || !studentTopics.Any())
+            {
+                throw new Exception("No progress found for any student in the specified classroom.");
+            }
+            studentTopics = studentTopics.Where(st => st.StudentClassroom.ClassroomId == classroomId).ToList();
+
+            int totalRecords = studentTopics.Count();
+            int completedRecords = studentTopics.Count(st => st.IsCompleted);
+
+            float completionRate = (float)completedRecords / totalRecords * 100;
+
+            return (float)Math.Round(completionRate, 0);
+        }
+
 
         public async Task<List<int>> GetStudentTopicIdsAsync(int StudentId)
         {

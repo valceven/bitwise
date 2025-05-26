@@ -58,7 +58,7 @@ namespace backend.Repositories
 
             return studentTopics;
         }
-        
+
         private async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0;
@@ -69,6 +69,13 @@ namespace backend.Repositories
             return await _context.StudentTopics
                 .Where(st => st.StudentClassroom.StudentId == StudentId)
                 .Select(st => st.StudentTopicId)
+                .ToListAsync();
+        }
+        public async Task<ICollection<StudentTopic>> GetAllStudentTopics()
+        {
+            return await _context.StudentTopics
+                .Include(st => st.Topic)
+                .Include(st => st.StudentClassroom)
                 .ToListAsync();
         }
     }
