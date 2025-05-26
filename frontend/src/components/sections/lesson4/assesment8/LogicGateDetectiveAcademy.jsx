@@ -1,0 +1,882 @@
+import React, { useState, useEffect, useCallback } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { CheckCircle, XCircle, ChevronLeft, ChevronRight, Clock, Award, BookOpen, ArrowRight, Info, Zap, Target, Timer, Star, RotateCcw, Play, Settings, Search, Lightbulb, Cpu, AlertTriangle, Shield, Calculator, Home } from "lucide-react"
+
+// Enhanced color palette (same as previous)
+const colors = {
+  greenz: "#27AE60",
+  darkpurple: "#9B51E0",
+  bluez: "#6E61FF",
+  yellowz: "#F2C94C",
+  cyanz: "#56CCF2",
+  grayz: "#29314D",
+  orangez: "#F2994A",
+  lightpurple: "#DAC3FF",
+  offwhite: "#F1F6F1",
+  redz: "#F14E3A",
+  white: "#FFFFFF",
+  blackz: "#031926",
+  pinkz: "#FF6B9D",
+  mintgreenz: "#51E5A8",
+  lavenderz: "#B794F6",
+  coralz: "#FF8A80",
+  tealz: "#26C6DA",
+  indigoz: "#5C7CFA",
+  emeraldz: "#10B981",
+  rosez: "#FB7185",
+  violetz: "#8B5CF6",
+  ambez: "#F59E0B",
+  limez: "#84CC16",
+  skyz: "#0EA5E9"
+}
+
+// Typewriter Component (same as previous)
+const Typewriter = ({ text, delay = 50, className = "", onComplete }) => {
+  const [displayText, setDisplayText] = useState("")
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isComplete, setIsComplete] = useState(false)
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayText(prev => prev + text[currentIndex])
+        setCurrentIndex(currentIndex + 1)
+      }, delay)
+      
+      return () => clearTimeout(timeout)
+    } else if (!isComplete) {
+      setIsComplete(true)
+      if (onComplete) onComplete()
+    }
+  }, [currentIndex, delay, text, isComplete, onComplete])
+
+  return <span className={className}>{displayText}</span>
+}
+
+// Logic Gate Symbols Component
+const LogicGateSymbol = ({ gateType, className = "w-16 h-12" }) => {
+  const symbols = {
+    AND: (
+      <svg className={className} viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M10 10 L40 10 Q70 10 70 30 Q70 50 40 50 L10 50 Z" fill="white" stroke="black"/>
+        <line x1="0" y1="20" x2="10" y2="20"/>
+        <line x1="0" y1="40" x2="10" y2="40"/>
+        <line x1="70" y1="30" x2="80" y2="30"/>
+        <text x="30" y="35" fontSize="8" textAnchor="middle" fill="black">AND</text>
+      </svg>
+    ),
+    OR: (
+      <svg className={className} viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M10 10 Q40 10 50 30 Q40 50 10 50 Q25 30 10 10" fill="white" stroke="black"/>
+        <line x1="0" y1="20" x2="15" y2="20"/>
+        <line x1="0" y1="40" x2="15" y2="40"/>
+        <line x1="50" y1="30" x2="60" y2="30"/>
+        <text x="25" y="35" fontSize="8" textAnchor="middle" fill="black">OR</text>
+      </svg>
+    ),
+    NOT: (
+      <svg className={className} viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M10 10 L40 30 L10 50 Z" fill="white" stroke="black"/>
+        <circle cx="45" cy="30" r="3" fill="white" stroke="black"/>
+        <line x1="0" y1="30" x2="10" y2="30"/>
+        <line x1="48" y1="30" x2="58" y2="30"/>
+        <text x="20" y="35" fontSize="8" textAnchor="middle" fill="black">NOT</text>
+      </svg>
+    ),
+    NAND: (
+      <svg className={className} viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M10 10 L40 10 Q70 10 70 30 Q70 50 40 50 L10 50 Z" fill="white" stroke="black"/>
+        <circle cx="73" cy="30" r="3" fill="white" stroke="black"/>
+        <line x1="0" y1="20" x2="10" y2="20"/>
+        <line x1="0" y1="40" x2="10" y2="40"/>
+        <line x1="76" y1="30" x2="86" y2="30"/>
+        <text x="30" y="35" fontSize="6" textAnchor="middle" fill="black">NAND</text>
+      </svg>
+    ),
+    NOR: (
+      <svg className={className} viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M10 10 Q40 10 50 30 Q40 50 10 50 Q25 30 10 10" fill="white" stroke="black"/>
+        <circle cx="53" cy="30" r="3" fill="white" stroke="black"/>
+        <line x1="0" y1="20" x2="15" y2="20"/>
+        <line x1="0" y1="40" x2="15" y2="40"/>
+        <line x1="56" y1="30" x2="66" y2="30"/>
+        <text x="25" y="35" fontSize="7" textAnchor="middle" fill="black">NOR</text>
+      </svg>
+    ),
+    XOR: (
+      <svg className={className} viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M10 10 Q40 10 50 30 Q40 50 10 50 Q25 30 10 10" fill="white" stroke="black"/>
+        <path d="M5 10 Q20 30 5 50" fill="none" stroke="black"/>
+        <line x1="0" y1="20" x2="10" y2="20"/>
+        <line x1="0" y1="40" x2="10" y2="40"/>
+        <line x1="50" y1="30" x2="60" y2="30"/>
+        <text x="25" y="35" fontSize="8" textAnchor="middle" fill="black">XOR</text>
+      </svg>
+    ),
+    XNOR: (
+      <svg className={className} viewBox="0 0 100 60" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M10 10 Q40 10 50 30 Q40 50 10 50 Q25 30 10 10" fill="white" stroke="black"/>
+        <path d="M5 10 Q20 30 5 50" fill="none" stroke="black"/>
+        <circle cx="53" cy="30" r="3" fill="white" stroke="black"/>
+        <line x1="0" y1="20" x2="10" y2="20"/>
+        <line x1="0" y1="40" x2="10" y2="40"/>
+        <line x1="56" y1="30" x2="66" y2="30"/>
+        <text x="25" y="35" fontSize="6" textAnchor="middle" fill="black">XNOR</text>
+      </svg>
+    )
+  }
+  
+  return symbols[gateType] || null
+}
+
+// Truth Table Component
+const TruthTable = ({ inputs, output, title = "Truth Table" }) => {
+  const inputNames = Object.keys(inputs[0])
+  
+  return (
+    <div className="p-4 rounded-lg" style={{ backgroundColor: `${colors.cyanz}10` }}>
+      <h4 className="font-bold mb-3 text-center" style={{ color: colors.cyanz }}>
+        {title}
+      </h4>
+      <div className="overflow-x-auto">
+        <table className="w-full text-center text-sm">
+          <thead>
+            <tr className="border-b-2" style={{ borderColor: colors.cyanz }}>
+              {inputNames.map(name => (
+                <th key={name} className="p-2 font-bold" style={{ color: colors.grayz }}>
+                  {name}
+                </th>
+              ))}
+              <th className="p-2 font-bold" style={{ color: colors.grayz }}>Y</th>
+            </tr>
+          </thead>
+          <tbody>
+            {inputs.map((row, idx) => (
+              <tr key={idx} className="border-b" style={{ borderColor: `${colors.cyanz}30` }}>
+                {inputNames.map(name => (
+                  <td key={name} className="p-2 font-mono" style={{ color: colors.grayz }}>
+                    {row[name]}
+                  </td>
+                ))}
+                <td className="p-2 font-mono font-bold" 
+                    style={{ color: output[idx] ? colors.emeraldz : colors.coralz }}>
+                  {output[idx]}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+// Draggable Gate Component
+const DraggableGate = ({ gateType, onDrop, isDropped = false }) => {
+  return (
+    <motion.div
+      drag={!isDropped}
+      dragSnapToOrigin={!isDropped}
+      className={`cursor-move p-2 rounded-lg border-2 ${isDropped ? 'opacity-50' : ''}`}
+      style={{ 
+        backgroundColor: colors.white,
+        borderColor: isDropped ? colors.grayz : colors.cyanz
+      }}
+      whileHover={{ scale: isDropped ? 1 : 1.05 }}
+      whileDrag={{ scale: 1.1, zIndex: 100 }}
+    >
+      <LogicGateSymbol gateType={gateType} className="w-12 h-8" />
+      <div className="text-xs text-center mt-1 font-bold" style={{ color: colors.grayz }}>
+        {gateType}
+      </div>
+    </motion.div>
+  )
+}
+
+// Logic Gate Detective Game Component
+const LogicGateDetectiveGame = ({ onComplete }) => {
+  const [currentCase, setCurrentCase] = useState(0)
+  const [score, setScore] = useState(0)
+  const [casesolved, setCasesSolved] = useState(0)
+  const [gameState, setGameState] = useState('intro') // intro, playing, case_solved, completed
+  const [selectedAnswer, setSelectedAnswer] = useState(null)
+  const [showFeedback, setShowFeedback] = useState(false)
+  const [showInstructions, setShowInstructions] = useState(true)
+  const [instructionStep, setInstructionStep] = useState(0)
+  const [showHint, setShowHint] = useState(false)
+  const [hintsUsed, setHintsUsed] = useState(0)
+  const [droppedGates, setDroppedGates] = useState({})
+
+  // Instructions for the game
+  const instructions = [
+    "Welcome to the Logic Gate Detective Academy! 🕵️⚡ You're now a Digital Circuit Investigator.",
+    "Your mission: Solve mysterious cases involving malfunctioning digital devices and circuits.",
+    "You'll analyze truth tables, identify logic gates, and build circuits to restore functionality.",
+    "Each case tests different skills: gate identification, circuit analysis, and hands-on building.",
+    "Ready to become a master of digital logic? Let's investigate these electronic mysteries! 🔍"
+  ]
+
+  // Detective cases with progressive difficulty
+  const detectiveCases = [
+    // Level 1 - Basic Gate Identification
+    {
+      id: 1,
+      title: "The Broken Smart Door Lock",
+      difficulty: "Rookie",
+      scenario: "A smart door lock malfunctioned. It should only open when BOTH the key card is scanned AND the correct PIN is entered. Help identify the logic gate!",
+      caseType: "gate_identification",
+      device: "🚪 Smart Door Lock",
+      truthTable: {
+        inputs: [
+          { "Card": 0, "PIN": 0 },
+          { "Card": 0, "PIN": 1 },
+          { "Card": 1, "PIN": 0 },
+          { "Card": 1, "PIN": 1 }
+        ],
+        output: [0, 0, 0, 1]
+      },
+      options: [
+        { gate: "AND", isCorrect: true, explanation: "Correct! AND gate outputs 1 only when ALL inputs are 1. Perfect for requiring both card AND PIN." },
+        { gate: "OR", isCorrect: false, explanation: "OR would open the door with just the card OR just the PIN - not secure!" },
+        { gate: "NAND", isCorrect: false, explanation: "NAND would keep the door locked when both card and PIN are correct - opposite of what we want!" },
+        { gate: "XOR", isCorrect: false, explanation: "XOR would open only when card OR PIN is present, but not both - very insecure!" }
+      ],
+      hint: "The door should open ONLY when BOTH conditions are true. Which gate requires ALL inputs to be high?",
+      points: 100
+    },
+
+    {
+      id: 2,
+      title: "The Faulty Fire Alarm System",
+      difficulty: "Rookie", 
+      scenario: "A fire alarm should trigger when smoke is detected OR when the manual button is pressed. But it's not working correctly...",
+      caseType: "gate_identification",
+      device: "🚨 Fire Alarm System",
+      truthTable: {
+        inputs: [
+          { "Smoke": 0, "Button": 0 },
+          { "Smoke": 0, "Button": 1 },
+          { "Smoke": 1, "Button": 0 },
+          { "Smoke": 1, "Button": 1 }
+        ],
+        output: [0, 1, 1, 1]
+      },
+      options: [
+        { gate: "OR", isCorrect: true, explanation: "Correct! OR gate triggers when ANY input is high - perfect for smoke OR manual activation." },
+        { gate: "AND", isCorrect: false, explanation: "AND would require both smoke AND button press simultaneously - not practical for safety!" },
+        { gate: "XOR", isCorrect: false, explanation: "XOR would turn OFF the alarm when both smoke and button are active - dangerous!" },
+        { gate: "NOR", isCorrect: false, explanation: "NOR would only activate when neither smoke nor button is detected - completely backwards!" }
+      ],
+      hint: "Safety systems should activate when ANY dangerous condition occurs. Which gate outputs 1 when any input is 1?",
+      points: 120
+    },
+
+    {
+      id: 3,
+      title: "The Mysterious Inverter Circuit",
+      difficulty: "Detective",
+      scenario: "A digital display is showing inverted signals. When input is HIGH, output should be LOW, and vice versa. Identify the gate!",
+      caseType: "gate_identification", 
+      device: "📺 Digital Display Controller",
+      truthTable: {
+        inputs: [
+          { "Input": 0 },
+          { "Input": 1 }
+        ],
+        output: [1, 0]
+      },
+      options: [
+        { gate: "NOT", isCorrect: true, explanation: "Perfect! NOT gate (inverter) flips the input - 0 becomes 1, and 1 becomes 0." },
+        { gate: "AND", isCorrect: false, explanation: "AND gate needs two inputs. This is a single-input problem." },
+        { gate: "OR", isCorrect: false, explanation: "OR gate also needs two inputs, and wouldn't invert the signal." },
+        { gate: "XOR", isCorrect: false, explanation: "XOR needs two inputs. For inversion, we need a single-input gate." }
+      ],
+      hint: "This gate has only ONE input and flips the signal. What's the simplest logic operation for inversion?",
+      points: 150
+    },
+
+    {
+      id: 4,
+      title: "The Exclusive Security Scanner",
+      difficulty: "Detective",
+      scenario: "A security scanner should beep when EXACTLY ONE sensor detects movement (not both sensors, not neither). What gate controls this behavior?",
+      caseType: "gate_identification",
+      device: "🔐 Security Motion Scanner", 
+      truthTable: {
+        inputs: [
+          { "Sensor1": 0, "Sensor2": 0 },
+          { "Sensor1": 0, "Sensor2": 1 },
+          { "Sensor1": 1, "Sensor2": 0 },
+          { "Sensor1": 1, "Sensor2": 1 }
+        ],
+        output: [0, 1, 1, 0]
+      },
+      options: [
+        { gate: "XOR", isCorrect: true, explanation: "Excellent! XOR outputs 1 only when inputs are different - exactly one sensor active." },
+        { gate: "OR", isCorrect: false, explanation: "OR would also trigger when BOTH sensors are active - not exclusive enough." },
+        { gate: "AND", isCorrect: false, explanation: "AND only triggers when BOTH sensors are active - opposite of what we want." },
+        { gate: "NAND", isCorrect: false, explanation: "NAND would be active most of the time, including when no sensors are triggered." }
+      ],
+      hint: "This gate outputs 1 only when inputs are DIFFERENT. It's the 'exclusive' gate - what's it called?",
+      points: 200
+    },
+
+    {
+      id: 5,
+      title: "The Universal Gate Challenge",
+      difficulty: "Senior Detective",
+      scenario: "A manufacturing plant only has NAND gates available. They need to create a NOT gate function. Can you identify what configuration works?",
+      caseType: "circuit_building",
+      device: "🏭 Manufacturing Logic Controller",
+      challenge: "Build a NOT gate using only NAND gates",
+      availableGates: ["NAND", "NAND", "NAND"],
+      targetTruthTable: {
+        inputs: [{ "A": 0 }, { "A": 1 }],
+        output: [1, 0]
+      },
+      correctCircuit: ["Connect input A to both inputs of a NAND gate"],
+      hint: "Remember: A NAND A = NOT A. Connect the same input to both NAND inputs!",
+      points: 300
+    },
+
+    {
+      id: 6,
+      title: "The Calculator Crisis - Half Adder",
+      difficulty: "Senior Detective", 
+      scenario: "A calculator's binary adder is broken. You need to build a half-adder that adds two bits and produces Sum and Carry outputs.",
+      caseType: "circuit_analysis",
+      device: "🧮 Digital Calculator",
+      circuitDescription: "Two inputs A and B. Sum = A XOR B, Carry = A AND B",
+      truthTable: {
+        inputs: [
+          { "A": 0, "B": 0 },
+          { "A": 0, "B": 1 },
+          { "A": 1, "B": 0 },
+          { "A": 1, "B": 1 }
+        ],
+        sum: [0, 1, 1, 0],
+        carry: [0, 0, 0, 1]
+      },
+      questions: [
+        {
+          question: "What gate produces the Sum output?",
+          options: ["XOR", "AND", "OR", "NAND"],
+          correct: 0,
+          explanation: "XOR gives 1 when inputs are different - perfect for binary addition sum!"
+        },
+        {
+          question: "What gate produces the Carry output?", 
+          options: ["OR", "AND", "XOR", "NOT"],
+          correct: 1,
+          explanation: "AND gives 1 only when both inputs are 1 - exactly when we need a carry bit!"
+        }
+      ],
+      hint: "Think about binary addition: 1+1=10 (sum=0, carry=1). Which gates match this behavior?",
+      points: 350
+    }
+  ]
+
+  const startGame = () => {
+    setGameState('playing')
+    setShowInstructions(false)
+  }
+
+  const nextInstruction = () => {
+    if (instructionStep < instructions.length - 1) {
+      setInstructionStep(instructionStep + 1)
+    } else {
+      startGame()
+    }
+  }
+
+  const selectAnswer = (answerIndex) => {
+    if (showFeedback) return
+    setSelectedAnswer(answerIndex)
+  }
+
+  const submitAnswer = () => {
+    if (selectedAnswer === null) return
+
+    const currentProblem = detectiveCases[currentCase]
+    let isCorrect = false
+    
+    if (currentProblem.caseType === 'gate_identification') {
+      isCorrect = currentProblem.options[selectedAnswer].isCorrect
+    } else if (currentProblem.caseType === 'circuit_analysis') {
+      // Handle multi-question cases
+      isCorrect = true // For now, simplified
+    }
+    
+    if (isCorrect) {
+      const points = currentProblem.points - (hintsUsed * 25)
+      setScore(score + Math.max(50, points))
+      setCasesSolved(casesolved + 1)
+      setGameState('case_solved')
+    }
+    
+    setShowFeedback(true)
+    
+    setTimeout(() => {
+      if (currentCase < detectiveCases.length - 1) {
+        nextCase()
+      } else {
+        setGameState('completed')
+        if (onComplete) onComplete(score)
+      }
+    }, 3000)
+  }
+
+  const nextCase = () => {
+    setCurrentCase(currentCase + 1)
+    setSelectedAnswer(null)
+    setShowFeedback(false)
+    setGameState('playing')
+    setShowHint(false)
+    setHintsUsed(0)
+  }
+
+  const resetGame = () => {
+    setCurrentCase(0)
+    setScore(0)
+    setCasesSolved(0)
+    setGameState('intro')
+    setShowInstructions(true)
+    setInstructionStep(0)
+    setSelectedAnswer(null)
+    setShowFeedback(false)
+    setShowHint(false)
+    setHintsUsed(0)
+    setDroppedGates({})
+  }
+
+  const showHintHandler = () => {
+    setShowHint(true)
+    setHintsUsed(hintsUsed + 1)
+  }
+
+  // Intro/Instructions Screen
+  if (gameState === 'intro' && showInstructions) {
+    return (
+      <div className="space-y-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center"
+               style={{ background: `linear-gradient(135deg, ${colors.violetz}, ${colors.cyanz})` }}>
+            <span className="text-3xl">🔌</span>
+          </div>
+          <h2 className="text-3xl font-bold mb-4" style={{ color: colors.grayz }}>
+            Logic Gate Detective Academy
+          </h2>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="p-8 rounded-xl shadow-lg min-h-32"
+          style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.violetz}10)` }}
+        >
+          <div className="text-lg leading-relaxed" style={{ color: colors.grayz }}>
+            <Typewriter
+              text={instructions[instructionStep]}
+              delay={30}
+              onComplete={() => setTimeout(() => {}, 1000)}
+            />
+          </div>
+        </motion.div>
+
+        <div className="flex justify-between items-center">
+          <div className="flex space-x-2">
+            {instructions.map((_, idx) => (
+              <div
+                key={idx}
+                className="w-3 h-3 rounded-full transition-all"
+                style={{
+                  backgroundColor: idx <= instructionStep ? colors.violetz : colors.grayz + "40"
+                }}
+              />
+            ))}
+          </div>
+          
+          <motion.button
+            onClick={nextInstruction}
+            className="px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105"
+            style={{ backgroundColor: colors.violetz, color: colors.white }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {instructionStep === instructions.length - 1 ? (
+              <>Start Investigation! <Cpu className="h-5 w-5 ml-2 inline" /></>
+            ) : (
+              <>Next <ArrowRight className="h-5 w-5 ml-2 inline" /></>
+            )}
+          </motion.button>
+        </div>
+      </div>
+    )
+  }
+
+  // Case Solved Screen
+  if (gameState === 'case_solved') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center space-y-6"
+      >
+        <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center"
+             style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})` }}>
+          <CheckCircle className="h-10 w-10 text-white" />
+        </div>
+        
+        <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+          Case Solved! 🎉
+        </h2>
+        
+        <div className="text-6xl">⚡</div>
+        
+        <p className="text-lg" style={{ color: colors.grayz }}>
+          Excellent work, Detective! Moving to the next case...
+        </p>
+      </motion.div>
+    )
+  }
+
+  // Completion Screen
+  if (gameState === 'completed') {
+    const accuracy = Math.round((casesolved / detectiveCases.length) * 100)
+    
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center space-y-6"
+      >
+        <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center"
+             style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})` }}>
+          <Award className="h-12 w-12 text-white" />
+        </div>
+        
+        <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
+          Detective Academy Graduated! 🎉
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-lg mx-auto">
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.violetz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.violetz }}>{score}</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Total Score</div>
+          </div>
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.emeraldz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.emeraldz }}>{casesolved}</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Cases Solved</div>
+          </div>
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.cyanz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.cyanz }}>{accuracy}%</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Success Rate</div>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-xl" 
+             style={{ backgroundColor: score >= 1500 ? `${colors.emeraldz}10` : score >= 1000 ? `${colors.cyanz}10` : `${colors.violetz}10` }}>
+          <h3 className="font-bold text-lg mb-2" 
+              style={{ color: score >= 1500 ? colors.emeraldz : score >= 1000 ? colors.cyanz : colors.violetz }}>
+            {score >= 1500 ? "Master Logic Detective! 🌟" :
+             score >= 1000 ? "Expert Circuit Analyst! 🎯" :
+             score >= 600 ? "Skilled Gate Inspector! 👍" : "Junior Investigator! 📚"}
+          </h3>
+          <p className="text-sm" style={{ color: colors.grayz }}>
+            {score >= 1500 ? "Outstanding! You've mastered logic gates and digital circuits with exceptional skill." :
+             score >= 1000 ? "Excellent work! You have a strong understanding of logic gates and circuit analysis." :
+             score >= 600 ? "Well done! You're developing good skills in digital logic and gate identification." :
+             "Good effort! Keep practicing to improve your logic gate knowledge and circuit analysis skills."}
+          </p>
+        </div>
+
+        <div className="flex justify-center gap-4">
+          <motion.button
+            onClick={resetGame}
+            className="px-6 py-3 rounded-lg font-medium transition-all"
+            style={{ backgroundColor: colors.cyanz, color: colors.white }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <RotateCcw className="h-4 w-4 mr-2 inline" />
+            Investigate Again
+          </motion.button>
+        </div>
+      </motion.div>
+    )
+  }
+
+  const currentProblem = detectiveCases[currentCase]
+  
+  return (
+    <div className="space-y-6">
+      {/* Game Stats */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex justify-between items-center p-4 rounded-xl" 
+        style={{ backgroundColor: `${colors.violetz}20` }}
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Target className="h-5 w-5" style={{ color: colors.violetz }} />
+            <span className="font-bold" style={{ color: colors.violetz }}>Score: {score}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Settings className="h-5 w-5" style={{ color: colors.emeraldz }} />
+            <span className="font-bold" style={{ color: colors.emeraldz }}>Solved: {casesolved}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="px-3 py-1 rounded-full font-bold text-sm"
+               style={{ 
+                 backgroundColor: currentProblem.difficulty === 'Rookie' ? `${colors.emeraldz}20` :
+                                  currentProblem.difficulty === 'Detective' ? `${colors.violetz}20` : `${colors.coralz}20`,
+                 color: currentProblem.difficulty === 'Rookie' ? colors.emeraldz :
+                        currentProblem.difficulty === 'Detective' ? colors.violetz : colors.coralz
+               }}>
+            {currentProblem.difficulty}
+          </div>
+          <div className="px-3 py-1 rounded-full font-bold"
+               style={{ backgroundColor: colors.indigoz, color: colors.white }}>
+            Case {currentCase + 1}/{detectiveCases.length}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Case Header */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-center"
+      >
+        <h3 className="text-2xl font-bold mb-2" style={{ color: colors.grayz }}>
+          🔍 {currentProblem.title}
+        </h3>
+        <div className="text-3xl mb-2">{currentProblem.device}</div>
+        <p className="text-lg mb-4" style={{ color: colors.grayz }}>
+          {currentProblem.scenario}
+        </p>
+      </motion.div>
+
+      {/* Truth Table Display */}
+      {currentProblem.truthTable && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <TruthTable 
+            inputs={currentProblem.truthTable.inputs}
+            output={currentProblem.truthTable.output || currentProblem.truthTable.sum}
+            title="Observed Truth Table"
+          />
+        </motion.div>
+      )}
+
+      {/* Additional Truth Table for Half Adder */}
+      {currentProblem.id === 6 && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          <TruthTable 
+            inputs={currentProblem.truthTable.inputs}
+            output={currentProblem.truthTable.sum}
+            title="Sum Output"
+          />
+          <TruthTable 
+            inputs={currentProblem.truthTable.inputs}
+            output={currentProblem.truthTable.carry}
+            title="Carry Output"
+          />
+        </motion.div>
+      )}
+
+      {/* Hint Section */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}
+        className="text-center"
+      >
+        {!showHint ? (
+          <button
+            onClick={showHintHandler}
+            className="flex items-center gap-2 mx-auto px-4 py-2 rounded-lg font-medium transition-all hover:scale-105"
+            style={{ backgroundColor: `${colors.yellowz}20`, color: colors.ambez }}
+          >
+            <Lightbulb className="h-4 w-4" />
+            Need a Hint? (-25 points)
+          </button>
+        ) : (
+          <div className="p-4 rounded-xl border-2" 
+               style={{ 
+                 backgroundColor: `${colors.yellowz}10`,
+                 borderColor: colors.yellowz,
+                 color: colors.ambez
+               }}>
+            <div className="flex items-center gap-2 mb-2">
+              <Lightbulb className="h-5 w-5" />
+              <span className="font-bold">Detective Hint:</span>
+            </div>
+            <p className="text-sm">{currentProblem.hint}</p>
+          </div>
+        )}
+      </motion.div>
+
+      {/* Answer Options */}
+      {currentProblem.caseType === 'gate_identification' && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="space-y-4"
+        >
+          <h4 className="text-lg font-bold text-center" style={{ color: colors.grayz }}>
+            🔧 Which Logic Gate Is Responsible?
+          </h4>
+          
+          <div className="grid grid-cols-2 gap-4">
+            {currentProblem.options.map((option, idx) => {
+              const isSelected = selectedAnswer === idx
+              const isCorrectAnswer = showFeedback && option.isCorrect
+              const isWrongAnswer = showFeedback && selectedAnswer === idx && !option.isCorrect
+              
+              return (
+                <motion.button
+                  key={idx}
+                  onClick={() => selectAnswer(idx)}
+                  disabled={showFeedback}
+                  className="p-6 rounded-xl border-2 transition-all transform hover:scale-102 text-center"
+                  style={{
+                    backgroundColor: isCorrectAnswer ? `${colors.emeraldz}20` : 
+                                   isWrongAnswer ? `${colors.coralz}20` :
+                                   isSelected ? `${colors.violetz}20` : colors.white,
+                    borderColor: isCorrectAnswer ? colors.emeraldz :
+                               isWrongAnswer ? colors.coralz :
+                               isSelected ? colors.violetz : colors.cyanz,
+                    opacity: showFeedback ? (option.isCorrect ? 1 : 0.7) : 1
+                  }}
+                  whileHover={{ scale: showFeedback ? 1 : 1.02 }}
+                  whileTap={{ scale: showFeedback ? 1 : 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 + idx * 0.1 }}
+                >
+                  <div className="flex flex-col items-center space-y-3">
+                    <LogicGateSymbol gateType={option.gate} className="w-20 h-16" />
+                    <span className="font-bold text-lg" style={{ color: colors.grayz }}>
+                      {option.gate} Gate
+                    </span>
+                    {isCorrectAnswer && <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz }} />}
+                    {isWrongAnswer && <XCircle className="h-6 w-6" style={{ color: colors.coralz }} />}
+                  </div>
+                  
+                  {showFeedback && (
+                    <div className="mt-4 p-3 rounded-lg" 
+                         style={{ backgroundColor: `${colors.white}80` }}>
+                      <p className="text-sm" style={{ color: colors.grayz }}>
+                        {option.explanation}
+                      </p>
+                    </div>
+                  )}
+                </motion.button>
+              )
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Circuit Analysis Questions */}
+      {currentProblem.caseType === 'circuit_analysis' && currentProblem.questions && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="space-y-6"
+        >
+          {currentProblem.questions.map((question, qIdx) => (
+            <div key={qIdx} className="p-6 rounded-xl" 
+                 style={{ backgroundColor: `${colors.cyanz}10` }}>
+              <h4 className="font-bold mb-4" style={{ color: colors.cyanz }}>
+                Question {qIdx + 1}: {question.question}
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                {question.options.map((option, oIdx) => (
+                  <button
+                    key={oIdx}
+                    onClick={() => selectAnswer(qIdx * 10 + oIdx)} // Simple encoding
+                    className="p-3 rounded-lg border transition-all"
+                    style={{
+                      backgroundColor: selectedAnswer === qIdx * 10 + oIdx ? `${colors.violetz}20` : colors.white,
+                      borderColor: selectedAnswer === qIdx * 10 + oIdx ? colors.violetz : colors.grayz
+                    }}
+                  >
+                    <LogicGateSymbol gateType={option} className="w-16 h-12 mx-auto mb-2" />
+                    <div className="font-bold" style={{ color: colors.grayz }}>{option}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      )}
+
+      {/* Submit Button */}
+      {selectedAnswer !== null && !showFeedback && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <button
+            onClick={submitAnswer}
+            className="px-8 py-3 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
+            style={{ backgroundColor: colors.emeraldz, color: colors.white }}
+          >
+            Submit Answer <Cpu className="h-5 w-5 ml-2 inline" />
+          </button>
+        </motion.div>
+      )}
+
+      {/* Progress */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-center"
+      >
+        <div className="text-sm mb-2" style={{ color: colors.grayz }}>
+          Investigation Progress
+        </div>
+        <div className="w-full max-w-md mx-auto h-2 bg-gray-200 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full rounded-full"
+            style={{ backgroundColor: colors.violetz }}
+            initial={{ width: 0 }}
+            animate={{ width: `${((currentCase + 1) / detectiveCases.length) * 100}%` }}
+            transition={{ duration: 0.5 }}
+          />
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
+export default function LogicGateDetectiveAcademy({ onComplete }) {
+  return (
+    <div className="flex flex-col w-full max-w-5xl mx-auto pb-16 px-4 min-h-screen" 
+         style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.violetz}05)` }}>
+      <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
+        <LogicGateDetectiveGame onComplete={onComplete} />
+      </div>
+    </div>
+  )
+}

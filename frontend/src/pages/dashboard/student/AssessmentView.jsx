@@ -6,6 +6,8 @@ import TruthTableConstructionAssessment from '../../../components/sections/lesso
 import BooleanLawsAssessment from '../../../components/sections/lesson2/assessment4/BooleanLawsAssessment';
 import BooleanRace from '../../../components/sections/lesson2/assessment5/BooleanRace';
 import CodeDetectiveGamez from '../../../components/sections/lesson3/assessment7/CodeDetectiveGame';
+import LogicGateDetectiveAcademy from '../../../components/sections/lesson4/assesment8/LogicGateDetectiveAcademy';
+import CircuitBuilderAcademyMain from '../../../components/sections/lesson4/assessment9/CircuitBuilderAcademyMain';
 
 export const AssessmentView = () => {
   const { topicId, assessmentId } = useParams();
@@ -136,6 +138,11 @@ export const AssessmentView = () => {
         return <BooleanRace onComplete={handleScoreUpdate} />
       case '7': 
         return <CodeDetectiveGamez onComplete={handleScoreUpdate} />;
+      case '8':
+        return <LogicGateDetectiveAcademy onComplete={handleScoreUpdate} />;
+      case '9':
+        return <CircuitBuilderAcademyMain onComplete={handleScoreUpdate} />;
+        
       default:
         return (
           <div className="p-6 bg-white rounded-lg shadow-md">

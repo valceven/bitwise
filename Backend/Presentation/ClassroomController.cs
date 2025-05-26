@@ -93,7 +93,7 @@ namespace backend.Controllers
 
             return BadRequest("Failed to delete classroom.");
         }
-        [HttpPost("archive-classroom")]
+        [HttpPut("archive-classroom")]
         public async Task<IActionResult> ArchiveClassroom([FromBody] ArchiveClassroomDTO classroomDTO)
         {
             if (classroomDTO == null)
@@ -107,6 +107,22 @@ namespace backend.Controllers
                 return Ok(result);
 
             return BadRequest("Failed to archive classroom.");
+        }
+
+        [HttpPut("update-classroom")]
+        public async Task<IActionResult> UpdateClassroom([FromBody] UpdateClassroomDTO classroomResponseDTO)
+        {
+            if (classroomResponseDTO == null)
+            {
+                return BadRequest("Invalid data.");
+            }
+
+            var result = await _classroomService.UpdateClassroomAsync(classroomResponseDTO);
+
+            if (result)
+                return Ok(result);
+
+            return BadRequest("Failed to update classroom.");
         }
     }
 }

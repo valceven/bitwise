@@ -8,7 +8,7 @@ import { topic4Sections } from "../../../components/sections/lesson2/topic4/Topi
 import { topic2Sections } from "../../../components/sections/lesson1/topic2/Topic2Sections";
 import { topic3Sections } from "../../../components/sections/lesson1/topic3/Topic3Sections";
 import { topic5Sections } from "../../../components/sections/lesson2/topic5/Topic5Sections";
-//import { topic5Sections } from '../../components/sections/lesson2/topic5/Topic5Sections';
+import { topic6Sections } from '../../../components/sections/lesson2/topic6/Topic6Sections';
 import { topic7Sections } from "../../../components/sections/lesson3/topic7/Topic7Sections";
 import { topic8Sections } from "../../../components/sections/lesson4/topic8/Topic8Sections";
 import { topic9Sections } from "../../../components/sections/lesson4/topic9/Topic9Sections";
@@ -24,7 +24,7 @@ const TopicView = () => {
     { id: "3", lessonId: "1", topicSections: topic3Sections },
     { id: "4", lessonId: "2", topicSections: topic4Sections },
     { id: "5", lessonId: "2", topicSections: topic5Sections },
-    { id: "6", lessonId: "2", topicSections: [] }, // if you want a dummy topic
+    { id: "6", lessonId: "2", topicSections: topic6Sections },
     { id: "7", lessonId: "3", topicSections: topic7Sections },
     { id: "8", lessonId: "4", topicSections: topic8Sections },
     { id: "9", lessonId: "4", topicSections: topic9Sections },
@@ -44,7 +44,7 @@ const TopicView = () => {
   });
 
   useEffect(() => {
-    
+
   })
 
   const handleNext = () => {
