@@ -34,5 +34,11 @@ namespace backend.Presentation
             var result = await studentLessonService.GetStudentLessonCompletionRate(getStudentLessonProgressDto);
             return Ok(result);
         }
+        [HttpGet("get-student-lesson-completion-rate-by-classroom-id")]
+        public async Task<IActionResult> GetStudentLessonCompletionRateByClassroomId([FromServices] IStudentLessonService studentLessonService, [FromQuery] int classroomId)
+        {
+            var result = await studentLessonService.GetStudentLessonCompletionRateByClassroomId(classroomId);
+            return Ok(result);
+        }
     }
 }

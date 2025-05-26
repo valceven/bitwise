@@ -44,6 +44,7 @@ namespace backend.Services
         {
             var result = await _studentTopicRepository.GetAllStudentTopicProgressdAsync(studentTopicProgress);
 
+            result = result.Where(r => r.TopicId == studentTopicProgress.TopicId).ToList();
             if (result == null || !result.Any())
             {
                 return 0.0f;
