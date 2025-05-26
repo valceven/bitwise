@@ -61,6 +61,36 @@ const removeStudentFromClassroom = async (studentId, classroomID) => {
   }
 }
 
+const updateClassroom = async (classroomData) => {
+  try {
+    console.log("Updating classroom with data:", classroomData);
+    const response = await apiService.put("/classroom/update-classroom", classroomData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+};
+
+const deleteClassroom = async (classroomId) => {
+  try {
+    const response = await apiService.delete(`/classroom/delete-classroom/`, {
+      params: { classroomId }
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+}
+
+const archiveClassroom = async (data) => {
+  try {
+    const response = await apiService.put("/classroom/archive-classroom", data);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+}
+
 export const teacherApi = {
   createClassroom,
   fetchClassroomList,
@@ -68,4 +98,7 @@ export const teacherApi = {
   acceptPendingStudent,
   rejectPendingStudent,
   removeStudentFromClassroom,
+  updateClassroom,
+  deleteClassroom,
+  archiveClassroom
 };

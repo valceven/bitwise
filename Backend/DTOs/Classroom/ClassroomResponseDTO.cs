@@ -12,7 +12,8 @@ namespace backend.DTOs.Classroom
         public DateTime CreatedAt {get; set;}
         public int TeacherID {get; set;}
         public string ClassCode {get; set;}
-        public string Section {get; set;}
+        public bool IsArchived {get; set;}
+        public string Section { get; set; }
         public string Description {get; set;}
         public List<StudentInClassroomDto> Students {get; set; }
     }

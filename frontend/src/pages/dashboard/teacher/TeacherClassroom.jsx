@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from "react";
 import CreateClassModal from "../../../components/modals/CreateClassModal";
+import EditClassroomModal from "../../../components/modals/EditClassroomModal"; // Add this import
 import { teacherApi } from "../../../api/teacher/teacherApi";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
 import { Outlet, useParams } from "react-router-dom";
-import { PlusCircle, Copy, Users, Calendar, BookOpen, ClipboardList, BarChart4, Settings, Search, Clock, ExternalLink } from "lucide-react";
+import { PlusCircle, Copy, Users, Calendar, BookOpen, ClipboardList, BarChart4, Settings, Search, Clock, ExternalLink, Edit3, Archive, ArchiveRestore } from "lucide-react";
 
 const TeacherClassroom = ({ user }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Add this state
+  const [selectedClassroom, setSelectedClassroom] = useState(null); // Add this state
   const [classrooms, setClassrooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("active");
   const { id } = useParams();
 
   const navigate = useNavigate();
@@ -42,6 +45,62 @@ const TeacherClassroom = ({ user }) => {
   const navigateToStudentReport = (classCode) => {
     navigate(`/app/teacher/classroom/${classCode}`);
   };
+
+  // Handle opening edit modal
+  const handleEditClassroom = (e, classroom) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedClassroom(classroom);
+    setIsEditModalOpen(true);
+  };
+
+  const handleArchiveClassroom = async (e, classroom) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const isCurrentlyArchived = classroom.isArchived;
+    const action = isCurrentlyArchived ? 'unarchive' : 'archive';
+    
+    const data = {
+      teacherId: user.userID,
+      classroomId: classroom.classroomId
+    };
+
+    try {
+      await teacherApi.archiveClassroom(data);
+      
+      setClassrooms(prevClassrooms => 
+        prevClassrooms.map(c => 
+          c.classCode === classroom.classCode 
+            ? { ...c, isArchived: !isCurrentlyArchived }
+            : c
+        )
+      );
+      
+      toast.success(`Classroom ${action}d successfully!`);
+    } catch (error) {
+      console.error(`Error ${action}ing classroom:`, error);
+      toast.error(`Failed to ${action} classroom`);
+    }
+  };
+
+  // Handle classroom update
+  const handleClassroomUpdated = (updatedClassroom) => {
+    setClassrooms(prevClassrooms => 
+      prevClassrooms.map(classroom => 
+        classroom.classCode === updatedClassroom.classCode 
+          ? updatedClassroom 
+          : classroom
+      )
+    );
+  };
+
+  // Handle classroom deletion
+  const handleClassroomDeleted = (deletedClassCode) => {
+    setClassrooms(prevClassrooms => 
+      prevClassrooms.filter(classroom => classroom.classCode !== deletedClassCode)
+    );
+  };
   
   // Filter classrooms based on search term and active tab
   const filteredClassrooms = classrooms
@@ -52,16 +111,14 @@ const TeacherClassroom = ({ user }) => {
       classroom.classCode?.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .filter(classroom => {
-      if (activeTab === "all") return true;
+      if (activeTab === "active") return classroom.isArchived === false;
       if (activeTab === "recent") {
-        // Filter for classrooms created in the last 30 days
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         return new Date(classroom.createdAt) >= thirtyDaysAgo;
       }
       if (activeTab === "archived") {
-        // Assuming there's an archived property, replace with your actual logic
-        return classroom.archived === true;
+        return classroom.isArchived === true;
       }
       return true;
     });
@@ -142,10 +199,10 @@ const TeacherClassroom = ({ user }) => {
               
               <div className="flex space-x-1 rounded-lg bg-offwhite p-1">
                 <button 
-                  className={`px-4 py-2 rounded-lg ${activeTab === 'all' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'}`}
-                  onClick={() => setActiveTab('all')}
+                  className={`px-4 py-2 rounded-lg ${activeTab === 'active' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'}`}
+                  onClick={() => setActiveTab('active')}
                 >
-                  All
+                  Active
                 </button>
                 <button 
                   className={`px-4 py-2 rounded-lg flex items-center ${activeTab === 'recent' ? 'bg-white shadow-sm' : 'hover:bg-gray-100'}`}
@@ -255,8 +312,8 @@ const TeacherClassroom = ({ user }) => {
                         </div>
                       </div>
                       
-                      <div className="flex items-center">
-                        <span className="bg-gray-100 text-grayz text-xs font-mono py-1 px-2 rounded mr-1">
+                      <div className="flex items-center space-x-1">
+                        <span className="bg-gray-100 text-grayz text-xs font-mono py-1 px-2 rounded">
                           {classroom.classCode}
                         </span>
                         <button
@@ -265,6 +322,24 @@ const TeacherClassroom = ({ user }) => {
                           title="Copy class code"
                         >
                           <Copy size={16} className="text-gray-500" />
+                        </button>
+                        <button
+                          onClick={(e) => handleEditClassroom(e, classroom)}
+                          className="p-1.5 hover:bg-gray-100 rounded transition"
+                          title="Edit classroom"
+                        >
+                          <Edit3 size={16} className="text-gray-500" />
+                        </button>
+                        <button
+                          onClick={(e) => handleArchiveClassroom(e, classroom)}
+                          className="p-1.5 hover:bg-gray-100 rounded transition"
+                          title={classroom.isArchived ? "Unarchive classroom" : "Archive classroom"}
+                        >
+                          {classroom.isArchived ? (
+                            <ArchiveRestore size={16} className="text-green-600" />
+                          ) : (
+                            <Archive size={16} className="text-orange-600" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -333,6 +408,14 @@ const TeacherClassroom = ({ user }) => {
         onClose={() => setIsModalOpen(false)}
         title="Create a Class"
         user={user}
+      />
+
+      <EditClassroomModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        classroom={selectedClassroom}
+        onClassroomUpdated={handleClassroomUpdated}
+        onClassroomDeleted={handleClassroomDeleted}
       />
       
       <ToastContainer 

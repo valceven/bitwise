@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Users, CheckCircle, Award, Clock, AlertCircle } from "lucide-react";
+import { ArrowLeft, Users, CheckCircle, Award, Clock, AlertCircle, Trophy, BarChart3 } from "lucide-react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { studentTopicApi } from "../../../api/studentTopic/studentTopicApi";
+import Leaderboard from "./Leaderboard"; // Import the new Leaderboard component
 
 // Sample student data by topic - In real implementation, this would be fetched from an API
 const studentsData = {
@@ -73,6 +74,7 @@ const DashboardStudentReportTopics = ({ classroom }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [topic, setTopic] = useState(null);
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'leaderboard'
 
   useEffect(() => {
     const fetchTopicStudents = async () => {
@@ -139,130 +141,170 @@ const DashboardStudentReportTopics = ({ classroom }) => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-darkpurple p-6">
-          <div className="flex items-center">
-            <button 
-              onClick={handleBack}
-              className="mr-4 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition"
-            >
-              <ArrowLeft size={20} />
-            </button>
-            <div>
-              <h2 className="text-2xl font-bold text-white">{topic ? topic.name : `Topic ${topicId}`}</h2>
-              <p className="text-white/80 mt-1">{students.length} students enrolled</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="p-6">
-          {isLoading ? (
-            <div className="flex justify-center items-center p-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bluez"></div>
-              <span className="ml-3 text-grayz">Loading student data...</span>
-            </div>
-          ) : (
-            <>
-              <div className="mb-6">
-                <div className="bg-offwhite rounded-lg p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
-                    <div className="p-2 rounded-full bg-blue-100 mb-2">
-                      <Users size={20} className="text-bluez" />
-                    </div>
-                    <span className="text-2xl font-bold text-grayz">{students.length}</span>
-                    <span className="text-xs text-gray-500">Enrolled</span>
-                  </div>
-                  
-                  <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
-                    <div className="p-2 rounded-full bg-green-100 mb-2">
-                      <CheckCircle size={20} className="text-greenz" />
-                    </div>
-                    <span className="text-2xl font-bold text-grayz">{students.filter(s => s.completed).length}</span>
-                    <span className="text-xs text-gray-500">Completed</span>
-                  </div>
-                  
-                  <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
-                    <div className="p-2 rounded-full bg-yellow-100 mb-2">
-                      <Award size={20} className="text-yellowz" />
-                    </div>
-                    <span className="text-2xl font-bold text-grayz">
-                      {students.length > 0 ? Math.max(...students.map(s => s.points)).toLocaleString() : 0}
-                    </span>
-                    <span className="text-xs text-gray-500">Highest Score</span>
-                  </div>
-                  
-                  <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
-                    <div className="p-2 rounded-full bg-purple-100 mb-2">
-                      <Clock size={20} className="text-darkpurple" />
-                    </div>
-                    <span className="text-2xl font-bold text-grayz">
-                      {students.length > 0 
-                        ? Math.round(students.reduce((acc, s) => acc + s.points, 0) / students.length).toLocaleString()
-                        : 0}
-                    </span>
-                    <span className="text-xs text-gray-500">Avg. Score</span>
-                  </div>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-darkpurple p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <button 
+                  onClick={handleBack}
+                  className="mr-4 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">{topic ? topic.name : `Topic ${topicId}`}</h2>
+                  <p className="text-white/80 mt-1">{students.length} students enrolled</p>
                 </div>
               </div>
               
-              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-offwhite">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Student</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Points</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Completed</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {students.map((student) => (
-                        <tr 
-                          key={student.id} 
-                          className="hover:bg-lightpurple/20 cursor-pointer transition"
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0 h-10 w-10">
-                                <img className="h-10 w-10 rounded-full" src={student.profileImg} alt={student.name} />
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-grayz">{student.name}</div>
-                                <div className="text-xs text-gray-500">Student ID: {student.id}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-grayz">{student.points.toLocaleString()}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              student.completed 
-                                ? 'bg-green-100 text-greenz' 
-                                : 'bg-yellow-100 text-yellowz'
-                            }`}>
-                              {student.completed ? 'Completed' : 'In Progress'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {student.completed ? student.completedAt : 'Not yet'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              {/* View Mode Toggle */}
+              <div className="flex bg-white/20 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('table')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                    viewMode === 'table' 
+                      ? 'bg-white text-darkpurple' 
+                      : 'text-white hover:bg-white/20'
+                  }`}
+                >
+                  <BarChart3 size={16} className="inline mr-2" />
+                  Table View
+                </button>
+                <button
+                  onClick={() => setViewMode('leaderboard')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+                    viewMode === 'leaderboard' 
+                      ? 'bg-white text-darkpurple' 
+                      : 'text-white hover:bg-white/20'
+                  }`}
+                >
+                  <Trophy size={16} className="inline mr-2" />
+                  Leaderboard
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Stats Section */}
+          <div className="p-6">
+            {isLoading ? (
+              <div className="flex justify-center items-center p-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bluez"></div>
+                <span className="ml-3 text-grayz">Loading student data...</span>
+              </div>
+            ) : (
+              <div className="bg-offwhite rounded-lg p-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <div className="p-2 rounded-full bg-blue-100 mb-2">
+                    <Users size={20} className="text-bluez" />
+                  </div>
+                  <span className="text-2xl font-bold text-grayz">{students.length}</span>
+                  <span className="text-xs text-gray-500">Enrolled</span>
                 </div>
                 
-                {students.length === 0 && (
-                  <div className="text-center py-8">
-                    <p className="text-grayz text-lg">No students have enrolled in this topic yet.</p>
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <div className="p-2 rounded-full bg-green-100 mb-2">
+                    <CheckCircle size={20} className="text-greenz" />
                   </div>
-                )}
+                  <span className="text-2xl font-bold text-grayz">{students.filter(s => s.completed).length}</span>
+                  <span className="text-xs text-gray-500">Completed</span>
+                </div>
+                
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <div className="p-2 rounded-full bg-yellow-100 mb-2">
+                    <Award size={20} className="text-yellowz" />
+                  </div>
+                  <span className="text-2xl font-bold text-grayz">
+                    {students.length > 0 ? Math.max(...students.map(s => s.points)).toLocaleString() : 0}
+                  </span>
+                  <span className="text-xs text-gray-500">Highest Score</span>
+                </div>
+                
+                <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg shadow-sm">
+                  <div className="p-2 rounded-full bg-purple-100 mb-2">
+                    <Clock size={20} className="text-darkpurple" />
+                  </div>
+                  <span className="text-2xl font-bold text-grayz">
+                    {students.length > 0 
+                      ? Math.round(students.reduce((acc, s) => acc + s.points, 0) / students.length).toLocaleString()
+                      : 0}
+                  </span>
+                  <span className="text-xs text-gray-500">Avg. Score</span>
+                </div>
               </div>
-            </>
-          )}
+            )}
+          </div>
         </div>
+
+        {/* Content Section */}
+        {!isLoading && viewMode === 'leaderboard' && (
+          <Leaderboard 
+            students={students}
+            title={`${topic ? topic.name : `Topic ${topicId}`} Leaderboard`}
+            showTopOnly={false}
+            maxDisplay={10}
+          />
+        )}
+
+        {!isLoading && viewMode === 'table' && (
+          <div className="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-offwhite">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Student</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Points</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Completed</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {students.map((student) => (
+                    <tr 
+                      key={student.id} 
+                      className="hover:bg-lightpurple/20 cursor-pointer transition"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <img className="h-10 w-10 rounded-full" src={student.profileImg} alt={student.name} />
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-grayz">{student.name}</div>
+                            <div className="text-xs text-gray-500">Student ID: {student.id}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-grayz">{student.points.toLocaleString()}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          student.completed 
+                            ? 'bg-green-100 text-greenz' 
+                            : 'bg-yellow-100 text-yellowz'
+                        }`}>
+                          {student.completed ? 'Completed' : 'In Progress'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {student.completed ? student.completedAt : 'Not yet'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {students.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-grayz text-lg">No students have enrolled in this topic yet.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

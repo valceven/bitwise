@@ -54,6 +54,7 @@ namespace backend.Services
                     CreatedAt = classroom.CreatedAt,
                     TeacherID = classroom.TeacherId,
                     ClassCode = classroom.ClassCode,
+                    IsArchived = classroom.isArchived,
                     Section = classroom.Section,
                     Description = classroom.Description,
                     Students = studentDtos
@@ -156,16 +157,26 @@ namespace backend.Services
         public async Task<bool> ArchiveClassroomAsync(ArchiveClassroomDTO classroomDTO)
         {
             var classroom = await _classroomRepository.ViewClassroomAsync(classroomDTO.ClassroomId);
+            
             if (classroom == null)
                 return false;
 
-            classroom.isArchived = true;
-            return await _classroomRepository.UpdateClassroomAsync(classroom);
+            return await _classroomRepository.ArchiveClassroomAsync(classroom);
+        }
+
+        public async Task<bool> UpdateClassroomAsync(UpdateClassroomDTO updateClassroomDTO)
+        {
+            var result = await _classroomRepository.UpdateClassroomAsync(updateClassroomDTO);
+
+            if (!result)
+            {
+                throw new Exception("Failed to update classroom.");
+            }
+
+            return result;
         }
     }
 
-    // just a little helper class to generate a random class code
-    // Not included in the service interface since it's not a core functionality
     public static class CodeGenerator
     {
         public static string GenerateClassCode(int length = 6)

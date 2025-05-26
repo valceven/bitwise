@@ -234,17 +234,22 @@ namespace backend.Repositories
                 throw new Exception("An error occurred while deleting the classroom.", ex);
             }
         }
-        public async Task<bool> UpdateClassroomAsync(Classroom classroom)
+        public async Task<bool> UpdateClassroomAsync(UpdateClassroomDTO classroom)
         {
             try
             {
                 var existingClassroom = await _context.Classrooms
-                    .FirstOrDefaultAsync(c => c.ClassroomID == classroom.ClassroomID);
+                    .FirstOrDefaultAsync(c => c.ClassroomID == classroom.ClassroomId);
 
                 if (existingClassroom == null)
                 {
                     return false; // Classroom not found
                 }
+
+                existingClassroom.ClassName = classroom.ClassName;
+                existingClassroom.Section = classroom.Section;
+                existingClassroom.Description = classroom.Description;
+
                 _context.Classrooms.Update(existingClassroom);
                 await _context.SaveChangesAsync();
 
@@ -256,5 +261,30 @@ namespace backend.Repositories
                 throw new Exception("An error occurred while updating the classroom.", ex);
             }
         }
+
+        public async Task<bool> ArchiveClassroomAsync(Classroom classroom)
+        {
+            try
+            {
+                var existingClassroom = await _context.Classrooms
+                    .FirstOrDefaultAsync(c => c.ClassroomID == classroom.ClassroomID);
+
+                if (existingClassroom == null)
+                {
+                    return false; // Classroom not found
+                }
+                existingClassroom.isArchived = !existingClassroom.isArchived; // Toggle the archived status
+                _context.Classrooms.Update(existingClassroom);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating classroom: {ex.Message}");
+                throw new Exception("An error occurred while updating the classroom.", ex);
+            }
+        }
+        
     }
 }

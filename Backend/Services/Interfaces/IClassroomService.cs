@@ -12,6 +12,6 @@ namespace backend.Services.Interfaces
         Task<bool> SubmitLeaveRequestAsync(ClassroomPendingLeaveDTO cp);
         Task<bool> DeleteClassroomAsync(int classroomId);
         Task<bool> ArchiveClassroomAsync(ArchiveClassroomDTO classroomDTO);
-        
+        Task<bool> UpdateClassroomAsync(UpdateClassroomDTO updateClassroomDTO);
     }
 }
