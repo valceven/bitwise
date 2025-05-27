@@ -31,8 +31,19 @@ const getStudentTopicIds = async (studentId) => {
     }
 }
 
+const completeTopic = async (data) => {
+    try {
+        const response = await apiService.put("student-topic/complete-student-topic", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error occured whiile completing topic", error.message);
+        throw error.response?.data || error.message || "Error completing studentTopic";
+    }
+}
+
 export const studentTopicApi = {
     fetchStudentTopicProgress,
     enterTopic,
-    getStudentTopicIds
+    getStudentTopicIds,
+    completeTopic
 }

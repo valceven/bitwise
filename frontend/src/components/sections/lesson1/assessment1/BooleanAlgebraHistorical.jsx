@@ -31,7 +31,13 @@ const colors = {
   skyz: "#0EA5E9"
 }
 
-export default function HistoricalAssessment({ onComplete }) {
+export default function HistoricalAssessment({ 
+  onComplete, 
+  onFinish, 
+  attemptsRemaining = 3, 
+  currentAttempt = 1, 
+  maxAttempts = 3 
+}) {
   // Assessment states
   const [currentStep, setCurrentStep] = useState(0)
   const [userAnswers, setUserAnswers] = useState([])
@@ -436,6 +442,19 @@ export default function HistoricalAssessment({ onComplete }) {
             <p className="text-lg max-w-2xl" style={{ color: colors.grayz }}>
               {step.content}
             </p>
+            
+            {/* Show attempt information */}
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-700 mb-2">
+                📝 Attempt <strong>{currentAttempt}</strong> of <strong>{maxAttempts}</strong>
+              </p>
+              <p className="text-xs text-blue-600">
+                {attemptsRemaining > 1 ? 
+                  `You have ${attemptsRemaining - 1} attempts remaining after this one.` : 
+                  "This is your final attempt!"}
+              </p>
+            </div>
+            
             <Button onClick={handleNext} size="lg" className="mt-6 flex items-center gap-1">
               Begin Journey <ArrowRight className="h-4 w-4" />
             </Button>
@@ -784,6 +803,13 @@ export default function HistoricalAssessment({ onComplete }) {
                     <span className="font-medium">Final Score:</span>
                     <span className="font-bold text-xl" style={{ color: colors.violetz }}>{finalScore}%</span>
                   </div>
+                  <div className="flex justify-between items-center p-3 rounded-lg" 
+                       style={{ backgroundColor: `${colors.ambez}10` }}>
+                    <span className="font-medium">Attempt:</span>
+                    <span className="font-bold" style={{ color: colors.ambez }}>
+                      {currentAttempt} / {maxAttempts}
+                    </span>
+                  </div>
                 </div>
 
                 <div
@@ -817,13 +843,19 @@ export default function HistoricalAssessment({ onComplete }) {
                 <BookOpen className="h-4 w-4" />
                 {isReviewMode ? "Hide Review" : "Review Answers"}
               </Button>
-              <Button onClick={handleRestartAssessment} variant="outline" className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                🔄 Restart Assessment
-              </Button>
-              <Button className="flex items-center gap-2">
+              
+              {/* Only show restart if attempts remaining */}
+              {attemptsRemaining > 1 && (
+                <Button onClick={handleRestartAssessment} variant="outline" className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  🔄 Try Again ({attemptsRemaining - 1} attempts left)
+                </Button>
+              )}
+              
+              {/* Use the universal finish function */}
+              <Button onClick={onFinish} className="flex items-center gap-2">
                 <Award className="h-4 w-4" />
-                Continue to Next Topic
+                Finish Assessment
               </Button>
             </div>
           </div>

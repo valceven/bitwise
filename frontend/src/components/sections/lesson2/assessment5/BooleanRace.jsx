@@ -54,7 +54,7 @@ const Typewriter = ({ text, delay = 50, className = "", onComplete }) => {
 }
 
 // Boolean Race: SOP vs POS Game Component
-const BooleanRaceGame = ({ onComplete }) => {
+const BooleanRaceGame = ({ onComplete, onFinish }) => {
   const [currentRound, setCurrentRound] = useState(0)
   const [score, setScore] = useState(0)
   const [timeLeft, setTimeLeft] = useState(30)
@@ -304,8 +304,7 @@ const BooleanRaceGame = ({ onComplete }) => {
         startRound(currentRound + 1)
         setGameState('playing')
       } else {
-        setGameState('completed')
-        if (onComplete) onComplete(score)
+        completeGame()
       }
     }, 3000)
   }
@@ -318,10 +317,25 @@ const BooleanRaceGame = ({ onComplete }) => {
         startRound(currentRound + 1)
         setGameState('playing')
       } else {
-        setGameState('completed')
-        if (onComplete) onComplete(score)
+        completeGame()
       }
     }, 3000)
+  }
+
+  const completeGame = () => {
+    setGameState('completed')
+    const correctAnswers = Math.floor(score / 100) // Rough estimate based on base points
+    const percentage = Math.round((score / (problemSets.length * 300)) * 100) // Adjusted for multiple problems
+    
+    // Call onComplete with score data
+    if (onComplete) {
+      onComplete(correctAnswers, problemSets.length * 3, percentage)
+    }
+    
+    // Call onFinish to let AssessmentView handle completion
+    if (onFinish) {
+      onFinish()
+    }
   }
 
   const resetGame = () => {
@@ -341,6 +355,11 @@ const BooleanRaceGame = ({ onComplete }) => {
     } else {
       startGame()
     }
+  }
+
+  // Don't render anything when completed - let AssessmentView handle
+  if (gameState === 'completed') {
+    return null
   }
 
   // Intro/Instructions Screen
@@ -434,72 +453,6 @@ const BooleanRaceGame = ({ onComplete }) => {
           <p className="text-lg" style={{ color: colors.grayz }}>
             {currentRound < problemSets.length ? "Next round starting..." : "Calculating final results..."}
           </p>
-        </div>
-      </motion.div>
-    )
-  }
-
-  // Completion Screen
-  if (gameState === 'completed') {
-    const avgScore = Math.round(score / problemSets.length)
-    
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="text-center space-y-6"
-      >
-        <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center"
-             style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})` }}>
-          <Star className="h-12 w-12 text-white" />
-        </div>
-        
-        <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
-          Race Complete! 🏁
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-lg mx-auto">
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.orangez}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.orangez }}>{score}</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Total Score</div>
-          </div>
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.emeraldz}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.emeraldz }}>{Math.max(streak, 3)}</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Best Streak</div>
-          </div>
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.violetz}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.violetz }}>{problemSets.length}</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Rounds</div>
-          </div>
-        </div>
-
-        <div className="p-6 rounded-xl" 
-             style={{ backgroundColor: score >= 1000 ? `${colors.emeraldz}10` : score >= 750 ? `${colors.cyanz}10` : `${colors.ambez}10` }}>
-          <h3 className="font-bold text-lg mb-2" 
-              style={{ color: score >= 1000 ? colors.emeraldz : score >= 750 ? colors.cyanz : colors.ambez }}>
-            {score >= 1000 ? "Speed Demon! 🚀" :
-             score >= 750 ? "Racing Expert! 🏆" :
-             score >= 500 ? "Good Racer! 🎯" : "Keep Racing! 📚"}
-          </h3>
-          <p className="text-sm" style={{ color: colors.grayz }}>
-            {score >= 1000 ? "Outstanding! You've mastered SOP/POS conversions with incredible speed and accuracy." :
-             score >= 750 ? "Excellent work! Your conversion skills are sharp and you work well under pressure." :
-             score >= 500 ? "Well done! You're developing solid conversion techniques and time management." :
-             "Good effort! Practice more SOP/POS conversions to improve your speed and accuracy."}
-          </p>
-        </div>
-
-        <div className="flex justify-center gap-4">
-          <motion.button
-            onClick={resetGame}
-            className="px-6 py-3 rounded-lg font-medium transition-all"
-            style={{ backgroundColor: colors.cyanz, color: colors.white }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <RotateCcw className="h-4 w-4 mr-2 inline" />
-            Race Again
-          </motion.button>
         </div>
       </motion.div>
     )
@@ -744,12 +697,12 @@ const BooleanRaceGame = ({ onComplete }) => {
   )
 }
 
-export default function BooleanRace({ onComplete }) {
+export default function BooleanRace({ onComplete, onFinish }) {
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto pb-16 px-4 min-h-screen" 
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.orangez}05)` }}>
       <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
-        <BooleanRaceGame onComplete={onComplete} />
+        <BooleanRaceGame onComplete={onComplete} onFinish={onFinish} />
       </div>
     </div>
   )

@@ -394,7 +394,7 @@ const TruthTable = ({ inputs, expectedOutput, actualOutput, title = "Truth Table
 }
 
 // Circuit Builder Academy Component
-const CircuitBuilderAcademy = ({ onComplete }) => {
+const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
   const [currentCase, setCurrentCase] = useState(0)
   const [score, setScore] = useState(0)
   const [circuitsBuilt, setCircuitsBuilt] = useState(0)
@@ -890,8 +890,7 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
         if (currentCase < architectCases.length - 1) {
           nextCase()
         } else {
-          setGameState('completed')
-          if (onComplete) onComplete(score)
+          completeGame()
         }
       }, 3000)
     } else {
@@ -912,6 +911,21 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
     setCircuitErrors([])
     setIsConnecting(false)
     setConnectFrom(null)
+  }
+
+  const completeGame = () => {
+    setGameState('completed')
+    const percentage = Math.round((circuitsBuilt / architectCases.length) * 100)
+    
+    // Call onComplete with score data
+    if (onComplete) {
+      onComplete(circuitsBuilt, architectCases.length, percentage)
+    }
+    
+    // Call onFinish to let AssessmentView handle completion
+    if (onFinish) {
+      onFinish()
+    }
   }
 
   const resetGame = () => {
@@ -935,6 +949,11 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
   const showHintHandler = () => {
     setShowHint(true)
     setHintsUsed(hintsUsed + 1)
+  }
+
+  // Don't render anything when completed - let AssessmentView handle it
+  if (gameState === 'completed') {
+    return null
   }
 
   // Intro/Instructions Screen
@@ -1024,72 +1043,6 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
         <p className="text-lg" style={{ color: colors.grayz }}>
           Perfect! Your circuit matches the Boolean expression. Moving to the next challenge...
         </p>
-      </motion.div>
-    )
-  }
-
-  // Completion Screen
-  if (gameState === 'completed') {
-    const accuracy = Math.round((circuitsBuilt / architectCases.length) * 100)
-    
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="text-center space-y-6"
-      >
-        <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center"
-             style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.tealz})` }}>
-          <Award className="h-12 w-12 text-white" />
-        </div>
-        
-        <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
-          Master Circuit Architect! 🎉
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-lg mx-auto">
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.indigoz}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.indigoz }}>{score}</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Total Score</div>
-          </div>
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.emeraldz}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.emeraldz }}>{circuitsBuilt}</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Circuits Built</div>
-          </div>
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.tealz}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.tealz }}>{accuracy}%</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Success Rate</div>
-          </div>
-        </div>
-
-        <div className="p-6 rounded-xl" 
-             style={{ backgroundColor: score >= 2000 ? `${colors.emeraldz}10` : score >= 1500 ? `${colors.tealz}10` : `${colors.indigoz}10` }}>
-          <h3 className="font-bold text-lg mb-2" 
-              style={{ color: score >= 2000 ? colors.emeraldz : score >= 1500 ? colors.tealz : colors.indigoz }}>
-            {score >= 2000 ? "Master Circuit Architect! 🌟" :
-             score >= 1500 ? "Expert Logic Designer! 🎯" :
-             score >= 1000 ? "Skilled Circuit Builder! 👍" : "Apprentice Engineer! 📚"}
-          </h3>
-          <p className="text-sm" style={{ color: colors.grayz }}>
-            {score >= 2000 ? "Outstanding! You've mastered circuit design and Boolean algebra implementation." :
-             score >= 1500 ? "Excellent work! You have strong skills in translating logic expressions to circuits." :
-             score >= 1000 ? "Well done! You're developing good circuit building and logic design abilities." :
-             "Good effort! Keep practicing to improve your circuit design and Boolean logic skills."}
-          </p>
-        </div>
-
-        <div className="flex justify-center gap-4">
-          <motion.button
-            onClick={resetGame}
-            className="px-6 py-3 rounded-lg font-medium transition-all"
-            style={{ backgroundColor: colors.tealz, color: colors.white }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <RotateCcw className="h-4 w-4 mr-2 inline" />
-            Build Again
-          </motion.button>
-        </div>
       </motion.div>
     )
   }
@@ -1417,12 +1370,12 @@ const CircuitBuilderAcademy = ({ onComplete }) => {
   )
 }
 
-export default function CircuitBuilderAcademyMain({ onComplete }) {
+export default function CircuitBuilderAcademyMain({ onComplete, onFinish }) {
   return (
     <div className="flex flex-col w-full max-w-7xl mx-auto pb-16 px-4 min-h-screen" 
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.indigoz}05)` }}>
       <div className="rounded-2xl shadow-xl p-8" style={{ backgroundColor: colors.white }}>
-        <CircuitBuilderAcademy onComplete={onComplete} />
+        <CircuitBuilderAcademy onComplete={onComplete} onFinish={onFinish} />
       </div>
     </div>
   )

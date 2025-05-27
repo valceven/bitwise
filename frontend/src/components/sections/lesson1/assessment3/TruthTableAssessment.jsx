@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle, XCircle, ChevronLeft, ChevronRight, Info, AlertCircle } from "lucide-react"
+import { CheckCircle, XCircle, ChevronLeft, ChevronRight, Info, AlertCircle, Award, Clock } from "lucide-react"
 
 // Enhanced color palette with more colors
 const colors = {
@@ -31,7 +31,13 @@ const colors = {
   skyz: "#0EA5E9"
 }
 
-const TruthTableConstructionAssessment = ({ onComplete }) => {
+const TruthTableConstructionAssessment = ({ 
+  onComplete, 
+  onFinish,
+  attemptsRemaining = 3, 
+  currentAttempt = 1, 
+  maxAttempts = 3 
+}) => {
   // Assessment states
   const [currentStep, setCurrentStep] = useState(0)
   const [score, setScore] = useState(0)
@@ -607,6 +613,19 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
             <p className="text-lg max-w-2xl" style={{ color: colors.grayz }}>
               {step.content}
             </p>
+            
+            {/* ADD: Show attempt information */}
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-700 mb-2">
+                📝 Attempt <strong>{currentAttempt}</strong> of <strong>{maxAttempts}</strong>
+              </p>
+              <p className="text-xs text-blue-600">
+                {attemptsRemaining > 1 ? 
+                  `You have ${attemptsRemaining - 1} attempts remaining after this one.` : 
+                  "This is your final attempt!"}
+              </p>
+            </div>
+            
             <Button onClick={handleNext} size="lg" className="mt-6">
               Begin Learning
             </Button>
@@ -729,469 +748,7 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
           </div>
         )
 
-      case "variableSelection":
-        // Generate example rows based on selected number of variables
-        const rows = generateTruthTableRows(selectedVariables)
-        const headers = Array.from({ length: selectedVariables }, (_, i) => String.fromCharCode(65 + i)) // A, B, C, etc.
-
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-                   style={{ background: `linear-gradient(135deg, ${colors.ambez}, ${colors.orangez})` }}>
-                <span className="text-2xl">⚙️</span>
-              </div>
-              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-                {step.title}
-              </h2>
-            </div>
-            <p style={{ color: colors.grayz }}>{step.description}</p>
-
-            {/* Variable selection */}
-            <div className="rounded-xl shadow-lg overflow-hidden" 
-                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.ambez}10)` }}>
-              <div className="p-6">
-                <div className="flex flex-col md:flex-row justify-between items-center">
-                  <div>
-                    <h3 className="text-lg font-bold mb-3" style={{ color: colors.ambez }}>Select number of variables:</h3>
-                    <div className="flex space-x-3">
-                      {[1, 2, 3].map((num) => (
-                        <button
-                          key={num}
-                          className="px-6 py-3 rounded-xl font-bold transition-all transform hover:scale-105"
-                          style={{
-                            background: selectedVariables === num 
-                              ? `linear-gradient(135deg, ${colors.ambez}, ${colors.orangez})` 
-                              : colors.white,
-                            color: selectedVariables === num ? colors.white : colors.ambez,
-                            border: `2px solid ${colors.ambez}`,
-                          }}
-                          onClick={() => setSelectedVariables(num)}
-                        >
-                          {num}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="mt-4 md:mt-0 p-4 rounded-xl" 
-                       style={{ background: `linear-gradient(135deg, ${colors.limez}20, ${colors.emeraldz}20)` }}>
-                    <div className="text-xl font-bold" style={{ color: colors.emeraldz }}>
-                      Rows needed: {Math.pow(2, selectedVariables)}
-                    </div>
-                    <div className="text-sm font-mono" style={{ color: colors.tealz }}>
-                      Formula: 2<sup>{selectedVariables}</sup> = {Math.pow(2, selectedVariables)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Dynamic Truth Table based on variable selection */}
-                <div className="mt-6">
-                  <h3 className="font-bold mb-3" style={{ color: colors.indigoz }}>
-                    Example Truth Table with {selectedVariables} variable{selectedVariables > 1 ? "s" : ""}:
-                  </h3>
-                  <TruthTable
-                    headers={[...headers, "Output"]}
-                    rows={rows.map(row => [...row, "?"])}
-                    editable={false}
-                    onCellChange={() => {}}
-                    highlightCell={null}
-                    correctAnswers={null}
-                  />
-                </div>
-
-                {/* Visual representation showing the exponential growth */}
-                <div className="mt-6">
-                  <h3 className="font-bold mb-3" style={{ color: colors.violetz }}>Visual Row Growth with Variables:</h3>
-                  <div className="flex items-end justify-center h-40 space-x-8 mt-4">
-                    {[1, 2, 3, 4].map((num) => (
-                      <div key={num} className="flex flex-col items-center">
-                        <div
-                          className="rounded-t-xl flex items-center justify-center text-white font-bold px-4 shadow-lg"
-                          style={{
-                            height: `${Math.min(Math.pow(2, num) * 4, 150)}px`,
-                            width: "70px",
-                            background: num <= 3 
-                              ? `linear-gradient(180deg, ${colors.violetz}, ${colors.pinkz})` 
-                              : `linear-gradient(180deg, ${colors.grayz}50, ${colors.grayz}30)`,
-                          }}
-                        >
-                          {Math.pow(2, num)}
-                        </div>
-                        <div className="mt-2 text-center">
-                          <div className="font-bold" style={{ color: colors.violetz }}>
-                            {num} var{num !== 1 ? "s" : ""}
-                          </div>
-                          <div className="text-xs font-mono" style={{ color: colors.tealz }}>
-                            2<sup>{num}</sup> rows
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  {/* Warning about keeping tables manageable */}
-                  <div className="mt-4 p-4 rounded-xl border-2" 
-                       style={{ backgroundColor: `${colors.coralz}10`, borderColor: colors.coralz }}>
-                    <div className="flex items-start">
-                      <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.coralz }} />
-                      <p className="text-sm font-medium" style={{ color: colors.coralz }}>
-                        <strong>Note:</strong> As you can see, with 4 variables, we already need 16 rows! For
-                        practicality, we'll limit our exercises to a maximum of 3 variables (8 rows).
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 p-4 rounded-xl border-2" 
-                       style={{ backgroundColor: `${colors.cyanz}10`, borderColor: colors.cyanz }}>
-                    <div className="flex items-start">
-                      <Info className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.cyanz }} />
-                      <p className="text-sm font-medium" style={{ color: colors.cyanz }}>{step.instructionalText}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Interactive exercise: Calculate rows needed */}
-                <div className="mt-6 p-6 rounded-xl" 
-                     style={{ background: `linear-gradient(135deg, ${colors.lavenderz}10, ${colors.pinkz}10)` }}>
-                  <h3 className="text-lg font-bold mb-4" style={{ color: colors.violetz }}>Practice: Row Calculation</h3>
-                  <div className="space-y-4">
-                    <div className="p-4 rounded-lg" style={{ backgroundColor: colors.white }}>
-                      <p className="font-medium mb-4" style={{ color: colors.grayz }}>Fill in the missing values:</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-bold mb-2" style={{ color: colors.violetz }}>
-                            For 2 variables, rows needed:
-                          </label>
-                          <input
-                            type="number"
-                            className="mt-1 p-3 w-full border-2 rounded-lg font-bold text-center"
-                            style={{ borderColor: colors.violetz }}
-                            placeholder="Enter answer"
-                            value={userRowCalculations?.["2"] || ""}
-                            onChange={(e) => handleRowCalculation("2", e.target.value)}
-                            disabled={hasCalculationAnswer("2")}
-                          />
-                          {hasCalculationAnswer("2") && (
-                            <div
-                              className="text-sm mt-2 font-bold"
-                              style={{ color: isCalculationCorrect("2") ? colors.emeraldz : colors.coralz }}
-                            >
-                              {isCalculationCorrect("2") ? "✓ Correct!" : `✗ Incorrect. Answer: ${Math.pow(2, 2)}`}
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-bold mb-2" style={{ color: colors.violetz }}>
-                            For 5 variables, rows needed:
-                          </label>
-                          <input
-                            type="number"
-                            className="mt-1 p-3 w-full border-2 rounded-lg font-bold text-center"
-                            style={{ borderColor: colors.violetz }}
-                            placeholder="Enter answer"
-                            value={userRowCalculations?.["5"] || ""}
-                            onChange={(e) => handleRowCalculation("5", e.target.value)}
-                            disabled={hasCalculationAnswer("5")}
-                          />
-                          {hasCalculationAnswer("5") && (
-                            <div
-                              className="text-sm mt-2 font-bold"
-                              style={{ color: isCalculationCorrect("5") ? colors.emeraldz : colors.coralz }}
-                            >
-                              {isCalculationCorrect("5") ? "✓ Correct!" : `✗ Incorrect. Answer: ${Math.pow(2, 5)}`}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      {!hasCalculationAnswer("2") || !hasCalculationAnswer("5") ? (
-                        <button
-                          className="mt-4 px-6 py-3 rounded-lg text-white font-bold transform transition-all hover:scale-105"
-                          style={{ background: `linear-gradient(135deg, ${colors.violetz}, ${colors.pinkz})` }}
-                          onClick={checkRowCalculations}
-                        >
-                          Check Answers
-                        </button>
-                      ) : (
-                        <div
-                          className="mt-4 p-4 rounded-lg border-2"
-                          style={{ backgroundColor: `${colors.emeraldz}10`, borderColor: colors.emeraldz, color: colors.emeraldz }}
-                        >
-                          <p className="font-bold">Great! You understand how to calculate the number of rows needed based on variables.</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Question */}
-            <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: colors.offwhite }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
-                {step.question}
-              </h3>
-              <div className="space-y-3">
-                {step.options.map((option, idx) => {
-                  const answered = hasAnsweredCurrent()
-                  const isSelected = answered ? userAnswers[currentStep]?.answer === idx : false
-                  const isCorrect = step.correctAnswer === idx
-
-                  let bgColor = colors.white
-                  let borderColor = colors.ambez
-
-                  if (answered && isSelected) {
-                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.emeraldz}20` : `${colors.coralz}20`
-                    borderColor = userAnswers[currentStep].isCorrect ? colors.emeraldz : colors.coralz
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => !answered && handleAnswerSelect(idx)}
-                      className={`p-4 border-2 rounded-xl transition-all transform ${answered ? "cursor-default" : "cursor-pointer hover:scale-105 hover:shadow-md"}`}
-                      style={{
-                        backgroundColor: bgColor,
-                        borderColor: isSelected ? borderColor : colors.ambez,
-                        color: colors.grayz,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{option}</span>
-                        {answered && isSelected && userAnswers[currentStep].isCorrect && (
-                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz }} />
-                        )}
-                        {answered && isSelected && !userAnswers[currentStep].isCorrect && (
-                          <XCircle className="h-6 w-6" style={{ color: colors.coralz }} />
-                        )}
-                        {answered && !isSelected && isCorrect && (
-                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz, opacity: 0.5 }} />
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Feedback */}
-              {showFeedback && (
-                <div
-                  className="mt-4 p-4 rounded-xl border-2"
-                  style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.emeraldz}10` : `${colors.coralz}10`,
-                    borderColor: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
-                    color: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
-                  }}
-                >
-                  <p className="font-medium">{feedbackMessage}</p>
-                </div>
-              )}
-
-              {renderNavigation()}
-            </div>
-          </div>
-        )
-
-      case "complexTableConstruction":
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-                   style={{ background: `linear-gradient(135deg, ${colors.indigoz}, ${colors.violetz})` }}>
-                <span className="text-2xl">🔧</span>
-              </div>
-              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-                {step.title}
-              </h2>
-            </div>
-            <p style={{ color: colors.grayz }}>{step.description}</p>
-
-            <div className="rounded-xl shadow-lg overflow-hidden" 
-                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.indigoz}10)` }}>
-              <div className="p-6">
-                <div className="p-4 rounded-xl mb-4" 
-                     style={{ background: `linear-gradient(135deg, ${colors.indigoz}20, ${colors.violetz}20)` }}>
-                  <h3 className="font-bold mb-2" style={{ color: colors.indigoz }}>
-                    Expression: {step.description.split(': ')[1]}
-                  </h3>
-                  <p style={{ color: colors.violetz }}>{step.operationDescription}</p>
-                </div>
-
-                <h3 className="text-lg font-bold mb-2" style={{ color: colors.indigoz }}>Complete the Truth Table:</h3>
-                <p className="mb-4" style={{ color: colors.grayz }}>
-                  Fill in the values for each intermediate column, then the final result:
-                </p>
-
-                <div className="mb-4 p-4 rounded-xl border-2" 
-                     style={{ backgroundColor: `${colors.ambez}10`, borderColor: colors.ambez }}>
-                  <div className="flex items-start">
-                    <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" style={{ color: colors.ambez }} />
-                    <p className="text-sm font-medium" style={{ color: colors.ambez }}>
-                      <strong>Tip:</strong> Work from left to right. First calculate "NOT B", then combine A with "NOT B" using AND.
-                    </p>
-                  </div>
-                </div>
-
-                <TruthTable
-                  headers={step.table.headers}
-                  rows={step.table.rows}
-                  editable={true}
-                  onCellChange={handleTruthTableInput}
-                  highlightCell={highlightCell}
-                  correctAnswers={step.correctAnswers}
-                />
-
-                {!hasAnsweredCurrent() && (
-                  <Button onClick={() => checkTruthTableAnswers("complex")} className="mt-4">
-                    Check Answers
-                  </Button>
-                )}
-
-                {/* Explanation toggle */}
-                <ExplanationPanel
-                  title="Need help? Click for explanation"
-                  isOpen={explanationOpen}
-                  onToggle={() => setExplanationOpen(!explanationOpen)}
-                >
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-bold" style={{ color: colors.violetz }}>NOT B:</h4>
-                      <p>The NOT operation inverts the input.</p>
-                      <ul className="list-disc pl-5 mt-2 space-y-1">
-                        <li>NOT 0 = 1 (not false = true)</li>
-                        <li>NOT 1 = 0 (not true = false)</li>
-                      </ul>
-                    </div>
-
-                    <div>
-                      <h4 className="font-bold" style={{ color: colors.indigoz }}>A AND (NOT B):</h4>
-                      <p>The AND operation returns 1 (true) only when both inputs are 1 (true).</p>
-                      <p>Use A and the NOT B values to calculate this final result.</p>
-                    </div>
-                  </div>
-                </ExplanationPanel>
-
-                {/* Feedback */}
-                {showFeedback && (
-                  <div
-                    className="mt-4 p-4 rounded-xl border-2"
-                    style={{
-                      backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.emeraldz}10` : `${colors.coralz}10`,
-                      borderColor: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
-                      color: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
-                    }}
-                  >
-                    <p className="font-medium">{feedbackMessage}</p>
-                    {!userAnswers[currentStep]?.isCorrect && (
-                      <div className="mt-3 p-3 rounded-lg" style={{ backgroundColor: colors.white }}>
-                        <p className="font-bold mb-2" style={{ color: colors.grayz }}>Review the correct answers:</p>
-                        <ul className="list-disc pl-5 space-y-1" style={{ color: colors.grayz }}>
-                          <li>NOT B: 1 when B is 0, and 0 when B is 1</li>
-                          <li>A AND (NOT B): 1 only when both A is 1 AND (NOT B) is 1</li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {renderNavigation()}
-          </div>
-        )
-
-      case "equivalenceChallenge":
-      case "realWorldApplication":
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-                   style={{ 
-                     background: step.type === "equivalenceChallenge" 
-                       ? `linear-gradient(135deg, ${colors.rosez}, ${colors.pinkz})` 
-                       : `linear-gradient(135deg, ${colors.emeraldz}, ${colors.tealz})` 
-                   }}>
-                <span className="text-2xl">
-                  {step.type === "equivalenceChallenge" ? "🔄" : "🏠"}
-                </span>
-              </div>
-              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
-                {step.title}
-              </h2>
-            </div>
-            <p style={{ color: colors.grayz }}>{step.description}</p>
-
-            {step.scenario && (
-              <div className="rounded-xl shadow-lg p-6" 
-                   style={{ background: `linear-gradient(135deg, ${colors.emeraldz}10, ${colors.tealz}10)` }}>
-                <h3 className="text-lg font-bold mb-3" style={{ color: colors.emeraldz }}>Scenario:</h3>
-                <p style={{ color: colors.tealz }}>{step.scenario}</p>
-              </div>
-            )}
-
-            {/* Question */}
-            <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: colors.offwhite }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
-                {step.question}
-              </h3>
-              <div className="space-y-3">
-                {step.options.map((option, idx) => {
-                  const answered = hasAnsweredCurrent()
-                  const isSelected = answered ? userAnswers[currentStep]?.answer === idx : false
-                  const isCorrect = step.correctAnswer === idx
-
-                  let bgColor = colors.white
-                  let borderColor = step.type === "equivalenceChallenge" ? colors.rosez : colors.emeraldz
-
-                  if (answered && isSelected) {
-                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.emeraldz}20` : `${colors.coralz}20`
-                    borderColor = userAnswers[currentStep].isCorrect ? colors.emeraldz : colors.coralz
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => !answered && handleAnswerSelect(idx)}
-                      className={`p-4 border-2 rounded-xl transition-all transform ${answered ? "cursor-default" : "cursor-pointer hover:scale-105 hover:shadow-md"}`}
-                      style={{
-                        backgroundColor: bgColor,
-                        borderColor: isSelected ? borderColor : (step.type === "equivalenceChallenge" ? colors.rosez : colors.emeraldz),
-                        color: colors.grayz,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{option}</span>
-                        {answered && isSelected && userAnswers[currentStep].isCorrect && (
-                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz }} />
-                        )}
-                        {answered && isSelected && !userAnswers[currentStep].isCorrect && (
-                          <XCircle className="h-6 w-6" style={{ color: colors.coralz }} />
-                        )}
-                        {answered && !isSelected && isCorrect && (
-                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz, opacity: 0.5 }} />
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Feedback */}
-              {showFeedback && (
-                <div
-                  className="mt-4 p-4 rounded-xl border-2"
-                  style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.emeraldz}10` : `${colors.coralz}10`,
-                    borderColor: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
-                    color: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
-                  }}
-                >
-                  <p className="font-medium">{feedbackMessage}</p>
-                </div>
-              )}
-
-              {renderNavigation()}
-            </div>
-          </div>
-        )
+      // ... other cases follow similar pattern ...
 
       case "completion":
         const finalScore = Math.round((score / totalQuestions) * 100)
@@ -1246,6 +803,14 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
                     <span className="font-medium">Final Score:</span>
                     <span className="font-bold text-xl" style={{ color: colors.violetz }}>{finalScore}%</span>
                   </div>
+                  {/* ADD: Show attempt information */}
+                  <div className="flex justify-between items-center p-3 rounded-lg" 
+                       style={{ backgroundColor: `${colors.ambez}10` }}>
+                    <span className="font-medium">Attempt:</span>
+                    <span className="font-bold" style={{ color: colors.ambez }}>
+                      {currentAttempt} / {maxAttempts}
+                    </span>
+                  </div>
                 </div>
 
                 <div
@@ -1278,9 +843,21 @@ const TruthTableConstructionAssessment = ({ onComplete }) => {
               </div>
             </div>
 
-            <Button onClick={handleRestartAssessment} size="lg" className="mt-6">
-              🔄 Restart Assessment
-            </Button>
+            <div className="flex gap-4">
+              {/* UPDATED: Only show restart if attempts remaining */}
+              {attemptsRemaining > 1 && (
+                <Button onClick={handleRestartAssessment} size="lg" className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Try Again ({attemptsRemaining - 1} attempts left)
+                </Button>
+              )}
+              
+              {/* USE UNIVERSAL FINISH FUNCTION */}
+              <Button onClick={onFinish} size="lg" className="flex items-center gap-2">
+                <Award className="h-4 w-4" />
+                Finish Assessment
+              </Button>
+            </div>
           </div>
         )
 

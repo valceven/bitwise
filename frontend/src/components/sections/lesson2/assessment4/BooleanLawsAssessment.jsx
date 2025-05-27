@@ -54,7 +54,7 @@ const Typewriter = ({ text, delay = 50, className = "", onComplete }) => {
 }
 
 // Law Detective Game Component
-const LawDetectiveGame = ({ onComplete }) => {
+const LawDetectiveGame = ({ onComplete, onFinish }) => {
   const [currentCase, setCurrentCase] = useState(0)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
@@ -209,7 +209,18 @@ const LawDetectiveGame = ({ onComplete }) => {
 
   const completeGame = () => {
     setGameState('completed')
-    if (onComplete) onComplete(score)
+    const correctAnswers = detectiveCases.filter((_, index) => index < currentCase + 1).length
+    const percentage = Math.round((score / (detectiveCases.length * 100)) * 100)
+    
+    // Call onComplete with score data
+    if (onComplete) {
+      onComplete(correctAnswers, detectiveCases.length, percentage)
+    }
+    
+    // Call onFinish to let AssessmentView handle completion
+    if (onFinish) {
+      onFinish()
+    }
   }
 
   const startGame = () => {
@@ -236,6 +247,11 @@ const LawDetectiveGame = ({ onComplete }) => {
     } else {
       startGame()
     }
+  }
+
+  // Don't render anything when completed - let AssessmentView handle it
+  if (gameState === 'completed') {
+    return null
   }
 
   // Intro/Instructions Screen
@@ -300,71 +316,6 @@ const LawDetectiveGame = ({ onComplete }) => {
           </motion.button>
         </div>
       </div>
-    )
-  }
-
-  // Completion Screen
-  if (gameState === 'completed') {
-    const accuracy = Math.round((score / (detectiveCases.length * 100)) * 100)
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="text-center space-y-6"
-      >
-        <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center"
-             style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})` }}>
-          <Star className="h-12 w-12 text-white" />
-        </div>
-        
-        <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
-          Detective Mission Complete! 🎉
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-lg mx-auto">
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.violetz}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.violetz }}>{score}</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Total Score</div>
-          </div>
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.emeraldz}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.emeraldz }}>{accuracy}%</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Accuracy</div>
-          </div>
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.ambez}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.ambez }}>#{Math.max(1, Math.ceil(streak / 2))}</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Best Streak</div>
-          </div>
-        </div>
-
-        <div className="p-6 rounded-xl" 
-             style={{ backgroundColor: score >= 800 ? `${colors.emeraldz}10` : score >= 600 ? `${colors.cyanz}10` : `${colors.ambez}10` }}>
-          <h3 className="font-bold text-lg mb-2" 
-              style={{ color: score >= 800 ? colors.emeraldz : score >= 600 ? colors.cyanz : colors.ambez }}>
-            {score >= 800 ? "Master Detective! 🌟" :
-             score >= 600 ? "Expert Detective! 🎯" :
-             score >= 400 ? "Good Detective! 👍" : "Detective in Training! 📚"}
-          </h3>
-          <p className="text-sm" style={{ color: colors.grayz }}>
-            {score >= 800 ? "Outstanding! You've mastered Boolean law identification with incredible speed and accuracy." :
-             score >= 600 ? "Excellent work! You show strong understanding of Boolean laws and their applications." :
-             score >= 400 ? "Well done! You're developing good skills in recognizing Boolean law patterns." :
-             "Good effort! Keep practicing to improve your law recognition speed and accuracy."}
-          </p>
-        </div>
-
-        <div className="flex justify-center gap-4">
-          <motion.button
-            onClick={resetGame}
-            className="px-6 py-3 rounded-lg font-medium transition-all"
-            style={{ backgroundColor: colors.cyanz, color: colors.white }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <RotateCcw className="h-4 w-4 mr-2 inline" />
-            Train Again
-          </motion.button>
-        </div>
-      </motion.div>
     )
   }
 
@@ -544,12 +495,12 @@ const LawDetectiveGame = ({ onComplete }) => {
   )
 }
 
-export default function BooleanLawDetectiveGame({ onComplete }) {
+export default function BooleanLawDetectiveGame({ onComplete, onFinish }) {
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto pb-16 px-4 min-h-screen" 
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.cyanz}05)` }}>
       <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
-        <LawDetectiveGame onComplete={onComplete} />
+        <LawDetectiveGame onComplete={onComplete} onFinish={onFinish} />
       </div>
     </div>
   )
