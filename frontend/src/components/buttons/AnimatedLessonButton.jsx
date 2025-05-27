@@ -6,6 +6,7 @@ import defaultAnimation from "../../assets/defaultTopicButton.json";
 import defaultAnimationLocked from "../../assets/defaultTopicButtonLocked.json";
 import pressedAnimation from "../../assets/pressedAnimationTopicButton.json";
 import indelSvg from "../../assets/bitbot/idle.svg";
+import mainStarSvg from "../../assets/main_star.svg";
 
 const AnimatedLessonButton = ({
   label,
@@ -60,6 +61,15 @@ const AnimatedLessonButton = ({
     }, 500);
   };
 
+  // Determine which SVG to use based on whether it's a main lesson button
+  const getSvgToUse = () => {
+    // Check if this is a main lesson button (contains "Lesson No" in the label)
+    if (label && label.includes("Lesson No")) {
+      return mainStarSvg;
+    }
+    return indelSvg;
+  };
+
   return (
     <div className="relative flex items-center">
       <div
@@ -78,22 +88,14 @@ const AnimatedLessonButton = ({
             className="z-50"
           />
 
-          {/* Show lesson details ONLY if unlocked and selected - positioned at top */}
-          {!locked && isSelected && !isLesson && (
-            <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-white rounded-lg p-4 w-36 z-50 border-black transition-opacity duration-300 ease-in-out border shadow-[4px_4px_0px_#0b1e2d]">
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-                <div className="w-4 h-4 bg-white border-l border-b border-black transform rotate-315"></div>
-              </div>
-              <div className="font-bold text-lg text-blue-600">{label}</div>
-            </div>
-          )}
-
-          {/* Show SVG for lesson buttons when selected */}
-          {!locked && isSelected && isLesson && (
-            <div className="absolute right-full top-1/2 -translate-y-1/2 p-6 w-40 h-40 z-50 border-black transition-opacity duration-300 ease-in-out flex items-center justify-center">
+          {/* Show SVG for buttons when selected */}
+          {!locked && isSelected && (
+            <div className="flex absolute -translate-y-5/6 w-full h-14  z-50 border-black transition-opacity duration-300 ease-in-out flex items-center justify-center">
               <img
-                src={indelSvg}
-                alt="Idle"
+                src={getSvgToUse()}
+                alt={
+                  label && label.includes("Lesson No") ? "Main Star" : "Idle"
+                }
                 className="w-full h-full object-contain"
               />
             </div>

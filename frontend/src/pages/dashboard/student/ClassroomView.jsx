@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, FreeMode } from 'swiper/modules';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, FreeMode } from "swiper/modules";
 import AnimatedLessonButton from "../../../components/buttons/AnimatedLessonButton.jsx";
+import AnimatedAssessmentButton from "../../../components/buttons/AnimatedAssessmentButton.jsx";
 import { studentApi } from "../../../api/student/studentApi.js";
 import { studentClassroomApi } from "../../../api/studentClassroom/studentClassroomApi.js";
 import { studentLessonApi } from "../../../api/studentLesson/studentLesson.js";
 import gridBox from "../../../assets/gridbox.svg";
 
 // Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/free-mode';
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/free-mode";
 
 const ClassroomView = ({ classroom, user }) => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const ClassroomView = ({ classroom, user }) => {
   const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [roadmapResponse, setRoadmapResponse] = useState({});
-  
+
   // Swiper instance ref
   const swiperRef = useRef(null);
 
@@ -38,25 +39,29 @@ const ClassroomView = ({ classroom, user }) => {
   const subLessonInfo = {
     1: {
       title: "Introduction to Basics",
-      description: "Learn the fundamental concepts and get started with the core principles of this lesson.",
+      description:
+        "Learn the fundamental concepts and get started with the core principles of this lesson.",
       duration: "15 min",
       difficulty: "Beginner",
     },
     2: {
       title: "Intermediate Concepts",
-      description: "Dive deeper into the subject matter and explore more complex applications.",
+      description:
+        "Dive deeper into the subject matter and explore more complex applications.",
       duration: "25 min",
       difficulty: "Intermediate",
     },
     3: {
       title: "Advanced Applications",
-      description: "Master advanced techniques and real-world problem-solving strategies.",
+      description:
+        "Master advanced techniques and real-world problem-solving strategies.",
       duration: "30 min",
       difficulty: "Advanced",
     },
     4: {
       title: "Foundation Building",
-      description: "Build upon previous knowledge with new foundational concepts.",
+      description:
+        "Build upon previous knowledge with new foundational concepts.",
       duration: "20 min",
       difficulty: "Beginner",
     },
@@ -68,7 +73,8 @@ const ClassroomView = ({ classroom, user }) => {
     },
     6: {
       title: "Expert Techniques",
-      description: "Master expert-level techniques and advanced problem solving.",
+      description:
+        "Master expert-level techniques and advanced problem solving.",
       duration: "40 min",
       difficulty: "Advanced",
     },
@@ -123,10 +129,12 @@ const ClassroomView = ({ classroom, user }) => {
   // Function to check if a lesson is unlocked
   const isLessonUnlocked = (lessonIndex) => {
     // If roadmapResponse is empty or no progress data, only lesson 1 is unlocked
-    if (!roadmapResponse?.progress || 
-        (!roadmapResponse.progress.completedLessons?.length && 
-         !roadmapResponse.progress.completedTopics?.length && 
-         !roadmapResponse.progress.completedAssessments?.length)) {
+    if (
+      !roadmapResponse?.progress ||
+      (!roadmapResponse.progress.completedLessons?.length &&
+        !roadmapResponse.progress.completedTopics?.length &&
+        !roadmapResponse.progress.completedAssessments?.length)
+    ) {
       return lessonIndex === 0;
     }
 
@@ -134,12 +142,18 @@ const ClassroomView = ({ classroom, user }) => {
 
     // Check if previous lesson is complete (last assessment of previous lesson is complete)
     const prevLessonIndex = lessonIndex - 1;
-    const prevLessonAssessmentCount = lessonConfig[prevLessonIndex].assessmentCount;
+    const prevLessonAssessmentCount =
+      lessonConfig[prevLessonIndex].assessmentCount;
     const prevLessonStartTopic = getLessonStartTopic(prevLessonIndex);
-    const lastAssessmentOfPrevLesson = prevLessonStartTopic + prevLessonAssessmentCount - 1;
-    
+    const lastAssessmentOfPrevLesson =
+      prevLessonStartTopic + prevLessonAssessmentCount - 1;
+
     // Check if the last assessment of the previous lesson is completed
-    return roadmapResponse.progress.completedAssessments?.includes(lastAssessmentOfPrevLesson) || false;
+    return (
+      roadmapResponse.progress.completedAssessments?.includes(
+        lastAssessmentOfPrevLesson
+      ) || false
+    );
   };
 
   // Function to check if a topic is unlocked
@@ -148,10 +162,12 @@ const ClassroomView = ({ classroom, user }) => {
     if (!isLessonUnlocked(lessonIndex)) return false;
 
     // If roadmapResponse is empty, only topic 1 is unlocked
-    if (!roadmapResponse?.progress || 
-        (!roadmapResponse.progress.completedLessons?.length && 
-         !roadmapResponse.progress.completedTopics?.length && 
-         !roadmapResponse.progress.completedAssessments?.length)) {
+    if (
+      !roadmapResponse?.progress ||
+      (!roadmapResponse.progress.completedLessons?.length &&
+        !roadmapResponse.progress.completedTopics?.length &&
+        !roadmapResponse.progress.completedAssessments?.length)
+    ) {
       return topicNumber === 1;
     }
 
@@ -160,7 +176,11 @@ const ClassroomView = ({ classroom, user }) => {
 
     // Check if previous topic's assessment is completed
     const prevAssessmentNumber = topicNumber - 1;
-    return roadmapResponse.progress.completedAssessments?.includes(prevAssessmentNumber) || false;
+    return (
+      roadmapResponse.progress.completedAssessments?.includes(
+        prevAssessmentNumber
+      ) || false
+    );
   };
 
   // Function to check if an assessment is unlocked
@@ -169,10 +189,12 @@ const ClassroomView = ({ classroom, user }) => {
     if (!isLessonUnlocked(lessonIndex)) return false;
 
     // If roadmapResponse is empty, only assessment 1 is unlocked if topic 1 is completed
-    if (!roadmapResponse?.progress || 
-        (!roadmapResponse.progress.completedLessons?.length && 
-         !roadmapResponse.progress.completedTopics?.length && 
-         !roadmapResponse.progress.completedAssessments?.length)) {
+    if (
+      !roadmapResponse?.progress ||
+      (!roadmapResponse.progress.completedLessons?.length &&
+        !roadmapResponse.progress.completedTopics?.length &&
+        !roadmapResponse.progress.completedAssessments?.length)
+    ) {
       if (assessmentNumber === 1) {
         return roadmapResponse.progress?.completedTopics?.includes(1) || false;
       }
@@ -180,16 +202,25 @@ const ClassroomView = ({ classroom, user }) => {
     }
 
     // Assessment is unlocked if corresponding topic is completed
-    return roadmapResponse.progress.completedTopics?.includes(assessmentNumber) || false;
+    return (
+      roadmapResponse.progress.completedTopics?.includes(assessmentNumber) ||
+      false
+    );
   };
 
   // Function to check if an item is completed
   const isTopicCompleted = (topicNumber) => {
-    return roadmapResponse.progress?.completedTopics?.includes(topicNumber) || false;
+    return (
+      roadmapResponse.progress?.completedTopics?.includes(topicNumber) || false
+    );
   };
 
   const isAssessmentCompleted = (assessmentNumber) => {
-    return roadmapResponse.progress?.completedAssessments?.includes(assessmentNumber) || false;
+    return (
+      roadmapResponse.progress?.completedAssessments?.includes(
+        assessmentNumber
+      ) || false
+    );
   };
 
   // Function to slide to specific lesson
@@ -202,15 +233,21 @@ const ClassroomView = ({ classroom, user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await studentClassroomApi.fetchRoadmapProgress(user.userID);
+        const response = await studentClassroomApi.fetchRoadmapProgress(
+          user.userID
+        );
         setRoadmapResponse(response);
 
         console.log("Roadmap Progress:", response);
 
-        const lessonResponse = await studentLessonApi.fetchStudentLessons(user.userID);
+        const lessonResponse = await studentLessonApi.fetchStudentLessons(
+          user.userID
+        );
         console.log(lessonResponse);
 
-        const sortedLessons = lessonResponse.lessons.sort((a, b) => a.lessonId - b.lessonId);
+        const sortedLessons = lessonResponse.lessons.sort(
+          (a, b) => a.lessonId - b.lessonId
+        );
         await setLessons(sortedLessons);
 
         if (lessonResponse.lessons.length > 0) {
@@ -221,7 +258,7 @@ const ClassroomView = ({ classroom, user }) => {
             lessonId: firstLesson.lessonId,
             topicNumber: 1,
             lessonNumber: 1,
-            type: 'topic'
+            type: "topic",
           });
         }
       } catch (error) {
@@ -261,18 +298,24 @@ const ClassroomView = ({ classroom, user }) => {
     }
   };
 
-  const handleButtonClick = (buttonId, lessonId, itemNumber, lessonNumber, type) => {
+  const handleButtonClick = (
+    buttonId,
+    lessonId,
+    itemNumber,
+    lessonNumber,
+    type
+  ) => {
     setSelectedButton(buttonId);
-    
+
     // Slide to center the lesson
     slideToLesson(lessonNumber - 1);
-    
+
     setSelectedLessonData({
       lessonId,
-      topicNumber: type === 'topic' ? itemNumber : null,
-      assessmentNumber: type === 'assessment' ? itemNumber : null,
+      topicNumber: type === "topic" ? itemNumber : null,
+      assessmentNumber: type === "assessment" ? itemNumber : null,
       lessonNumber,
-      type
+      type,
     });
   };
 
@@ -290,10 +333,14 @@ const ClassroomView = ({ classroom, user }) => {
       console.log("MARS", response);
 
       // Navigate based on type
-      if (selectedLessonData.type === 'topic') {
-        navigate(`lesson/${selectedLessonData.lessonId}/topic/${selectedLessonData.topicNumber}`);
-      } else if (selectedLessonData.type === 'assessment') {
-        navigate(`lesson/${selectedLessonData.lessonId}/assessment/${selectedLessonData.assessmentNumber}`);
+      if (selectedLessonData.type === "topic") {
+        navigate(
+          `lesson/${selectedLessonData.lessonId}/topic/${selectedLessonData.topicNumber}`
+        );
+      } else if (selectedLessonData.type === "assessment") {
+        navigate(
+          `lesson/${selectedLessonData.lessonId}/assessment/${selectedLessonData.assessmentNumber}`
+        );
       }
     } catch (error) {
       console.error("Error entering lesson:", error.message);
@@ -342,12 +389,16 @@ const ClassroomView = ({ classroom, user }) => {
         {/* Selected Item Info Card */}
         {selectedLessonData && (
           <div className="p-6 bg-white rounded-lg shadow-[4px_4px_0px_#0b1e2d] border border-black">
-            {selectedLessonData.type === 'topic' ? (
+            {selectedLessonData.type === "topic" ? (
               <>
                 <h2 className="text-xl font-bold mb-2">
-                  Lesson {selectedLessonData.lessonNumber} - Topic {selectedLessonData.topicNumber}
+                  Lesson {selectedLessonData.lessonNumber} - Topic{" "}
+                  {selectedLessonData.topicNumber}
                 </h2>
-                <h3 className="text-lg font-semibold text-blue-600 mb-2">
+                <h3
+                  className="text-lg font-semibold mb-2"
+                  style={{ color: "#6e61ff" }}
+                >
                   {getTopicInfo(selectedLessonData.topicNumber).title}
                 </h3>
                 <p className="text-gray-600 text-sm mb-4">
@@ -355,14 +406,30 @@ const ClassroomView = ({ classroom, user }) => {
                 </p>
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
                   <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <circle cx="12" cy="12" r="10" />
                       <polyline points="12 6 12 12 16 14" />
                     </svg>
                     {getTopicInfo(selectedLessonData.topicNumber).duration}
                   </div>
                   <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M2 20h.01M7 20v-4" />
                       <path d="M12 20v-8" />
                       <path d="M17 20v-12" />
@@ -373,8 +440,94 @@ const ClassroomView = ({ classroom, user }) => {
                 </div>
                 {isTopicCompleted(selectedLessonData.topicNumber) && (
                   <div className="mb-4 p-2 bg-green-100 text-green-800 rounded-lg text-sm flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Completed
+                  </div>
+                )}
+                <button
+                  onClick={handleEnterLesson}
+                  className="w-full text-white font-medium py-2 px-4 rounded-lg transition duration-300"
+                  style={{
+                    backgroundColor: "#6e61ff",
+                    ":hover": { backgroundColor: "#5b4ecc" },
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.target.style.backgroundColor = "#5b4ecc")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.target.style.backgroundColor = "#6e61ff")
+                  }
+                >
+                  {isTopicCompleted(selectedLessonData.topicNumber)
+                    ? "Review Topic"
+                    : "Proceed to Topic"}
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold mb-2">
+                  Assessment {selectedLessonData.assessmentNumber}
+                </h2>
+                <h3 className="text-lg font-semibold text-blue-600 mb-2">
+                  Topic {selectedLessonData.assessmentNumber} Assessment
+                </h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  Test your understanding of the concepts learned in Topic{" "}
+                  {selectedLessonData.assessmentNumber}.
+                </p>
+                <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+                  <div className="flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    10 min
+                  </div>
+                  <div className="flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-1"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 11H7a2 2 0 000 4h2m6-4h2a2 2 0 110 4h-2m-6-4h6" />
+                    </svg>
+                    Assessment
+                  </div>
+                </div>
+                {isAssessmentCompleted(selectedLessonData.assessmentNumber) && (
+                  <div className="mb-4 p-2 bg-green-100 text-green-800 rounded-lg text-sm flex items-center">
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                     Completed
                   </div>
@@ -383,48 +536,9 @@ const ClassroomView = ({ classroom, user }) => {
                   onClick={handleEnterLesson}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
                 >
-                  {isTopicCompleted(selectedLessonData.topicNumber) ? 'Review Topic' : 'Proceed to Topic'}
-                </button>
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl font-bold mb-2">
-                  Assessment {selectedLessonData.assessmentNumber}
-                </h2>
-                <h3 className="text-lg font-semibold text-orange-600 mb-2">
-                  Topic {selectedLessonData.assessmentNumber} Assessment
-                </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Test your understanding of the concepts learned in Topic {selectedLessonData.assessmentNumber}.
-                </p>
-                <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="12 6 12 12 16 14" />
-                    </svg>
-                    10 min
-                  </div>
-                  <div className="flex items-center">
-                    <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M9 11H7a2 2 0 000 4h2m6-4h2a2 2 0 110 4h-2m-6-4h6" />
-                    </svg>
-                    Assessment
-                  </div>
-                </div>
-                {isAssessmentCompleted(selectedLessonData.assessmentNumber) && (
-                  <div className="mb-4 p-2 bg-green-100 text-green-800 rounded-lg text-sm flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    Completed
-                  </div>
-                )}
-                <button
-                  onClick={handleEnterLesson}
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
-                >
-                  {isAssessmentCompleted(selectedLessonData.assessmentNumber) ? 'Review Assessment' : 'Start Assessment'}
+                  {isAssessmentCompleted(selectedLessonData.assessmentNumber)
+                    ? "Review Assessment"
+                    : "Start Assessment"}
                 </button>
               </>
             )}
@@ -433,13 +547,13 @@ const ClassroomView = ({ classroom, user }) => {
       </div>
 
       {/* Swiper Slider Container */}
-      <div className="flex-1 flex flex-col relative ml-8">
+      <div className="flex-1 flex flex-col relative ml-8 w-3/4 h-full">
         <div className="flex justify-center mb-4">
           <div className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow">
             Navigate through lessons • Follow the roadmap
           </div>
         </div>
-        
+
         <div className="flex-1 relative">
           {isLoading ? (
             <div className="text-center text-gray-500 flex items-center justify-center h-full">
@@ -450,12 +564,12 @@ const ClassroomView = ({ classroom, user }) => {
               ref={swiperRef}
               modules={[Navigation, Pagination, FreeMode]}
               spaceBetween={50}
-              slidesPerView={'auto'}
+              slidesPerView={"auto"}
               centeredSlides={true}
               freeMode={true}
               navigation={{
-                nextEl: '.swiper-button-next-custom',
-                prevEl: '.swiper-button-prev-custom',
+                nextEl: ".swiper-button-next-custom",
+                prevEl: ".swiper-button-prev-custom",
               }}
               pagination={{
                 clickable: true,
@@ -463,16 +577,16 @@ const ClassroomView = ({ classroom, user }) => {
               }}
               className="w-full h-full"
               style={{
-                paddingBottom: '50px',
+                paddingBottom: "50px",
               }}
             >
               {lessons.map((lesson, lessonIndex) => {
                 const lessonTopics = getLessonTopics(lessonIndex);
                 const isMainLessonUnlocked = isLessonUnlocked(lessonIndex);
-                
+
                 return (
-                  <SwiperSlide key={lesson.lessonId} style={{ width: 'auto' }}>
-                    <div className="flex flex-col items-center space-y-4 px-8 py-4 relative">
+                  <SwiperSlide key={lesson.lessonId} style={{ width: "auto" }}>
+                    <div className="flex flex-col items-center space-y-4 px-8 relative py-15">
                       {/* Big lesson button */}
                       <AnimatedLessonButton
                         label={"Lesson No " + (lessonIndex + 1)}
@@ -485,14 +599,14 @@ const ClassroomView = ({ classroom, user }) => {
                               lesson.lessonId,
                               firstTopic,
                               lessonIndex + 1,
-                              'topic'
+                              "topic"
                             );
                           }
                         }}
                         onEnterLesson={() => {}}
-                        isSelected={
-                          selectedButton?.startsWith(`lesson-${lesson.lessonId}`)
-                        }
+                        isSelected={selectedButton?.startsWith(
+                          `lesson-${lesson.lessonId}`
+                        )}
                         className="w-full min-w-[200px]"
                         locked={!isMainLessonUnlocked}
                       />
@@ -500,17 +614,18 @@ const ClassroomView = ({ classroom, user }) => {
                       {/* Topics and Assessments with connecting lines */}
                       <div className="flex flex-col space-y-6 items-center relative">
                         {/* SVG for connecting lines */}
-                        <svg 
-                          className="absolute inset-0 w-full h-full pointer-events-none z-0" 
-                          style={{ overflow: 'visible' }}
+                        <svg
+                          className="absolute inset-0 w-full h-full pointer-events-none z-0"
+                          style={{ overflow: "visible" }}
                         >
                           {lessonTopics.map((topicNumber, topicIndex) => {
-                            if (topicIndex === lessonTopics.length - 1) return null; // Don't draw line after last topic
-                            
-                            const startY = (topicIndex * 120) + 60; // 120px is the space-y-6 converted + button height
+                            if (topicIndex === lessonTopics.length - 1)
+                              return null; // Don't draw line after last topic
+
+                            const startY = topicIndex * 120 + 60; // 120px is the space-y-6 converted + button height
                             const endY = startY + 120;
                             const centerX = 80; // Center of the topic/assessment area
-                            
+
                             return (
                               <g key={`line-${topicNumber}`}>
                                 {/* Line from topic to assessment */}
@@ -519,9 +634,17 @@ const ClassroomView = ({ classroom, user }) => {
                                   y1={startY}
                                   x2={centerX + 30}
                                   y2={startY}
-                                  stroke={isTopicCompleted(topicNumber) ? "#22c55e" : "#e5e7eb"}
+                                  stroke={
+                                    isTopicCompleted(topicNumber)
+                                      ? "#22c55e"
+                                      : "#e5e7eb"
+                                  }
                                   strokeWidth="3"
-                                  strokeDasharray={isTopicCompleted(topicNumber) ? "none" : "5,5"}
+                                  strokeDasharray={
+                                    isTopicCompleted(topicNumber)
+                                      ? "none"
+                                      : "5,5"
+                                  }
                                 />
                                 {/* Line from assessment to next topic */}
                                 <line
@@ -529,9 +652,17 @@ const ClassroomView = ({ classroom, user }) => {
                                   y1={startY}
                                   x2={centerX + 30}
                                   y2={endY - 30}
-                                  stroke={isAssessmentCompleted(topicNumber) ? "#22c55e" : "#e5e7eb"}
+                                  stroke={
+                                    isAssessmentCompleted(topicNumber)
+                                      ? "#22c55e"
+                                      : "#e5e7eb"
+                                  }
                                   strokeWidth="3"
-                                  strokeDasharray={isAssessmentCompleted(topicNumber) ? "none" : "5,5"}
+                                  strokeDasharray={
+                                    isAssessmentCompleted(topicNumber)
+                                      ? "none"
+                                      : "5,5"
+                                  }
                                 />
                                 {/* Line from vertical to next topic */}
                                 <line
@@ -539,9 +670,17 @@ const ClassroomView = ({ classroom, user }) => {
                                   y1={endY - 30}
                                   x2={centerX - 30}
                                   y2={endY}
-                                  stroke={isAssessmentCompleted(topicNumber) ? "#22c55e" : "#e5e7eb"}
+                                  stroke={
+                                    isAssessmentCompleted(topicNumber)
+                                      ? "#22c55e"
+                                      : "#e5e7eb"
+                                  }
                                   strokeWidth="3"
-                                  strokeDasharray={isAssessmentCompleted(topicNumber) ? "none" : "5,5"}
+                                  strokeDasharray={
+                                    isAssessmentCompleted(topicNumber)
+                                      ? "none"
+                                      : "5,5"
+                                  }
                                 />
                               </g>
                             );
@@ -551,11 +690,20 @@ const ClassroomView = ({ classroom, user }) => {
                         {lessonTopics.map((topicNumber, topicIndex) => {
                           const topicButtonId = `lesson-${lesson.lessonId}-topic-${topicNumber}`;
                           const assessmentButtonId = `lesson-${lesson.lessonId}-assessment-${topicNumber}`;
-                          const isTopicLocked = !isTopicUnlocked(topicNumber, lessonIndex);
-                          const isAssessmentLocked = !isAssessmentUnlocked(topicNumber, lessonIndex);
+                          const isTopicLocked = !isTopicUnlocked(
+                            topicNumber,
+                            lessonIndex
+                          );
+                          const isAssessmentLocked = !isAssessmentUnlocked(
+                            topicNumber,
+                            lessonIndex
+                          );
 
                           return (
-                            <div key={topicNumber} className="flex items-center space-x-8 relative z-10">
+                            <div
+                              key={topicNumber}
+                              className="flex items-center space-x-8 relative z-10"
+                            >
                               {/* Topic Button */}
                               <div className="flex justify-center">
                                 <AnimatedLessonButton
@@ -567,7 +715,7 @@ const ClassroomView = ({ classroom, user }) => {
                                         lesson.lessonId,
                                         topicNumber,
                                         lessonIndex + 1,
-                                        'topic'
+                                        "topic"
                                       );
                                     }
                                   }}
@@ -585,9 +733,10 @@ const ClassroomView = ({ classroom, user }) => {
                                 )}
                               </div>
 
-                              {/* Assessment Button */}
+                              {/* Assessment Button - Now using AnimatedAssessmentButton */}
                               <div className="flex justify-center relative">
-                                <button
+                                <AnimatedAssessmentButton
+                                  label={`A${topicNumber}`}
                                   onClick={() => {
                                     if (!isAssessmentLocked) {
                                       handleButtonClick(
@@ -595,29 +744,18 @@ const ClassroomView = ({ classroom, user }) => {
                                         lesson.lessonId,
                                         topicNumber,
                                         lessonIndex + 1,
-                                        'assessment'
+                                        "assessment"
                                       );
                                     }
                                   }}
-                                  disabled={isAssessmentLocked}
-                                  className={`
-                                    w-16 h-16 rounded-lg font-bold text-xs transition-all duration-300 transform hover:scale-105 relative
-                                    ${selectedButton === assessmentButtonId 
-                                      ? 'bg-orange-600 text-white shadow-lg scale-105' 
-                                      : isAssessmentLocked
-                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                        : 'bg-orange-500 text-white hover:bg-orange-600 shadow-md'
-                                    }
-                                    ${!isAssessmentLocked ? 'hover:shadow-lg' : ''}
-                                  `}
-                                >
-                                  <div className="flex flex-col items-center">
-                                    <svg className="w-4 h-4 mb-1" viewBox="0 0 24 24" fill="currentColor">
-                                      <path d="M9 11H7a2 2 0 000 4h2m6-4h2a2 2 0 110 4h-2m-6-4h6"/>
-                                    </svg>
-                                    <span>A{topicNumber}</span>
-                                  </div>
-                                </button>
+                                  onEnterLesson={() => handleEnterLesson()}
+                                  isSelected={
+                                    selectedButton === assessmentButtonId
+                                  }
+                                  className=""
+                                  locked={isAssessmentLocked}
+                                  assessmentNumber={topicNumber}
+                                />
                                 {/* Completion checkmark for assessment */}
                                 {isAssessmentCompleted(topicNumber) && (
                                   <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs z-20">
@@ -639,9 +777,17 @@ const ClassroomView = ({ classroom, user }) => {
                               y1="2"
                               x2="40"
                               y2="2"
-                              stroke={isLessonUnlocked(lessonIndex + 1) ? "#22c55e" : "#e5e7eb"}
+                              stroke={
+                                isLessonUnlocked(lessonIndex + 1)
+                                  ? "#22c55e"
+                                  : "#e5e7eb"
+                              }
                               strokeWidth="4"
-                              strokeDasharray={isLessonUnlocked(lessonIndex + 1) ? "none" : "8,8"}
+                              strokeDasharray={
+                                isLessonUnlocked(lessonIndex + 1)
+                                  ? "none"
+                                  : "8,8"
+                              }
                             />
                           </svg>
                         </div>
@@ -652,16 +798,36 @@ const ClassroomView = ({ classroom, user }) => {
               })}
             </Swiper>
           )}
-          
+
           {/* Custom Navigation Buttons */}
           <div className="swiper-button-prev-custom absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-100 transition-colors">
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-6 h-6 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </div>
           <div className="swiper-button-next-custom absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-100 transition-colors">
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            <svg
+              className="w-6 h-6 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </div>
         </div>
