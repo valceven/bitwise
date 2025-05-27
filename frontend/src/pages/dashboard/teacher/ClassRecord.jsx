@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 import { ArrowLeft, User, Trash2, Search, UserPlus, Download, UserX, Filter, SortAsc, SortDesc } from "lucide-react";
+import { CSVLink, CSVDownload } from "react-csv";
 
 const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
   const [filterActive, setFilterActive] = useState(false);
+
+  const csvData = [
+  ["firstname", "lastname", "email"],
+  ["Ahmed", "Tomi", "ah@smthing.co.com"],
+  ["Raed", "Labes", "rl@smthing.co.com"],
+  ["Yezzi", "Min l3b", "ymin@cocococo.com"]
+];
   
   // Assuming we have this data - you'll need to adapt this to your actual data structure
   const studentsWithStats = classroom?.students?.map(student => ({
@@ -93,39 +101,33 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
       
       {/* Class stats */}
       <div className="bg-offwhite p-6 border-b border-gray-200">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          {/* Total Students Card */}
           <div className="bg-white rounded-lg p-4 shadow-sm flex items-center">
             <div className="p-3 rounded-full bg-blue-100 mr-3">
               <User size={20} className="text-bluez" />
             </div>
             <div>
-              <div className="text-2xl font-bold text-grayz">{studentsWithStats.length}</div>
-              <div className="text-sm text-gray-500">Total Students</div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg p-4 shadow-sm flex items-center">
-            <div className="p-3 rounded-full bg-green-100 mr-3">
-              <UserPlus size={20} className="text-greenz" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-grayz">
-                {new Date(Math.max(...studentsWithStats.map(s => new Date(s.joinedAt || 0)))).toLocaleDateString()}
+              <div className="font-bold text-grayz">
+                Total Students: {studentsWithStats.length}
               </div>
-              <div className="text-sm text-gray-500">Latest Joined</div>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg p-4 shadow-sm flex items-center">
-            <div className="p-3 rounded-full bg-purple-100 mr-3">
-              <Download size={20} className="text-darkpurple" />
-            </div>
-            <div>
-              <button className="text-darkpurple hover:text-purple-800 transition font-medium text-sm">
-                Export Student List
-              </button>
-            </div>
+
+          <div className="bg-white hover:bg-lightpurple rounded-lg p-4 shadow-sm flex items-center cursor-pointer">
+            <CSVLink data={csvData} target="_blank" className="flex items-center">
+              <div className="p-3 rounded-full bg-purple-100 mr-3">
+                <Download size={20} className="text-darkpurple" />
+              </div>
+              <div>
+                <span className="text-darkpurple hover:text-purple-800 transition font-medium text-sm">
+                  Export Student List
+                </span>
+              </div>
+            </CSVLink>
           </div>
+
         </div>
       </div>
 
@@ -154,14 +156,7 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
             <Filter size={18} className="mr-2" />
             Filters
           </button>
-          
-          <button 
-            className="px-4 py-2 bg-greenz text-white rounded-lg hover:bg-green-600 transition flex items-center"
-            onClick={() => console.log("Add new student")}
-          >
-            <UserPlus size={18} className="mr-2" />
-            Add Student
-          </button>
+        
         </div>
         
         {/* Filter panel - can be expanded */}
