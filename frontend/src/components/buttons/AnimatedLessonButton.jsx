@@ -5,8 +5,10 @@ import hoverAnimationLocked from "../../assets/AnimatedHoveredButtonLocked.json"
 import defaultAnimation from "../../assets/defaultTopicButton.json";
 import defaultAnimationLocked from "../../assets/defaultTopicButtonLocked.json";
 import pressedAnimation from "../../assets/pressedAnimationTopicButton.json";
-import indelSvg from "../../assets/bitbot/idle.svg";
-import mainStarSvg from "../../assets/main_star.svg";
+// Import the new completed animations
+import completeHover from "../../assets/completeHover.json";
+import completeDefault from "../../assets/completeDefault.json";
+import completePressed from "../../assets/completePressed.json";
 
 const AnimatedLessonButton = ({
   label,
@@ -16,12 +18,23 @@ const AnimatedLessonButton = ({
   className,
   locked,
   isLesson,
+  isCompleted, // new prop for completed state
 }) => {
   const [state, setState] = useState("default");
   const animationRef = useRef();
 
   const getAnimation = () => {
-    if (locked) {
+    // Priority: completed > locked > normal
+    if (isCompleted) {
+      switch (state) {
+        case "hover":
+          return completeHover;
+        case "pressed":
+          return completePressed;
+        default:
+          return completeDefault;
+      }
+    } else if (locked) {
       switch (state) {
         case "hover":
           return hoverAnimationLocked;
@@ -61,15 +74,6 @@ const AnimatedLessonButton = ({
     }, 500);
   };
 
-  // Determine which SVG to use based on whether it's a main lesson button
-  const getSvgToUse = () => {
-    // Check if this is a main lesson button (contains "Lesson No" in the label)
-    if (label && label.includes("Lesson No")) {
-      return mainStarSvg;
-    }
-    return indelSvg;
-  };
-
   return (
     <div className="relative flex items-center">
       <div
@@ -87,19 +91,6 @@ const AnimatedLessonButton = ({
             lottieRef={animationRef}
             className="z-50"
           />
-
-          {/* Show SVG for buttons when selected */}
-          {!locked && isSelected && (
-            <div className="flex absolute -translate-y-5/6 w-full h-14  z-50 border-black transition-opacity duration-300 ease-in-out flex items-center justify-center">
-              <img
-                src={getSvgToUse()}
-                alt={
-                  label && label.includes("Lesson No") ? "Main Star" : "Idle"
-                }
-                className="w-full h-full object-contain"
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>

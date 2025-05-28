@@ -298,6 +298,25 @@ const ClassroomView = ({ classroom, user }) => {
     }
   };
 
+  const isLessonCompleted = (lessonIndex) => {
+    const lessonTopics = getLessonTopics(lessonIndex);
+    const lessonAssessmentCount = lessonConfig[lessonIndex].assessmentCount;
+    const startTopic = getLessonStartTopic(lessonIndex);
+
+    // Check if all topics in this lesson are completed
+    const allTopicsCompleted = lessonTopics.every((topicNumber) =>
+      isTopicCompleted(topicNumber)
+    );
+
+    // Check if all assessments in this lesson are completed
+    const allAssessmentsCompleted = Array.from(
+      { length: lessonAssessmentCount },
+      (_, i) => startTopic + i
+    ).every((assessmentNumber) => isAssessmentCompleted(assessmentNumber));
+
+    return allTopicsCompleted && allAssessmentsCompleted;
+  };
+
   const handleButtonClick = (
     buttonId,
     lessonId,
@@ -609,6 +628,7 @@ const ClassroomView = ({ classroom, user }) => {
                         )}
                         className="w-full min-w-[200px]"
                         locked={!isMainLessonUnlocked}
+                        isCompleted={isLessonCompleted(lessonIndex)} // Add this line
                       />
 
                       {/* Topics and Assessments with connecting lines */}
@@ -622,18 +642,24 @@ const ClassroomView = ({ classroom, user }) => {
                             if (topicIndex === lessonTopics.length - 1)
                               return null; // Don't draw line after last topic
 
-                            const startY = topicIndex * 120 + 60; // 120px is the space-y-6 converted + button height
-                            const endY = startY + 120;
-                            const centerX = 80; // Center of the topic/assessment area
+                            // Better positioning calculations that match the flex layout
+                            const rowSpacing = 96; // space-y-6 = 24px + button height + margins ≈ 96px
+                            const currentRowY = 60 + topicIndex * rowSpacing; // Start offset + row spacing
+                            const nextRowY = currentRowY + rowSpacing;
+
+                            // Horizontal positioning - adjust these values based on your button widths
+                            const topicCenterX = 60; // Center of topic button (adjust as needed)
+                            const assessmentCenterX = 160; // Center of assessment button (adjust as needed)
+                            const connectionPointX = 110; // Middle point between buttons
 
                             return (
                               <g key={`line-${topicNumber}`}>
-                                {/* Line from topic to assessment */}
+                                {/* Line from topic to assessment (horizontal) */}
                                 <line
-                                  x1={centerX - 30}
-                                  y1={startY}
-                                  x2={centerX + 30}
-                                  y2={startY}
+                                  x1={topicCenterX + 40} // Right edge of topic button
+                                  y1={currentRowY}
+                                  x2={assessmentCenterX - 25} // Left edge of assessment button
+                                  y2={currentRowY}
                                   stroke={
                                     isTopicCompleted(topicNumber)
                                       ? "#22c55e"
@@ -646,12 +672,13 @@ const ClassroomView = ({ classroom, user }) => {
                                       : "5,5"
                                   }
                                 />
-                                {/* Line from assessment to next topic */}
+
+                                {/* Line from assessment down (vertical) */}
                                 <line
-                                  x1={centerX + 30}
-                                  y1={startY}
-                                  x2={centerX + 30}
-                                  y2={endY - 30}
+                                  x1={assessmentCenterX}
+                                  y1={currentRowY + 25} // Bottom of assessment button
+                                  x2={assessmentCenterX}
+                                  y2={currentRowY + rowSpacing * 0.6} // Partway down
                                   stroke={
                                     isAssessmentCompleted(topicNumber)
                                       ? "#22c55e"
@@ -664,12 +691,32 @@ const ClassroomView = ({ classroom, user }) => {
                                       : "5,5"
                                   }
                                 />
-                                {/* Line from vertical to next topic */}
+
+                                {/* Line from right side to left side (horizontal) */}
                                 <line
-                                  x1={centerX + 30}
-                                  y1={endY - 30}
-                                  x2={centerX - 30}
-                                  y2={endY}
+                                  x1={assessmentCenterX}
+                                  y1={currentRowY + rowSpacing * 0.6}
+                                  x2={topicCenterX}
+                                  y2={currentRowY + rowSpacing * 0.6}
+                                  stroke={
+                                    isAssessmentCompleted(topicNumber)
+                                      ? "#22c55e"
+                                      : "#e5e7eb"
+                                  }
+                                  strokeWidth="3"
+                                  strokeDasharray={
+                                    isAssessmentCompleted(topicNumber)
+                                      ? "none"
+                                      : "5,5"
+                                  }
+                                />
+
+                                {/* Line from left side to next topic (vertical) */}
+                                <line
+                                  x1={topicCenterX}
+                                  y1={currentRowY + rowSpacing * 0.6}
+                                  x2={topicCenterX}
+                                  y2={nextRowY - 25} // Top of next topic button
                                   stroke={
                                     isAssessmentCompleted(topicNumber)
                                       ? "#22c55e"
@@ -724,10 +771,11 @@ const ClassroomView = ({ classroom, user }) => {
                                   className="scale-75 h-15 relative"
                                   isLesson={true}
                                   locked={isTopicLocked}
+                                  isCompleted={isTopicCompleted(topicNumber)} // Add this line
                                 />
                                 {/* Completion checkmark for topic */}
                                 {isTopicCompleted(topicNumber) && (
-                                  <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs z-20">
+                                  <div className="absolute top-8 -right-6 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs z-20">
                                     ✓
                                   </div>
                                 )}
@@ -755,10 +803,13 @@ const ClassroomView = ({ classroom, user }) => {
                                   className=""
                                   locked={isAssessmentLocked}
                                   assessmentNumber={topicNumber}
+                                  isCompleted={isAssessmentCompleted(
+                                    topicNumber
+                                  )} // Add this line
                                 />
                                 {/* Completion checkmark for assessment */}
                                 {isAssessmentCompleted(topicNumber) && (
-                                  <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs z-20">
+                                  <div className="absolute bottom-1 -right-1 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs z-20">
                                     ✓
                                   </div>
                                 )}

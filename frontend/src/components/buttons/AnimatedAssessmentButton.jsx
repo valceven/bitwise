@@ -1,11 +1,19 @@
 import React, { useState, useRef } from "react";
 import Lottie from "lottie-react";
-// You can create assessment-specific animations or reuse the existing ones
+// Existing animations
 import hoverAnimation from "../../assets/assessmentHover.json";
 import hoverAnimationLocked from "../../assets/AnimatedHoveredButtonLocked.json";
 import defaultAnimation from "../../assets/assessmentIdle.json";
 import defaultAnimationLocked from "../../assets/defaultTopicButtonLocked.json";
 import pressedAnimation from "../../assets/assessmentPressed.json";
+// New completed animations for assessments
+import completeHoverAssessment from "../../assets/completeHover.json"; // if you have assessment-specific ones
+import completeDefaultAssessment from "../../assets/completeDefault.json";
+import completePressedAssessment from "../../assets/completePressed.json";
+// OR if you want to reuse the same completed animations from lesson buttons:
+// import completeHover from "../../assets/completeHover.json";
+// import completeDefault from "../../assets/completeDefault.json";
+// import completePressed from "../../assets/completePressed.json";
 import indelSvg from "../../assets/bitbot/idle.svg";
 import mainStarSvg from "../../assets/main_star.svg";
 
@@ -17,12 +25,23 @@ const AnimatedAssessmentButton = ({
   className,
   locked,
   assessmentNumber,
+  isCompleted, // New prop for completed state
 }) => {
   const [state, setState] = useState("default");
   const animationRef = useRef();
 
   const getAnimation = () => {
-    if (locked) {
+    // Priority: completed > locked > normal
+    if (isCompleted) {
+      switch (state) {
+        case "hover":
+          return completeHoverAssessment; // or completeHover if reusing
+        case "pressed":
+          return completePressedAssessment; // or completePressed if reusing
+        default:
+          return completeDefaultAssessment; // or completeDefault if reusing
+      }
+    } else if (locked) {
       switch (state) {
         case "hover":
           return hoverAnimationLocked;
@@ -93,11 +112,11 @@ const AnimatedAssessmentButton = ({
                 ? "text-white"
                 : locked
                 ? "text-gray-500"
+                : isCompleted
+                ? "text-white" // Keep white text for completed assessments
                 : "text-white"
             }`}
-          >
-            <span className="text-xs font-bold">A{assessmentNumber}</span>
-          </div>
+          ></div>
 
           {/* Show SVG for assessment buttons when selected */}
           {!locked && isSelected && (

@@ -1,6 +1,15 @@
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle, XCircle, ChevronLeft, ChevronRight, Info, AlertCircle, Award, Clock } from "lucide-react"
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  CheckCircle,
+  XCircle,
+  ChevronLeft,
+  ChevronRight,
+  Info,
+  AlertCircle,
+  Award,
+  Clock,
+} from "lucide-react";
 
 // Enhanced color palette with more colors
 const colors = {
@@ -28,32 +37,32 @@ const colors = {
   violetz: "#8B5CF6",
   ambez: "#F59E0B",
   limez: "#84CC16",
-  skyz: "#0EA5E9"
-}
+  skyz: "#0EA5E9",
+};
 
-const TruthTableConstructionAssessment = ({ 
-  onComplete, 
+const TruthTableConstructionAssessment = ({
+  onComplete,
   onFinish,
-  attemptsRemaining = 3, 
-  currentAttempt = 1, 
-  maxAttempts = 3 
+  attemptsRemaining = 3,
+  currentAttempt = 1,
+  maxAttempts = 3,
 }) => {
   // Assessment states
-  const [currentStep, setCurrentStep] = useState(0)
-  const [score, setScore] = useState(0)
-  const [userAnswers, setUserAnswers] = useState({})
-  const [showFeedback, setShowFeedback] = useState(false)
-  const [feedbackMessage, setFeedbackMessage] = useState("")
-  const [isCompleted, setIsCompleted] = useState(false)
+  const [currentStep, setCurrentStep] = useState(0);
+  const [score, setScore] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({});
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [isCompleted, setIsCompleted] = useState(false);
 
   // Interactive states
-  const [selectedVariables, setSelectedVariables] = useState(2)
-  const [userTruthTable, setUserTruthTable] = useState({})
-  const [highlightCell, setHighlightCell] = useState(null)
-  const [showFormula, setShowFormula] = useState(false)
-  const [explanationOpen, setExplanationOpen] = useState(false)
-  const [userRowCalculations, setUserRowCalculations] = useState({})
-  const [calculationChecked, setCalculationChecked] = useState(false)
+  const [selectedVariables, setSelectedVariables] = useState(2);
+  const [userTruthTable, setUserTruthTable] = useState({});
+  const [highlightCell, setHighlightCell] = useState(null);
+  const [showFormula, setShowFormula] = useState(false);
+  const [explanationOpen, setExplanationOpen] = useState(false);
+  const [userRowCalculations, setUserRowCalculations] = useState({});
+  const [calculationChecked, setCalculationChecked] = useState(false);
 
   // Assessment content
   const assessmentSteps = [
@@ -104,7 +113,8 @@ const TruthTableConstructionAssessment = ({
     {
       type: "complexTableConstruction",
       title: "Construct a Truth Table",
-      description: "Now let's build a simplified truth table for the expression: A AND (NOT B)",
+      description:
+        "Now let's build a simplified truth table for the expression: A AND (NOT B)",
       operationDescription:
         "This expression has two parts: A and (NOT B). We'll calculate NOT B first, then combine it with A using the AND operator.",
       table: {
@@ -154,237 +164,270 @@ const TruthTableConstructionAssessment = ({
     {
       type: "completion",
       title: "Assessment Complete!",
-      content: "You've completed your journey through truth table construction.",
+      content:
+        "You've completed your journey through truth table construction.",
     },
-  ]
+  ];
 
   // Calculate progress percentage
-  const progress = ((currentStep + 1) / assessmentSteps.length) * 100
+  const progress = ((currentStep + 1) / assessmentSteps.length) * 100;
 
   // Get total number of questions (excluding intro and completion steps)
   const totalQuestions = assessmentSteps.filter(
-    (step) => step.type !== "intro" && step.type !== "completion" && step.question,
-  ).length
+    (step) =>
+      step.type !== "intro" && step.type !== "completion" && step.question
+  ).length;
 
   // Check if user has already answered current question
   const hasAnsweredCurrent = () => {
-    return userAnswers[currentStep] !== undefined
-  }
+    return userAnswers[currentStep] !== undefined;
+  };
 
   // Handle answer selection for multiple choice
   const handleAnswerSelect = (answerIndex) => {
-    if (hasAnsweredCurrent()) return
+    if (hasAnsweredCurrent()) return;
 
-    const currentQuestion = assessmentSteps[currentStep]
-    const isCorrect = answerIndex === currentQuestion.correctAnswer
+    const currentQuestion = assessmentSteps[currentStep];
+    const isCorrect = answerIndex === currentQuestion.correctAnswer;
 
     // Update score
     if (isCorrect) {
-      setScore((prevScore) => prevScore + 1)
-      setFeedbackMessage("Correct! " + currentQuestion.explanation)
+      setScore((prevScore) => prevScore + 1);
+      setFeedbackMessage("Correct! " + currentQuestion.explanation);
     } else {
-      setFeedbackMessage("Not quite. " + currentQuestion.explanation)
+      setFeedbackMessage("Not quite. " + currentQuestion.explanation);
     }
 
     // Update user answers
     setUserAnswers({
       ...userAnswers,
       [currentStep]: { answer: answerIndex, isCorrect },
-    })
+    });
 
     // Show feedback
-    setShowFeedback(true)
-  }
+    setShowFeedback(true);
+  };
 
   // Handle user input for truth table cells
   const handleTruthTableInput = (rowIndex, columnHeader, value) => {
     setUserTruthTable({
       ...userTruthTable,
-      [`${rowIndex}-${columnHeader}`]: value === "" ? undefined : Number.parseInt(value),
-    })
-  }
+      [`${rowIndex}-${columnHeader}`]:
+        value === "" ? undefined : Number.parseInt(value),
+    });
+  };
 
   // Check truth table answers
   const checkTruthTableAnswers = (tableType) => {
-    const step = assessmentSteps[currentStep]
-    let isAllCorrect = true
-    let correctCount = 0
-    let totalCells = 0
+    const step = assessmentSteps[currentStep];
+    let isAllCorrect = true;
+    let correctCount = 0;
+    let totalCells = 0;
 
     if (tableType === "basic") {
       // Basic table with single column of answers
       for (let i = 0; i < step.table.rows.length; i++) {
-        const userAnswer = userTruthTable[`${i}-${step.table.headers[2]}`]
+        const userAnswer = userTruthTable[`${i}-${step.table.headers[2]}`];
         if (userAnswer === undefined) {
-          isAllCorrect = false
-          break
+          isAllCorrect = false;
+          break;
         }
 
         if (userAnswer === step.correctAnswers[i]) {
-          correctCount++
+          correctCount++;
         } else {
-          isAllCorrect = false
+          isAllCorrect = false;
         }
-        totalCells++
+        totalCells++;
       }
     } else if (tableType === "complex") {
       // Complex table with multiple columns to fill
-      const columnsToCheck = Object.keys(step.correctAnswers)
+      const columnsToCheck = Object.keys(step.correctAnswers);
 
       for (const column of columnsToCheck) {
         for (let i = 0; i < step.table.rows.length; i++) {
-          const userAnswer = userTruthTable[`${i}-${column}`]
+          const userAnswer = userTruthTable[`${i}-${column}`];
           if (userAnswer === undefined) {
-            isAllCorrect = false
-            break
+            isAllCorrect = false;
+            break;
           }
 
           if (userAnswer === step.correctAnswers[column][i]) {
-            correctCount++
+            correctCount++;
           } else {
-            isAllCorrect = false
+            isAllCorrect = false;
           }
-          totalCells++
+          totalCells++;
         }
       }
     }
 
     // Calculate partial score (for complex tables)
-    const accuracy = correctCount / totalCells
+    const accuracy = correctCount / totalCells;
 
     // Update score and show feedback
     if (isAllCorrect) {
-      setScore((prevScore) => prevScore + 1)
-      setFeedbackMessage("Perfect! " + step.explanation)
+      setScore((prevScore) => prevScore + 1);
+      setFeedbackMessage("Perfect! " + step.explanation);
     } else if (accuracy > 0.5) {
       // Partial credit for more than 50% correct
-      setScore((prevScore) => prevScore + 0.5)
-      setFeedbackMessage("You got some correct, but not all. " + step.explanation)
+      setScore((prevScore) => prevScore + 0.5);
+      setFeedbackMessage(
+        "You got some correct, but not all. " + step.explanation
+      );
     } else {
-      setFeedbackMessage("Let's review this. " + step.explanation)
+      setFeedbackMessage("Let's review this. " + step.explanation);
     }
 
     // Update user answers
     setUserAnswers({
       ...userAnswers,
       [currentStep]: { isCorrect: isAllCorrect, accuracy },
-    })
+    });
 
     // Show feedback
-    setShowFeedback(true)
-  }
+    setShowFeedback(true);
+  };
 
   // Handle row calculation for the variable selection exercise
   const handleRowCalculation = (variables, value) => {
     setUserRowCalculations({
       ...userRowCalculations,
       [variables]: value,
-    })
-  }
+    });
+  };
 
   // Check if user has answered a specific row calculation
   const hasCalculationAnswer = (variables) => {
-    return calculationChecked && userRowCalculations[variables] !== undefined
-  }
+    return calculationChecked && userRowCalculations[variables] !== undefined;
+  };
 
   // Check if a specific row calculation is correct
   const isCalculationCorrect = (variables) => {
-    return Number.parseInt(userRowCalculations[variables]) === Math.pow(2, Number.parseInt(variables))
-  }
+    return (
+      Number.parseInt(userRowCalculations[variables]) ===
+      Math.pow(2, Number.parseInt(variables))
+    );
+  };
 
   // Check all row calculations
   const checkRowCalculations = () => {
-    setCalculationChecked(true)
-  }
+    setCalculationChecked(true);
+  };
 
   // Handle navigation between steps
   const handleNext = () => {
     if (currentStep < assessmentSteps.length - 1) {
-      setCurrentStep(currentStep + 1)
-      setShowFeedback(false)
-      setUserTruthTable({})
-      setHighlightCell(null)
-      setExplanationOpen(false)
-      setCalculationChecked(false)
-      setUserRowCalculations({})
+      setCurrentStep(currentStep + 1);
+      setShowFeedback(false);
+      setUserTruthTable({});
+      setHighlightCell(null);
+      setExplanationOpen(false);
+      setCalculationChecked(false);
+      setUserRowCalculations({});
     } else {
-      finishAssessment()
+      finishAssessment();
     }
-  }
+  };
 
   const handlePrevious = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1)
-      setShowFeedback(false)
-      setUserTruthTable({})
-      setHighlightCell(null)
-      setExplanationOpen(false)
-      setCalculationChecked(false)
-      setUserRowCalculations({})
+      setCurrentStep(currentStep - 1);
+      setShowFeedback(false);
+      setUserTruthTable({});
+      setHighlightCell(null);
+      setExplanationOpen(false);
+      setCalculationChecked(false);
+      setUserRowCalculations({});
     }
-  }
+  };
 
   // Complete the assessment
   const finishAssessment = () => {
-    setIsCompleted(true)
+    setIsCompleted(true);
 
     // Calculate final score
-    const finalScore = Math.round((score / totalQuestions) * 100)
+    const finalScore = Math.round((score / totalQuestions) * 100);
 
     // Call the onComplete callback if provided
     if (onComplete) {
-      onComplete(score, totalQuestions, finalScore)
+      onComplete(score, totalQuestions, finalScore);
     }
 
-    console.log(`Assessment completed with score: ${score}/${totalQuestions} (${finalScore}%)`)
-  }
+    console.log(
+      `Assessment completed with score: ${score}/${totalQuestions} (${finalScore}%)`
+    );
+  };
 
   // Reset and restart assessment
   const handleRestartAssessment = () => {
-    setCurrentStep(0)
-    setScore(0)
-    setUserAnswers({})
-    setShowFeedback(false)
-    setFeedbackMessage("")
-    setIsCompleted(false)
-    setUserTruthTable({})
-    setHighlightCell(null)
-    setSelectedVariables(2)
-    setExplanationOpen(false)
-    setCalculationChecked(false)
-    setUserRowCalculations({})
+    setCurrentStep(0);
+    setScore(0);
+    setUserAnswers({});
+    setShowFeedback(false);
+    setFeedbackMessage("");
+    setIsCompleted(false);
+    setUserTruthTable({});
+    setHighlightCell(null);
+    setSelectedVariables(2);
+    setExplanationOpen(false);
+    setCalculationChecked(false);
+    setUserRowCalculations({});
 
     // Scroll to top
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Custom Button component
-  const Button = ({ children, onClick, disabled, variant, className, size }) => {
-    const baseStyles = "rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
-    const sizeStyles = size === "lg" ? "px-6 py-3 text-lg" : "px-4 py-2 text-sm"
+  const Button = ({
+    children,
+    onClick,
+    disabled,
+    variant,
+    className,
+    size,
+  }) => {
+    const baseStyles =
+      "rounded-lg font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2";
+    const sizeStyles =
+      size === "lg" ? "px-6 py-3 text-lg" : "px-4 py-2 text-sm";
 
-    let variantStyles = ""
+    let variantStyles = "";
     if (variant === "outline") {
-      variantStyles = `border border-${disabled ? "gray-300" : "bluez"} text-${disabled ? "gray-400" : "bluez"} hover:bg-bluez hover:bg-opacity-10`
+      variantStyles = `border border-${disabled ? "gray-300" : "bluez"} text-${
+        disabled ? "gray-400" : "bluez"
+      } hover:bg-bluez hover:bg-opacity-10`;
     } else {
-      variantStyles = `bg-${disabled ? "gray-300" : "bluez"} text-white hover:bg-opacity-90`
+      variantStyles = `bg-${
+        disabled ? "gray-300" : "bluez"
+      } text-white hover:bg-opacity-90`;
     }
 
     return (
       <button
         onClick={onClick}
         disabled={disabled}
-        className={`${baseStyles} ${sizeStyles} ${variantStyles} ${className || ""}`}
+        className={`${baseStyles} ${sizeStyles} ${variantStyles} ${
+          className || ""
+        }`}
         style={{
-          backgroundColor: disabled ? "#ccc" : variant === "outline" ? "transparent" : colors.bluez,
-          color: disabled ? "#888" : variant === "outline" ? colors.bluez : colors.white,
+          backgroundColor: disabled
+            ? "#ccc"
+            : variant === "outline"
+            ? "transparent"
+            : colors.bluez,
+          color: disabled
+            ? "#888"
+            : variant === "outline"
+            ? colors.bluez
+            : colors.white,
           borderColor: variant === "outline" ? colors.bluez : "transparent",
         }}
       >
         {children}
       </button>
-    )
-  }
+    );
+  };
 
   // Custom Badge component
   const Badge = ({ children, color, className }) => {
@@ -398,26 +441,26 @@ const TruthTableConstructionAssessment = ({
       >
         {children}
       </span>
-    )
-  }
+    );
+  };
 
   // Function to generate truth table rows based on number of variables
   const generateTruthTableRows = (variables) => {
-    const rows = []
-    const totalRows = Math.pow(2, variables)
+    const rows = [];
+    const totalRows = Math.pow(2, variables);
 
     for (let i = 0; i < totalRows; i++) {
-      const row = []
+      const row = [];
       for (let j = variables - 1; j >= 0; j--) {
         // Calculate bit value (0 or 1) for this position
-        const bit = (i >> j) & 1
-        row.unshift(bit) // Add to beginning of row
+        const bit = (i >> j) & 1;
+        row.unshift(bit); // Add to beginning of row
       }
-      rows.push(row)
+      rows.push(row);
     }
 
-    return rows
-  }
+    return rows;
+  };
 
   // Progress Bar component
   const ProgressBar = ({ value }) => {
@@ -431,8 +474,8 @@ const TruthTableConstructionAssessment = ({
           }}
         />
       </div>
-    )
-  }
+    );
+  };
 
   // Mathematical formula with superscript
   const Formula = ({ base, exponent }) => {
@@ -441,8 +484,8 @@ const TruthTableConstructionAssessment = ({
         {base}
         <sup>{exponent}</sup>
       </span>
-    )
-  }
+    );
+  };
 
   // Explanation panel component
   const ExplanationPanel = ({ title, children, isOpen, onToggle }) => {
@@ -472,18 +515,29 @@ const TruthTableConstructionAssessment = ({
           )}
         </AnimatePresence>
       </div>
-    )
-  }
+    );
+  };
 
   // Truth Table component
-  const TruthTable = ({ headers, rows, editable, onCellChange, highlightCell, correctAnswers }) => {
-    const answered = hasAnsweredCurrent()
+  const TruthTable = ({
+    headers,
+    rows,
+    editable,
+    onCellChange,
+    highlightCell,
+    correctAnswers,
+  }) => {
+    const answered = hasAnsweredCurrent();
 
     return (
       <div className="overflow-x-auto mt-4 mb-6">
         <table className="w-full text-center border-collapse rounded-lg overflow-hidden shadow-md">
           <thead>
-            <tr style={{ background: `linear-gradient(135deg, ${colors.tealz}, ${colors.cyanz})` }}>
+            <tr
+              style={{
+                background: `linear-gradient(135deg, ${colors.tealz}, ${colors.cyanz})`,
+              }}
+            >
               {headers.map((header, index) => (
                 <th key={index} className="p-3 border text-white font-bold">
                   {header}
@@ -493,38 +547,45 @@ const TruthTableConstructionAssessment = ({
           </thead>
           <tbody>
             {rows.map((row, rowIndex) => (
-              <tr key={rowIndex} className={rowIndex % 2 === 0 ? "bg-white" : ""} 
-                  style={{ backgroundColor: rowIndex % 2 === 1 ? `${colors.skyz}10` : "white" }}>
+              <tr
+                key={rowIndex}
+                className={rowIndex % 2 === 0 ? "bg-white" : ""}
+                style={{
+                  backgroundColor:
+                    rowIndex % 2 === 1 ? `${colors.skyz}10` : "white",
+                }}
+              >
                 {row.map((cell, cellIndex) => {
-                  const isEditable = editable && cell === null
-                  const cellHeader = headers[cellIndex]
-                  const cellKey = `${rowIndex}-${cellHeader}`
-                  const isHighlighted = highlightCell === cellKey
-                  const userValue = userTruthTable[cellKey]
+                  const isEditable = editable && cell === null;
+                  const cellHeader = headers[cellIndex];
+                  const cellKey = `${rowIndex}-${cellHeader}`;
+                  const isHighlighted = highlightCell === cellKey;
+                  const userValue = userTruthTable[cellKey];
 
-                  const cellClass = "p-3 border font-medium"
-                  const cellStyle = {}
+                  const cellClass = "p-3 border font-medium";
+                  const cellStyle = {};
 
                   if (isHighlighted) {
-                    cellStyle.backgroundColor = `${colors.ambez}30`
+                    cellStyle.backgroundColor = `${colors.ambez}30`;
                   }
 
                   // Check if answer is correct (for feedback)
-                  let isCorrect = null
+                  let isCorrect = null;
                   if (answered && userValue !== undefined && correctAnswers) {
                     if (Array.isArray(correctAnswers)) {
-                      isCorrect = userValue === correctAnswers[rowIndex]
+                      isCorrect = userValue === correctAnswers[rowIndex];
                     } else {
-                      isCorrect = userValue === correctAnswers[cellHeader][rowIndex]
+                      isCorrect =
+                        userValue === correctAnswers[cellHeader][rowIndex];
                     }
 
                     // Apply styling based on correctness
                     if (isCorrect) {
-                      cellStyle.backgroundColor = `${colors.emeraldz}20`
-                      cellStyle.borderColor = colors.emeraldz
+                      cellStyle.backgroundColor = `${colors.emeraldz}20`;
+                      cellStyle.borderColor = colors.emeraldz;
                     } else {
-                      cellStyle.backgroundColor = `${colors.coralz}20`
-                      cellStyle.borderColor = colors.coralz
+                      cellStyle.backgroundColor = `${colors.coralz}20`;
+                      cellStyle.borderColor = colors.coralz;
                     }
                   }
 
@@ -533,7 +594,9 @@ const TruthTableConstructionAssessment = ({
                       {isEditable ? (
                         <select
                           value={userValue || ""}
-                          onChange={(e) => onCellChange(rowIndex, cellHeader, e.target.value)}
+                          onChange={(e) =>
+                            onCellChange(rowIndex, cellHeader, e.target.value)
+                          }
                           className="w-16 text-center border-2 rounded-md py-2 font-bold"
                           style={{ borderColor: colors.indigoz }}
                           disabled={answered}
@@ -545,10 +608,19 @@ const TruthTableConstructionAssessment = ({
                       ) : cell === "?" ? (
                         <span style={{ color: colors.violetz }}>?</span>
                       ) : (
-                        <span style={{ color: cell === 1 ? colors.emeraldz : colors.grayz }}>{cell}</span>
+                        <span
+                          style={{
+                            color: cell === 1 ? colors.emeraldz : colors.grayz,
+                          }}
+                        >
+                          {cell}
+                        </span>
                       )}
                       {answered && isCorrect === false && (
-                        <div className="text-xs mt-1 font-bold" style={{ color: colors.redz }}>
+                        <div
+                          className="text-xs mt-1 font-bold"
+                          style={{ color: colors.redz }}
+                        >
                           Correct:{" "}
                           {Array.isArray(correctAnswers)
                             ? correctAnswers[rowIndex]
@@ -556,126 +628,204 @@ const TruthTableConstructionAssessment = ({
                         </div>
                       )}
                     </td>
-                  )
+                  );
                 })}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    )
-  }
+    );
+  };
 
   // Navigation buttons
   const renderNavigation = () => {
-    const isLastStep = currentStep === assessmentSteps.length - 1
-    const isFirstStep = currentStep === 0
+    const isLastStep = currentStep === assessmentSteps.length - 1;
+    const isFirstStep = currentStep === 0;
     const canProceed =
       hasAnsweredCurrent() ||
       assessmentSteps[currentStep].type === "intro" ||
-      assessmentSteps[currentStep].type === "completion"
+      assessmentSteps[currentStep].type === "completion";
 
     return (
       <div className="flex justify-between mt-6">
-        <Button onClick={handlePrevious} disabled={isFirstStep} variant="outline" className="flex items-center">
+        <Button
+          onClick={handlePrevious}
+          disabled={isFirstStep}
+          variant="outline"
+          className="flex items-center"
+        >
           <ChevronLeft className="h-4 w-4 mr-1" /> Previous
         </Button>
 
-        <Button onClick={handleNext} disabled={!canProceed} className="flex items-center">
-          {isLastStep ? "Finish" : "Next"} <ChevronRight className="h-4 w-4 ml-1" />
+        <Button
+          onClick={handleNext}
+          disabled={!canProceed}
+          className="flex items-center"
+        >
+          {isLastStep ? "Finish" : "Next"}{" "}
+          <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
       </div>
-    )
-  }
+    );
+  };
 
   // Render different content based on step type
   const renderStepContent = () => {
-    const step = assessmentSteps[currentStep]
+    const step = assessmentSteps[currentStep];
 
     switch (step.type) {
       case "intro":
         return (
           <div className="flex flex-col items-center space-y-6 text-center">
-            <div className="w-24 h-24 rounded-full flex items-center justify-center mb-4"
-                 style={{ background: `linear-gradient(135deg, ${colors.pinkz}, ${colors.violetz})` }}>
+            <div
+              className="w-24 h-24 rounded-full flex items-center justify-center mb-4"
+              style={{
+                background: `linear-gradient(135deg, ${colors.pinkz}, ${colors.violetz})`,
+              }}
+            >
               <span className="text-3xl">🧮</span>
             </div>
             <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
               {step.title}
             </h2>
-            <div className="w-full max-w-2xl h-64 rounded-xl flex items-center justify-center"
-                 style={{ background: `linear-gradient(135deg, ${colors.cyanz}20, ${colors.lavenderz}20)` }}>
+            <div
+              className="w-full max-w-2xl h-64 rounded-xl flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${colors.cyanz}20, ${colors.lavenderz}20)`,
+              }}
+            >
               <div className="text-center">
                 <div className="text-6xl mb-4">📊</div>
-                <p className="text-lg font-medium" style={{ color: colors.grayz }}>Interactive Truth Table Learning</p>
+                <p
+                  className="text-lg font-medium"
+                  style={{ color: colors.grayz }}
+                >
+                  Interactive Truth Table Learning
+                </p>
               </div>
             </div>
             <p className="text-lg max-w-2xl" style={{ color: colors.grayz }}>
               {step.content}
             </p>
-            
+
             {/* ADD: Show attempt information */}
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-700 mb-2">
-                📝 Attempt <strong>{currentAttempt}</strong> of <strong>{maxAttempts}</strong>
+                📝 Attempt <strong>{currentAttempt}</strong> of{" "}
+                <strong>{maxAttempts}</strong>
               </p>
               <p className="text-xs text-blue-600">
-                {attemptsRemaining > 1 ? 
-                  `You have ${attemptsRemaining - 1} attempts remaining after this one.` : 
-                  "This is your final attempt!"}
+                {attemptsRemaining > 1
+                  ? `You have ${
+                      attemptsRemaining - 1
+                    } attempts remaining after this one.`
+                  : "This is your final attempt!"}
               </p>
             </div>
-            
+
             <Button onClick={handleNext} size="lg" className="mt-6">
               Begin Learning
             </Button>
           </div>
-        )
+        );
 
       case "variableExplanation":
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-                   style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.tealz})` }}>
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.tealz})`,
+                }}
+              >
                 <span className="text-2xl">📈</span>
               </div>
-              <h2 className="text-2xl font-bold" style={{ color: colors.grayz }}>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: colors.grayz }}
+              >
                 {step.title}
               </h2>
             </div>
             <p style={{ color: colors.grayz }}>{step.description}</p>
 
             {/* Examples table */}
-            <div className="rounded-xl shadow-lg overflow-hidden" 
-                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.skyz}10)` }}>
+            <div
+              className="rounded-xl shadow-lg overflow-hidden"
+              style={{
+                background: `linear-gradient(135deg, ${colors.white}, ${colors.skyz}10)`,
+              }}
+            >
               <div className="p-6">
-                <h3 className="text-lg font-bold mb-4" style={{ color: colors.indigoz }}>Examples:</h3>
+                <h3
+                  className="text-lg font-bold mb-4"
+                  style={{ color: colors.indigoz }}
+                >
+                  Examples:
+                </h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-center border-collapse">
                     <thead>
-                      <tr style={{ background: `linear-gradient(135deg, ${colors.indigoz}, ${colors.violetz})` }}>
-                        <th className="p-3 border text-white font-bold">Number of Variables</th>
-                        <th className="p-3 border text-white font-bold">Number of Rows</th>
-                        <th className="p-3 border text-white font-bold">Formula</th>
+                      <tr
+                        style={{
+                          background: `linear-gradient(135deg, ${colors.indigoz}, ${colors.violetz})`,
+                        }}
+                      >
+                        <th className="p-3 border text-white font-bold">
+                          Number of Variables
+                        </th>
+                        <th className="p-3 border text-white font-bold">
+                          Number of Rows
+                        </th>
+                        <th className="p-3 border text-white font-bold">
+                          Formula
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {step.examples.map((example, index) => (
-                        <tr key={index} style={{ 
-                          backgroundColor: index % 2 === 0 ? colors.white : `${colors.mintgreenz}10` 
-                        }}>
-                          <td className="p-3 border font-medium">{example.variables}</td>
-                          <td className="p-3 border font-bold" style={{ color: colors.emeraldz }}>{example.rows}</td>
-                          <td className="p-3 border font-mono" style={{ color: colors.indigoz }}>{example.formula}</td>
+                        <tr
+                          key={index}
+                          style={{
+                            backgroundColor:
+                              index % 2 === 0
+                                ? colors.white
+                                : `${colors.mintgreenz}10`,
+                          }}
+                        >
+                          <td className="p-3 border font-medium">
+                            {example.variables}
+                          </td>
+                          <td
+                            className="p-3 border font-bold"
+                            style={{ color: colors.emeraldz }}
+                          >
+                            {example.rows}
+                          </td>
+                          <td
+                            className="p-3 border font-mono"
+                            style={{ color: colors.indigoz }}
+                          >
+                            {example.formula}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
 
-                <div className="mt-4 p-4 rounded-lg" style={{ background: `linear-gradient(135deg, ${colors.lavenderz}20, ${colors.pinkz}20)` }}>
-                  <p className="font-bold text-center" style={{ color: colors.violetz }}>
+                <div
+                  className="mt-4 p-4 rounded-lg"
+                  style={{
+                    background: `linear-gradient(135deg, ${colors.lavenderz}20, ${colors.pinkz}20)`,
+                  }}
+                >
+                  <p
+                    className="font-bold text-center"
+                    style={{ color: colors.violetz }}
+                  >
                     Formula: {step.formula}
                   </p>
                 </div>
@@ -683,29 +833,42 @@ const TruthTableConstructionAssessment = ({
             </div>
 
             {/* Question */}
-            <div className="p-6 rounded-xl shadow-lg" style={{ backgroundColor: colors.offwhite }}>
-              <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
+            <div className="p-6">
+              <h3
+                className="text-lg font-bold mb-4"
+                style={{ color: colors.grayz }}
+              >
                 {step.question}
               </h3>
               <div className="space-y-3">
                 {step.options.map((option, idx) => {
-                  const answered = hasAnsweredCurrent()
-                  const isSelected = answered ? userAnswers[currentStep]?.answer === idx : false
-                  const isCorrect = step.correctAnswer === idx
+                  const answered = hasAnsweredCurrent();
+                  const isSelected = answered
+                    ? userAnswers[currentStep]?.answer === idx
+                    : false;
+                  const isCorrect = step.correctAnswer === idx;
 
-                  let bgColor = colors.white
-                  let borderColor = colors.cyanz
+                  let bgColor = colors.white;
+                  let borderColor = colors.cyanz;
 
                   if (answered && isSelected) {
-                    bgColor = userAnswers[currentStep].isCorrect ? `${colors.emeraldz}20` : `${colors.coralz}20`
-                    borderColor = userAnswers[currentStep].isCorrect ? colors.emeraldz : colors.coralz
+                    bgColor = userAnswers[currentStep].isCorrect
+                      ? `${colors.emeraldz}20`
+                      : `${colors.coralz}20`;
+                    borderColor = userAnswers[currentStep].isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz;
                   }
 
                   return (
                     <div
                       key={idx}
                       onClick={() => !answered && handleAnswerSelect(idx)}
-                      className={`p-4 border-2 rounded-xl transition-all transform ${answered ? "cursor-default" : "cursor-pointer hover:scale-105 hover:shadow-md"}`}
+                      className={`p-4 border-2 rounded-xl transition-all transform ${
+                        answered
+                          ? "cursor-default"
+                          : "cursor-pointer hover:scale-105 hover:shadow-md"
+                      }`}
                       style={{
                         backgroundColor: bgColor,
                         borderColor: isSelected ? borderColor : colors.cyanz,
@@ -714,18 +877,31 @@ const TruthTableConstructionAssessment = ({
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-medium">{option}</span>
-                        {answered && isSelected && userAnswers[currentStep].isCorrect && (
-                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz }} />
-                        )}
-                        {answered && isSelected && !userAnswers[currentStep].isCorrect && (
-                          <XCircle className="h-6 w-6" style={{ color: colors.coralz }} />
-                        )}
+                        {answered &&
+                          isSelected &&
+                          userAnswers[currentStep].isCorrect && (
+                            <CheckCircle
+                              className="h-6 w-6"
+                              style={{ color: colors.emeraldz }}
+                            />
+                          )}
+                        {answered &&
+                          isSelected &&
+                          !userAnswers[currentStep].isCorrect && (
+                            <XCircle
+                              className="h-6 w-6"
+                              style={{ color: colors.coralz }}
+                            />
+                          )}
                         {answered && !isSelected && isCorrect && (
-                          <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz, opacity: 0.5 }} />
+                          <CheckCircle
+                            className="h-6 w-6"
+                            style={{ color: colors.emeraldz, opacity: 0.5 }}
+                          />
                         )}
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </div>
 
@@ -734,9 +910,15 @@ const TruthTableConstructionAssessment = ({
                 <div
                   className="mt-4 p-4 rounded-xl border-2"
                   style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect ? `${colors.emeraldz}10` : `${colors.coralz}10`,
-                    borderColor: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
-                    color: userAnswers[currentStep]?.isCorrect ? colors.emeraldz : colors.coralz,
+                    backgroundColor: userAnswers[currentStep]?.isCorrect
+                      ? `${colors.emeraldz}10`
+                      : `${colors.coralz}10`,
+                    borderColor: userAnswers[currentStep]?.isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz,
+                    color: userAnswers[currentStep]?.isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz,
                   }}
                 >
                   <p className="font-medium">{feedbackMessage}</p>
@@ -746,17 +928,21 @@ const TruthTableConstructionAssessment = ({
               {renderNavigation()}
             </div>
           </div>
-        )
+        );
 
       // ... other cases follow similar pattern ...
 
       case "completion":
-        const finalScore = Math.round((score / totalQuestions) * 100)
+        const finalScore = Math.round((score / totalQuestions) * 100);
 
         return (
           <div className="flex flex-col items-center space-y-6 text-center">
-            <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-                 style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})` }}>
+            <div
+              className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+              style={{
+                background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})`,
+              }}
+            >
               <span className="text-3xl">🎉</span>
             </div>
             <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
@@ -766,7 +952,9 @@ const TruthTableConstructionAssessment = ({
             <div
               className="w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg"
               style={{
-                background: `conic-gradient(${colors.emeraldz} ${finalScore * 3.6}deg, ${colors.offwhite} 0deg)`,
+                background: `conic-gradient(${colors.emeraldz} ${
+                  finalScore * 3.6
+                }deg, ${colors.offwhite} 0deg)`,
                 color: colors.emeraldz,
               }}
             >
@@ -779,33 +967,61 @@ const TruthTableConstructionAssessment = ({
               {step.content}
             </p>
 
-            <div className="rounded-xl shadow-lg overflow-hidden w-full max-w-md" 
-                 style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.cyanz}10)` }}>
+            <div
+              className="rounded-xl shadow-lg overflow-hidden w-full max-w-md"
+              style={{
+                background: `linear-gradient(135deg, ${colors.white}, ${colors.cyanz}10)`,
+              }}
+            >
               <div className="p-6">
-                <h3 className="text-lg font-bold mb-4" style={{ color: colors.indigoz }}>Your Results:</h3>
+                <h3
+                  className="text-lg font-bold mb-4"
+                  style={{ color: colors.indigoz }}
+                >
+                  Your Results:
+                </h3>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center p-3 rounded-lg" 
-                       style={{ backgroundColor: `${colors.skyz}10` }}>
+                  <div
+                    className="flex justify-between items-center p-3 rounded-lg"
+                    style={{ backgroundColor: `${colors.skyz}10` }}
+                  >
                     <span className="font-medium">Questions Answered:</span>
-                    <span className="font-bold" style={{ color: colors.indigoz }}>
+                    <span
+                      className="font-bold"
+                      style={{ color: colors.indigoz }}
+                    >
                       {Object.keys(userAnswers).length} / {totalQuestions}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-3 rounded-lg" 
-                       style={{ backgroundColor: `${colors.emeraldz}10` }}>
+                  <div
+                    className="flex justify-between items-center p-3 rounded-lg"
+                    style={{ backgroundColor: `${colors.emeraldz}10` }}
+                  >
                     <span className="font-medium">Correct Answers:</span>
-                    <span className="font-bold" style={{ color: colors.emeraldz }}>
+                    <span
+                      className="font-bold"
+                      style={{ color: colors.emeraldz }}
+                    >
                       {score} / {totalQuestions}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-3 rounded-lg" 
-                       style={{ backgroundColor: `${colors.violetz}10` }}>
+                  <div
+                    className="flex justify-between items-center p-3 rounded-lg"
+                    style={{ backgroundColor: `${colors.violetz}10` }}
+                  >
                     <span className="font-medium">Final Score:</span>
-                    <span className="font-bold text-xl" style={{ color: colors.violetz }}>{finalScore}%</span>
+                    <span
+                      className="font-bold text-xl"
+                      style={{ color: colors.violetz }}
+                    >
+                      {finalScore}%
+                    </span>
                   </div>
                   {/* ADD: Show attempt information */}
-                  <div className="flex justify-between items-center p-3 rounded-lg" 
-                       style={{ backgroundColor: `${colors.ambez}10` }}>
+                  <div
+                    className="flex justify-between items-center p-3 rounded-lg"
+                    style={{ backgroundColor: `${colors.ambez}10` }}
+                  >
                     <span className="font-medium">Attempt:</span>
                     <span className="font-bold" style={{ color: colors.ambez }}>
                       {currentAttempt} / {maxAttempts}
@@ -816,8 +1032,12 @@ const TruthTableConstructionAssessment = ({
                 <div
                   className="mt-6 p-4 rounded-xl border-2"
                   style={{
-                    backgroundColor: finalScore >= 70 ? `${colors.emeraldz}10` : `${colors.ambez}10`,
-                    borderColor: finalScore >= 70 ? colors.emeraldz : colors.ambez,
+                    backgroundColor:
+                      finalScore >= 70
+                        ? `${colors.emeraldz}10`
+                        : `${colors.ambez}10`,
+                    borderColor:
+                      finalScore >= 70 ? colors.emeraldz : colors.ambez,
                     color: finalScore >= 70 ? colors.emeraldz : colors.ambez,
                   }}
                 >
@@ -825,19 +1045,19 @@ const TruthTableConstructionAssessment = ({
                     {finalScore >= 90
                       ? "Excellent! 🌟"
                       : finalScore >= 70
-                        ? "Good job! 👍"
-                        : finalScore >= 50
-                          ? "Nice effort! 💪"
-                          : "Keep practicing! 📚"}
+                      ? "Good job! 👍"
+                      : finalScore >= 50
+                      ? "Nice effort! 💪"
+                      : "Keep practicing! 📚"}
                   </p>
                   <p className="text-sm mt-1">
                     {finalScore >= 90
                       ? "You have mastered truth table construction!"
                       : finalScore >= 70
-                        ? "You have a good understanding of truth tables."
-                        : finalScore >= 50
-                          ? "You're on the right track with truth tables."
-                          : "Truth tables take practice. Try again to improve your score."}
+                      ? "You have a good understanding of truth tables."
+                      : finalScore >= 50
+                      ? "You're on the right track with truth tables."
+                      : "Truth tables take practice. Try again to improve your score."}
                   </p>
                 </div>
               </div>
@@ -846,29 +1066,36 @@ const TruthTableConstructionAssessment = ({
             <div className="flex gap-4">
               {/* UPDATED: Only show restart if attempts remaining */}
               {attemptsRemaining > 1 && (
-                <Button onClick={handleRestartAssessment} size="lg" className="flex items-center gap-2">
+                <Button
+                  onClick={handleRestartAssessment}
+                  size="lg"
+                  className="flex items-center gap-2"
+                >
                   <Clock className="h-4 w-4" />
                   Try Again ({attemptsRemaining - 1} attempts left)
                 </Button>
               )}
-              
+
               {/* USE UNIVERSAL FINISH FUNCTION */}
-              <Button onClick={onFinish} size="lg" className="flex items-center gap-2">
+              <Button
+                onClick={onFinish}
+                size="lg"
+                className="flex items-center gap-2"
+              >
                 <Award className="h-4 w-4" />
                 Finish Assessment
               </Button>
             </div>
           </div>
-        )
+        );
 
       default:
-        return <div>Unknown step type: {step.type}</div>
+        return <div>Unknown step type: {step.type}</div>;
     }
-  }
+  };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6 min-h-screen" 
-         style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.cyanz}05)` }}>
+    <div className="max-w-4xl mx-auto p-4 md:p-6 min-h-screen">
       {/* Progress bar and step indicator */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
@@ -883,11 +1110,11 @@ const TruthTableConstructionAssessment = ({
       </div>
 
       {/* Main content */}
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+      <div className="bg-white rounded-2xl overflow-hidden">
         <div className="p-6">{renderStepContent()}</div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TruthTableConstructionAssessment
+export default TruthTableConstructionAssessment;
