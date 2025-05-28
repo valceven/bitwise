@@ -10,5 +10,6 @@ namespace backend.Repositories.Interfaces
     {
         Task<bool> RemoveStudentFromClassroomAsync(int studentId, int classroomId);
         Task<StudentProgress> GetStudentProgressByStudentClassroomIdAsync(int studentClassroomId);
+        Task<ICollection<StudentScores>> GetStudentScoresByClassroomCodeAsync(string classroomCode);
     }
 }

@@ -18,6 +18,7 @@ namespace backend.Models
         public Assessment Assessment { get; set; }
         public double Score { get; set; }
         public bool IsCompleted { get; set; } = false;
+        public int Attempts { get; set; } = 0;
         public DateTime SubmittedAt { get; set; }
         public DateTime StartTime { get; set; }
     }

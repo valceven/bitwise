@@ -87,7 +87,46 @@ namespace backend.Repositories
                 throw new Exception("An error occurred while fetching student progress.", ex);
             }
         }
-        
+        public async Task<ICollection<StudentScores>> GetStudentScoresByClassroomCodeAsync(string classroomCode)
+        {
+            try
+            {
+                var studentClassrooms = await _context.StudentClassrooms
+                    .Include(sc => sc.Student)
+                        .ThenInclude(s => s.User)
+                    .Include(sc => sc.Classroom)
+                    .Where(sc => sc.Classroom.ClassCode == classroomCode)
+                    .ToListAsync();
+
+                var studentScoresList = new List<StudentScores>();
+
+                foreach (var studentClassroom in studentClassrooms)
+                {
+                    var studentName = studentClassroom.Student.User.Name;
+                    var studentEmail = studentClassroom.Student.User.Email;
+
+                    var assessmentScores = await _context.StudentAssessments
+                        .Where(sa => sa.StudentClassroom.StudentId == studentClassroom.StudentId)
+                        .OrderBy(sa => sa.AssessmentId)
+                        .Select(sa => (float)sa.Score)
+                        .ToListAsync();
+
+                    studentScoresList.Add(new StudentScores
+                    {
+                        StudentName = studentName,
+                        StudentEmail = studentEmail,
+                        AssessmentScores = assessmentScores
+                    });
+                }
+
+                return studentScoresList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching student scores: {ex.Message}");
+                throw new Exception("An error occurred while fetching student scores.", ex);
+            }
+        }
     }
 
 }
