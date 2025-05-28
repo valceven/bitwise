@@ -27,7 +27,19 @@ const getStudentAssessments = async (studentId) => {
     }
 }
 
+const finishAssessment = async (data) => {
+    try {
+        console.log("MRSSS", data);
+        const response = await apiService.put("student-assessment/complete-student-assessment", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error occured while getting finishing assessments", error.message);
+        throw error.response?.data || error.message || "Error finishing studentAssessment";
+    }
+}
+
 export const studentAssessmentApi = {
     enterAssessment,
-    getStudentAssessments
-}
+    getStudentAssessments,
+    finishAssessment
+};

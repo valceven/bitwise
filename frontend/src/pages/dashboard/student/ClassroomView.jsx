@@ -25,7 +25,7 @@ const ClassroomView = ({ classroom, user }) => {
   const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [roadmapResponse, setRoadmapResponse] = useState({});
-  const [assessments, setAsessments] = useState({});
+  const [assessments, setAssessments] = useState([]);
 
   // Swiper instance ref
   const swiperRef = useRef(null);
@@ -127,6 +127,17 @@ const ClassroomView = ({ classroom, user }) => {
         difficulty: "Intermediate",
       }
     );
+  };
+
+  // Function to get assessment data by assessment number
+  const getAssessmentData = (assessmentNumber) => {
+    return assessments[assessmentNumber - 1] || { score: 0, attempts: 0 };
+  };
+
+  // Function to check if assessment has reached max attempts (3)
+  const isAssessmentMaxAttempts = (assessmentNumber) => {
+    const assessmentData = getAssessmentData(assessmentNumber);
+    return assessmentData.attempts >= 3;
   };
 
   // Function to check if a lesson is unlocked
@@ -237,7 +248,7 @@ const ClassroomView = ({ classroom, user }) => {
     const fetchData = async () => {
       try {
         const assessmentResponse = await studentAssessmentApi.getStudentAssessments(user.userID);
-        setAsessments(assessmentResponse);
+        setAssessments(assessmentResponse);
 
         const response = await studentClassroomApi.fetchRoadmapProgress(
           user.userID
@@ -363,7 +374,7 @@ const ClassroomView = ({ classroom, user }) => {
         const enterTopicData = {
           classroomId: classroom.classroomId,
           studentId: user.userID,
-          lessonId: selectedLessonData.topicNumber
+          topicId: selectedLessonData.topicNumber
         };
         
         try  {
@@ -379,14 +390,22 @@ const ClassroomView = ({ classroom, user }) => {
       } else if (selectedLessonData.type === "assessment") {
 
         try {
-          const assessmentResponse = await studentAssessmentApi.enterAssessment(assessments[selectedLessonData.assessmentNumber - 1]);
+          console.log("assessment id: ", assessments[selectedLessonData.assessmentNumber - 1]);
+
+          const selectedAssessment = assessments[selectedLessonData.assessmentNumber - 1];
+
+          const assessmentResponse = await studentAssessmentApi.enterAssessment(selectedAssessment.studentAssessmentId);
+
           if (assessmentResponse) {
             navigate(
-              `lesson/${selectedLessonData.lessonId}/assessment/${selectedLessonData.assessmentNumber}`
+              `lesson/${selectedLessonData.lessonId}/assessment/${selectedLessonData.assessmentNumber}`,
+              {
+                state: { assessmentData: selectedAssessment }
+              }
             );
           }
         } catch (error) {
-          console.error("Error entering assessnebt:", error.message);
+          console.error("Error entering assessment:", error.message);
         }
       }
     } catch (error) {
@@ -532,6 +551,29 @@ const ClassroomView = ({ classroom, user }) => {
                   Test your understanding of the concepts learned in Topic{" "}
                   {selectedLessonData.assessmentNumber}.
                 </p>
+                
+                {/* Assessment Score and Attempts Display */}
+                {(() => {
+                  const assessmentData = getAssessmentData(selectedLessonData.assessmentNumber);
+                  return assessmentData.attempts > 0 && (
+                    <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">
+                          Score: <span className="font-semibold">{assessmentData.score}%</span>
+                        </span>
+                        <span className="text-gray-600">
+                          Attempts: <span className="font-semibold">{assessmentData.attempts}/3</span>
+                        </span>
+                      </div>
+                      {assessmentData.attempts >= 3 && (
+                        <div className="mt-2 text-xs text-orange-600">
+                          Maximum attempts reached
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
                   <div className="flex items-center">
                     <svg
@@ -583,7 +625,7 @@ const ClassroomView = ({ classroom, user }) => {
                   onClick={handleEnterLesson}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
                 >
-                  {isAssessmentCompleted(selectedLessonData.assessmentNumber)
+                  {isAssessmentMaxAttempts(selectedLessonData.assessmentNumber) || isAssessmentCompleted(selectedLessonData.assessmentNumber)
                     ? "Review Assessment"
                     : "Start Assessment"}
                 </button>
@@ -655,7 +697,7 @@ const ClassroomView = ({ classroom, user }) => {
                         )}
                         className="w-full min-w-[200px]"
                         locked={!isMainLessonUnlocked}
-                        isCompleted={isLessonCompleted(lessonIndex)} // Add this line
+                        isCompleted={isLessonCompleted(lessonIndex)}
                       />
 
                       {/* Topics and Assessments with connecting lines */}
@@ -798,7 +840,7 @@ const ClassroomView = ({ classroom, user }) => {
                                   className="scale-75 h-15 relative"
                                   isLesson={true}
                                   locked={isTopicLocked}
-                                  isCompleted={isTopicCompleted(topicNumber)} // Add this line
+                                  isCompleted={isTopicCompleted(topicNumber)}
                                 />
                                 {/* Completion checkmark for topic */}
                                 {isTopicCompleted(topicNumber) && (
@@ -830,9 +872,7 @@ const ClassroomView = ({ classroom, user }) => {
                                   className=""
                                   locked={isAssessmentLocked}
                                   assessmentNumber={topicNumber}
-                                  isCompleted={isAssessmentCompleted(
-                                    topicNumber
-                                  )} // Add this line
+                                  isCompleted={isAssessmentCompleted(topicNumber)}
                                 />
                                 {/* Completion checkmark for assessment */}
                                 {isAssessmentCompleted(topicNumber) && (

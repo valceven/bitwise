@@ -2,6 +2,7 @@ using backend.Models;
 using backend.Repositories.Interfaces;
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
+using backend.DTOs.StudentAssessment;
 
 namespace backend.Repositories
 {
@@ -14,14 +15,20 @@ namespace backend.Repositories
             _context = context;
         }
 
-        public async Task<ICollection<int>> GetAllStudentAssessmentsAsync(int studentId)
+        public async Task<ICollection<RoadmapStudentAssessmentDto>> GetAllStudentAssessmentsAsync(int studentId)
         {
             return await _context.StudentAssessments
                 .Where(st => st.StudentClassroom.StudentId == studentId)
-                .Select(st => st.StudentAssessmentId)
-                .OrderBy(id => id)
+                .Select(st => new RoadmapStudentAssessmentDto
+                {
+                    StudentAssessmentId = st.StudentAssessmentId,
+                    Score = st.Score,
+                    Attempts = st.Attempts
+                })
+                .OrderBy(dto => dto.StudentAssessmentId)
                 .ToListAsync();
         }
+
         public async Task<StudentAssessment> GetStudentAssessmentById(int StudentAssessmentId)
         {
             var studentAssessment = await _context.StudentAssessments.FirstOrDefaultAsync(sa => sa.StudentAssessmentId == StudentAssessmentId);

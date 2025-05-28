@@ -50,10 +50,10 @@ const colors = {
 
 export default function HistoricalAssessment({
   onComplete,
-  onFinish,
   attemptsRemaining = 3,
   currentAttempt = 1,
   maxAttempts = 3,
+  studentAssessmentId
 }) {
   // Assessment states
   const [currentStep, setCurrentStep] = useState(0);
@@ -67,7 +67,6 @@ export default function HistoricalAssessment({
   const [showHistoryInfo, setShowHistoryInfo] = useState(false);
 
   useEffect(() => {
-    // Show timeline with slight delay for animation effect
     const timer = setTimeout(() => {
       setTimelineVisible(true);
     }, 500);
@@ -75,13 +74,11 @@ export default function HistoricalAssessment({
     return () => clearTimeout(timer);
   }, []);
 
-  // Reset selected option and feedback when changing steps
   useEffect(() => {
     setSelectedOption(null);
     setShowFeedback(false);
   }, [currentStep]);
 
-  // Assessment content structured as a journey
   const assessmentSteps = [
     {
       type: "intro",
@@ -295,47 +292,38 @@ export default function HistoricalAssessment({
     },
   ];
 
-  // Calculate progress percentage
   const progress = ((currentStep + 1) / assessmentSteps.length) * 100;
 
-  // Get total number of questions (excluding intro and completion steps)
   const totalQuestions = assessmentSteps.filter(
     (step) => step.type !== "intro" && step.type !== "completion"
   ).length;
 
-  // Calculate score
   const score = userAnswers.filter((answer) => answer.isCorrect).length;
 
-  // Check if current step has a question
   const hasQuestion = useCallback(() => {
     const step = assessmentSteps[currentStep];
     return step.options && step.correctAnswer !== undefined;
   }, [currentStep, assessmentSteps]);
 
-  // Check if user has already answered the current question
   const hasAnsweredCurrent = useCallback(() => {
     return userAnswers.some((answer) => answer.questionIndex === currentStep);
   }, [currentStep, userAnswers]);
 
-  // Get user's answer for the current question
   const getCurrentAnswer = useCallback(() => {
     return userAnswers.find((answer) => answer.questionIndex === currentStep);
   }, [currentStep, userAnswers]);
 
-  // Handle answer selection
   const handleAnswerSelect = (answerIndex) => {
     if (hasAnsweredCurrent()) return;
     setSelectedOption(answerIndex);
   };
 
-  // Show immediate feedback upon selection
   const handleShowFeedback = () => {
     if (selectedOption === null) return;
 
     const currentQuestion = assessmentSteps[currentStep];
     const isCorrect = currentQuestion.correctAnswer === selectedOption;
 
-    // Set feedback message
     if (isCorrect) {
       setFeedbackMessage("Correct! " + currentQuestion.explanation);
     } else {
@@ -346,7 +334,6 @@ export default function HistoricalAssessment({
       );
     }
 
-    // Add answer to userAnswers array
     setUserAnswers([
       ...userAnswers,
       {
@@ -375,24 +362,27 @@ export default function HistoricalAssessment({
     }
   };
 
-  // Complete the assessment
-  const finishAssessment = () => {
+  // Complete the assessment - SIMPLIFIED VERSION
+  const finishAssessment = async () => {
     setIsCompleted(true);
-    const finalScore = (score / totalQuestions) * 100;
+    const finalScore = Math.round((score / totalQuestions) * 100);
 
-    // Call the onComplete callback if provided
+    // Single callback with all data needed
     if (onComplete) {
-      onComplete(score, totalQuestions, Math.round(finalScore));
+      await onComplete({
+        score,
+        totalQuestions,
+        percentage: finalScore,
+        userAnswers,
+        isCompleted: true
+      });
     }
 
-    console.log(
-      "Assessment completed with score:",
+    console.log("Assessment completed:", {
       score,
-      "out of",
       totalQuestions,
-      ":",
-      Math.round(finalScore) + "%"
-    );
+      percentage: finalScore
+    });
   };
 
   // Toggle review mode
@@ -1180,8 +1170,8 @@ export default function HistoricalAssessment({
                 </Button>
               )}
 
-              {/* Use the universal finish function */}
-              <Button onClick={onFinish} className="flex items-center gap-2">
+              {/* SIMPLIFIED - Single finish button */}
+              <Button onClick={finishAssessment} className="flex items-center gap-2">
                 <Award className="h-4 w-4" />
                 Finish Assessment
               </Button>

@@ -12,6 +12,7 @@ const fetchStudentTopicProgress = async (data) => {
 
 const enterTopic = async (data) => {
     try {
+        console.log(data);
         const response = await apiService.put("student-topic/view-topic", data);
         return response.data;
     } catch (error) {

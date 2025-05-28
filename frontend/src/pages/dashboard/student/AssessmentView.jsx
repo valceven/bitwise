@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   Trophy,
@@ -10,6 +10,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import EditBackground from "../../../components/EditBackgroud";
+import { studentAssessmentApi } from "../../../api/studentAssessment/studentAssessmentApi";
 
 // Component imports
 import HistoricalAssessment from "../../../components/sections/lesson1/assessment1/BooleanAlgebraHistorical";
@@ -250,16 +251,6 @@ const MaxAttemptsReached = ({ assessmentStats, onReturn, onReset }) => (
         <ArrowLeft className="w-4 h-4 mr-2" />
         Return to Lessons
       </button>
-
-      {/* Optional: Add a reset button for development/testing */}
-      {process.env.NODE_ENV === "development" && (
-        <button
-          onClick={onReset}
-          className="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
-          Reset Attempts (Dev Only)
-        </button>
-      )}
     </div>
   </div>
 );
@@ -274,62 +265,85 @@ const AssessmentView = () => {
     lastScore: null,
   });
 
+  const location = useLocation();
+  const passedAssessmentData = location.state?.assessmentData;
+  const studentAssessmentId = passedAssessmentData?.studentAssessmentId;
+  const attempts = passedAssessmentData?.attempts;
+
   const currentAssessmentId = useMemo(
     () => assessmentId || topicId,
     [assessmentId, topicId]
   );
+  
+  // Use the hook to get assessment data functions
+  const assessmentDataHook = useAssessmentData(currentAssessmentId);
+  
   const config = ASSESSMENT_CONFIG[currentAssessmentId];
-  const assessmentData = useAssessmentData(currentAssessmentId);
   const maxAttempts = 3;
 
   useEffect(() => {
     const loadStats = async () => {
       await new Promise((res) => setTimeout(res, 300));
       setAssessmentStats({
-        attempts: assessmentData.getAttempts(),
-        bestScore: assessmentData.getBestScore(),
-        lastScore: assessmentData.getLastScore(),
+        attempts: assessmentDataHook.getAttempts(),
+        bestScore: assessmentDataHook.getBestScore(),
+        lastScore: assessmentDataHook.getLastScore(),
       });
       setLoading(false);
     };
     loadStats();
-  }, [currentAssessmentId]);
+  }, [currentAssessmentId, assessmentDataHook]);
 
-  const handleScoreUpdate = (score, totalQuestions, percentage) => {
-    const updated = assessmentData.updateScore(score, percentage);
-    setAssessmentStats(updated);
-    console.log("Assessment Result:", {
-      topicId,
-      assessmentId: currentAssessmentId,
-      score,
-      totalQuestions,
-      percentage,
-      attempts: updated.attempts,
-    });
-  };
+  // SIMPLIFIED - Single function handles everything
+  const handleAssessmentComplete = async (assessmentData) => {
+    try {
+      console.log("Assessment completed:", assessmentData);
+      
+      // Update local storage
+      const updated = assessmentDataHook.updateScore(
+        assessmentData.score, 
+        assessmentData.percentage
+      );
+      setAssessmentStats(updated);
 
-  const handleFinish = () => {
-    if (assessmentStats.attempts >= maxAttempts) {
-      console.log("Assessment completed with max attempts reached");
+      // Submit to API if available (non-blocking)
+      if (studentAssessmentId) {
+        const apiData = {
+          score: assessmentData.percentage,
+          studentAssessmentId: studentAssessmentId,
+        };
+
+        try {
+          const response = await studentAssessmentApi.finishAssessment(apiData);
+          console.log('Assessment submitted successfully:', response);
+        } catch (apiError) {
+          console.error('API submission failed:', apiError);
+          // Continue anyway - don't block the user
+        }
+      }
+
+      // Navigate back to classroom
+      navigate(`/app/classroom/student/${classCode}`, {
+        replace: true,
+        state: {
+          assessmentCompleted: currentAssessmentId,
+          finalScore: assessmentData.percentage,
+          attemptsUsed: updated.attempts,
+          maxAttemptsReached: updated.attempts >= maxAttempts,
+        },
+      });
+
+    } catch (error) {
+      console.error('Error completing assessment:', error);
+      alert('Failed to save assessment. Please try again.');
     }
-
-    // Navigate back to classroom with assessment completion status
-    navigate(`/app/classroom/student/${classCode}`, {
-      replace: true,
-      state: {
-        assessmentCompleted: currentAssessmentId,
-        finalScore: assessmentStats.bestScore || assessmentStats.lastScore,
-        attemptsUsed: assessmentStats.attempts,
-        maxAttemptsReached: assessmentStats.attempts >= maxAttempts,
-      },
-    });
   };
 
   const handleReturn = () =>
     navigate(`/app/classroom/student/${classCode}`, { replace: true });
 
   const handleResetAttempts = () => {
-    assessmentData.resetAttempts();
+    assessmentDataHook.resetAttempts();
     setAssessmentStats({ attempts: 0, bestScore: null, lastScore: null });
   };
 
@@ -359,11 +373,11 @@ const AssessmentView = () => {
     const Component = config.component;
     return (
       <Component
-        onComplete={handleScoreUpdate}
-        onFinish={handleFinish}
+        onComplete={handleAssessmentComplete}  // SIMPLIFIED - Single callback
         attemptsRemaining={maxAttempts - assessmentStats.attempts}
         currentAttempt={assessmentStats.attempts + 1}
         maxAttempts={maxAttempts}
+        studentAssessmentId={studentAssessmentId}
       />
     );
   };

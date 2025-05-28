@@ -44,10 +44,10 @@ const colors = {
 
 const LogicGateExplorer = ({
   onComplete,
-  onFinish,
   attemptsRemaining = 3,
   currentAttempt = 1,
   maxAttempts = 3,
+  studentAssessmentId
 }) => {
   // Assessment states
   const [currentStep, setCurrentStep] = useState(0);
@@ -529,21 +529,27 @@ const LogicGateExplorer = ({
     }
   };
 
-  // Complete the assessment
-  const finishAssessment = () => {
+  // SIMPLIFIED - Complete the assessment
+  const finishAssessment = async () => {
     setIsCompleted(true);
-
-    // Calculate final score
     const finalScore = Math.round((score / totalQuestions) * 100);
 
-    // Call the onComplete callback if provided
+    // Single callback with all data needed
     if (onComplete) {
-      onComplete(score, totalQuestions, finalScore);
+      await onComplete({
+        score,
+        totalQuestions,
+        percentage: finalScore,
+        userAnswers,
+        isCompleted: true
+      });
     }
 
-    console.log(
-      `Assessment completed with score: ${score}/${totalQuestions} (${finalScore}%)`
-    );
+    console.log("Assessment completed:", {
+      score,
+      totalQuestions,
+      percentage: finalScore
+    });
   };
 
   // Reset and restart assessment
@@ -742,7 +748,7 @@ const LogicGateExplorer = ({
               {step.content}
             </p>
 
-            {/* ADD: Show attempt information */}
+            {/* Show attempt information */}
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-700 mb-2">
                 📝 Attempt <strong>{currentAttempt}</strong> of{" "}
@@ -1121,7 +1127,612 @@ const LogicGateExplorer = ({
           </div>
         );
 
-      // ... other cases follow the same pattern ...
+      case "gateIdentification":
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.tealz}, ${colors.cyanz})`,
+                }}
+              >
+                <span className="text-2xl">🔍</span>
+              </div>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: colors.grayz }}
+              >
+                {step.title}
+              </h2>
+            </div>
+            <p style={{ color: colors.grayz }}>{step.description}</p>
+
+            {/* Display truth table for the current challenge */}
+            {step.challenges && step.challenges[0] && (
+              <div
+                className="p-6 rounded-xl shadow-lg"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.white}, ${colors.tealz}10)`,
+                }}
+              >
+                <h3
+                  className="text-lg font-bold mb-4"
+                  style={{ color: colors.tealz }}
+                >
+                  Truth Table Pattern
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr
+                        style={{
+                          backgroundColor: `${colors.tealz}20`,
+                          color: colors.grayz,
+                        }}
+                      >
+                        {step.challenges[0].inputs[0].hasOwnProperty('b') && (
+                          <>
+                            <th className="border border-gray-300 px-4 py-2 font-bold">Input A</th>
+                            <th className="border border-gray-300 px-4 py-2 font-bold">Input B</th>
+                          </>
+                        )}
+                        {!step.challenges[0].inputs[0].hasOwnProperty('b') && (
+                          <th className="border border-gray-300 px-4 py-2 font-bold">Input</th>
+                        )}
+                        <th className="border border-gray-300 px-4 py-2 font-bold">Output</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {step.challenges[0].inputs.map((row, idx) => (
+                        <tr key={idx}>
+                          <td 
+                            className="border border-gray-300 px-4 py-2 text-center font-bold"
+                            style={{ color: colors.grayz }}
+                          >
+                            {row.a}
+                          </td>
+                          {row.hasOwnProperty('b') && (
+                            <td 
+                              className="border border-gray-300 px-4 py-2 text-center font-bold"
+                              style={{ color: colors.grayz }}
+                            >
+                              {row.b}
+                            </td>
+                          )}
+                          <td 
+                            className="border border-gray-300 px-4 py-2 text-center font-bold"
+                            style={{ 
+                              color: row.output === 1 ? colors.emeraldz : colors.coralz 
+                            }}
+                          >
+                            {row.output}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Question */}
+            <div className="p-6 rounded-xl">
+              <h3
+                className="text-lg font-bold mb-4"
+                style={{ color: colors.grayz }}
+              >
+                {step.challenges?.[0]?.question}
+              </h3>
+              <div className="space-y-3">
+                {step.challenges?.[0]?.options.map((option, idx) => {
+                  const answered = hasAnsweredCurrent();
+                  const isSelected = answered
+                    ? userAnswers[currentStep]?.answer === idx
+                    : false;
+                  const isCorrect = step.challenges[0].correctAnswer === idx;
+
+                  let bgColor = colors.white;
+                  let borderColor = colors.tealz;
+
+                  if (answered && isSelected) {
+                    bgColor = userAnswers[currentStep].isCorrect
+                      ? `${colors.emeraldz}20`
+                      : `${colors.coralz}20`;
+                    borderColor = userAnswers[currentStep].isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz;
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => !answered && handleAnswerSelect(idx)}
+                      className={`p-4 border-2 rounded-xl transition-all transform ${
+                        answered
+                          ? "cursor-default"
+                          : "cursor-pointer hover:scale-105 hover:shadow-md"
+                      }`}
+                      style={{
+                        backgroundColor: bgColor,
+                        borderColor: isSelected ? borderColor : colors.tealz,
+                        color: colors.grayz,
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{option}</span>
+                        {answered &&
+                          isSelected &&
+                          userAnswers[currentStep].isCorrect && (
+                            <CheckCircle
+                              className="h-6 w-6"
+                              style={{ color: colors.emeraldz }}
+                            />
+                          )}
+                        {answered &&
+                          isSelected &&
+                          !userAnswers[currentStep].isCorrect && (
+                            <XCircle
+                              className="h-6 w-6"
+                              style={{ color: colors.coralz }}
+                            />
+                          )}
+                        {answered && !isSelected && isCorrect && (
+                          <CheckCircle
+                            className="h-6 w-6"
+                            style={{ color: colors.emeraldz, opacity: 0.5 }}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Feedback */}
+              {showFeedback && (
+                <div
+                  className="mt-4 p-4 rounded-xl border-2"
+                  style={{
+                    backgroundColor: userAnswers[currentStep]?.isCorrect
+                      ? `${colors.emeraldz}10`
+                      : `${colors.coralz}10`,
+                    borderColor: userAnswers[currentStep]?.isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz,
+                    color: userAnswers[currentStep]?.isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz,
+                  }}
+                >
+                  <p className="font-medium">{feedbackMessage}</p>
+                </div>
+              )}
+
+              {renderNavigation()}
+            </div>
+          </div>
+        );
+
+      case "gateMatching":
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.violetz}, ${colors.pinkz})`,
+                }}
+              >
+                <span className="text-2xl">🔗</span>
+              </div>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: colors.grayz }}
+              >
+                {step.title}
+              </h2>
+            </div>
+            <p style={{ color: colors.grayz }}>{step.description}</p>
+
+            {/* Matching cards */}
+            <div className="grid grid-cols-1 gap-4">
+              {step.matches?.map((match) => (
+                <div
+                  key={match.id}
+                  className="p-4 rounded-xl shadow-md border-l-4"
+                  style={{
+                    backgroundColor: colors.white,
+                    borderLeftColor: match.color,
+                  }}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex-1">
+                      <p
+                        className="font-medium"
+                        style={{ color: colors.grayz }}
+                      >
+                        {match.description}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {step.gateOptions?.map((gate) => (
+                        <button
+                          key={gate}
+                          onClick={() => {
+                            const newMatches = { ...userMatches };
+                            newMatches[match.id] = gate;
+                            setUserMatches(newMatches);
+                          }}
+                          className={`px-3 py-2 rounded-lg font-medium transition-all ${
+                            userMatches[match.id] === gate
+                              ? "shadow-lg"
+                              : "hover:shadow-md"
+                          }`}
+                          style={{
+                            backgroundColor:
+                              userMatches[match.id] === gate
+                                ? match.color
+                                : colors.white,
+                            color:
+                              userMatches[match.id] === gate
+                                ? colors.white
+                                : colors.grayz,
+                            border: `2px solid ${
+                              userMatches[match.id] === gate
+                                ? match.color
+                                : "#e5e7eb"
+                            }`,
+                          }}
+                        >
+                          {gate}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Submit matching answers */}
+            <div className="text-center">
+              <Button
+                onClick={() => handleAnswerSelect(userMatches)}
+                disabled={
+                  Object.keys(userMatches).length !== step.matches?.length ||
+                  hasAnsweredCurrent()
+                }
+                className="px-8 py-3"
+              >
+                Submit Matches
+              </Button>
+            </div>
+
+            {/* Feedback */}
+            {showFeedback && (
+              <div
+                className="mt-4 p-4 rounded-xl border-2"
+                style={{
+                  backgroundColor: userAnswers[currentStep]?.isCorrect
+                    ? `${colors.emeraldz}10`
+                    : `${colors.coralz}10`,
+                  borderColor: userAnswers[currentStep]?.isCorrect
+                    ? colors.emeraldz
+                    : colors.coralz,
+                  color: userAnswers[currentStep]?.isCorrect
+                    ? colors.emeraldz
+                    : colors.coralz,
+                }}
+              >
+                <p className="font-medium">{feedbackMessage}</p>
+              </div>
+            )}
+
+            {renderNavigation()}
+          </div>
+        );
+
+      case "symbolRecognition":
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.ambez}, ${colors.orangez})`,
+                }}
+              >
+                <span className="text-2xl">🔣</span>
+              </div>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: colors.grayz }}
+              >
+                {step.title}
+              </h2>
+            </div>
+            <p style={{ color: colors.grayz }}>{step.description}</p>
+
+            {/* Symbol gallery */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {step.symbols?.map((symbolInfo, idx) => (
+                <div
+                  key={idx}
+                  className="p-6 rounded-xl shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+                  style={{
+                    backgroundColor: colors.white,
+                    border: `2px solid ${symbolInfo.color}30`,
+                  }}
+                >
+                  <div className="text-center">
+                    <div
+                      className="text-4xl font-bold mb-2"
+                      style={{ color: symbolInfo.color }}
+                    >
+                      {symbolInfo.symbol}
+                    </div>
+                    <div
+                      className="text-sm font-medium"
+                      style={{ color: colors.grayz }}
+                    >
+                      {symbolInfo.name}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Question */}
+            <div className="p-6 rounded-xl">
+              <h3
+                className="text-lg font-bold mb-4"
+                style={{ color: colors.grayz }}
+              >
+                {step.question}
+              </h3>
+              <div className="space-y-3">
+                {step.options?.map((option, idx) => {
+                  const answered = hasAnsweredCurrent();
+                  const isSelected = answered
+                    ? userAnswers[currentStep]?.answer === idx
+                    : false;
+                  const isCorrect = step.correctAnswer === idx;
+
+                  let bgColor = colors.white;
+                  let borderColor = colors.ambez;
+
+                  if (answered && isSelected) {
+                    bgColor = userAnswers[currentStep].isCorrect
+                      ? `${colors.emeraldz}20`
+                      : `${colors.coralz}20`;
+                    borderColor = userAnswers[currentStep].isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz;
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => !answered && handleAnswerSelect(idx)}
+                      className={`p-4 border-2 rounded-xl transition-all transform ${
+                        answered
+                          ? "cursor-default"
+                          : "cursor-pointer hover:scale-105 hover:shadow-md"
+                      }`}
+                      style={{
+                        backgroundColor: bgColor,
+                        borderColor: isSelected ? borderColor : colors.ambez,
+                        color: colors.grayz,
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-2xl">{option}</span>
+                        {answered &&
+                          isSelected &&
+                          userAnswers[currentStep].isCorrect && (
+                            <CheckCircle
+                              className="h-6 w-6"
+                              style={{ color: colors.emeraldz }}
+                            />
+                          )}
+                        {answered &&
+                          isSelected &&
+                          !userAnswers[currentStep].isCorrect && (
+                            <XCircle
+                              className="h-6 w-6"
+                              style={{ color: colors.coralz }}
+                            />
+                          )}
+                        {answered && !isSelected && isCorrect && (
+                          <CheckCircle
+                            className="h-6 w-6"
+                            style={{ color: colors.emeraldz, opacity: 0.5 }}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Feedback */}
+              {showFeedback && (
+                <div
+                  className="mt-4 p-4 rounded-xl border-2"
+                  style={{
+                    backgroundColor: userAnswers[currentStep]?.isCorrect
+                      ? `${colors.emeraldz}10`
+                      : `${colors.coralz}10`,
+                    borderColor: userAnswers[currentStep]?.isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz,
+                    color: userAnswers[currentStep]?.isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz,
+                  }}
+                >
+                  <p className="font-medium">{feedbackMessage}</p>
+                </div>
+              )}
+
+              {renderNavigation()}
+            </div>
+          </div>
+        );
+
+      case "realWorldLogic":
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.limez}, ${colors.emeraldz})`,
+                }}
+              >
+                <span className="text-2xl">🌍</span>
+              </div>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: colors.grayz }}
+              >
+                {step.title}
+              </h2>
+            </div>
+            <p style={{ color: colors.grayz }}>{step.description}</p>
+
+            {/* Real-world scenarios */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {step.scenarios?.map((scenario) => (
+                <div
+                  key={scenario.id}
+                  className="p-6 rounded-xl shadow-lg hover:shadow-xl transition-all border-l-4"
+                  style={{
+                    backgroundColor: colors.white,
+                    borderLeftColor: scenario.color,
+                  }}
+                >
+                  <div className="mb-4">
+                    <div
+                      className="inline-block px-3 py-1 rounded-full text-sm font-bold mb-3"
+                      style={{
+                        backgroundColor: `${scenario.color}20`,
+                        color: scenario.color,
+                      }}
+                    >
+                      {scenario.gate} Gate
+                    </div>
+                    <p
+                      className="font-medium mb-2"
+                      style={{ color: colors.grayz }}
+                    >
+                      {scenario.scenario}
+                    </p>
+                    <p className="text-sm" style={{ color: colors.grayz }}>
+                      {scenario.explanation}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Question */}
+            <div className="p-6 rounded-xl">
+              <h3
+                className="text-lg font-bold mb-4"
+                style={{ color: colors.grayz }}
+              >
+                {step.question}
+              </h3>
+              <div className="space-y-3">
+                {step.options?.map((option, idx) => {
+                  const answered = hasAnsweredCurrent();
+                  const isSelected = answered
+                    ? userAnswers[currentStep]?.answer === idx
+                    : false;
+                  const isCorrect = step.correctAnswer === idx;
+
+                  let bgColor = colors.white;
+                  let borderColor = colors.limez;
+
+                  if (answered && isSelected) {
+                    bgColor = userAnswers[currentStep].isCorrect
+                      ? `${colors.emeraldz}20`
+                      : `${colors.coralz}20`;
+                    borderColor = userAnswers[currentStep].isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz;
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => !answered && handleAnswerSelect(idx)}
+                      className={`p-4 border-2 rounded-xl transition-all transform ${
+                        answered
+                          ? "cursor-default"
+                          : "cursor-pointer hover:scale-105 hover:shadow-md"
+                      }`}
+                      style={{
+                        backgroundColor: bgColor,
+                        borderColor: isSelected ? borderColor : colors.limez,
+                        color: colors.grayz,
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{option}</span>
+                        {answered &&
+                          isSelected &&
+                          userAnswers[currentStep].isCorrect && (
+                            <CheckCircle
+                              className="h-6 w-6"
+                              style={{ color: colors.emeraldz }}
+                            />
+                          )}
+                        {answered &&
+                          isSelected &&
+                          !userAnswers[currentStep].isCorrect && (
+                            <XCircle
+                              className="h-6 w-6"
+                              style={{ color: colors.coralz }}
+                            />
+                          )}
+                        {answered && !isSelected && isCorrect && (
+                          <CheckCircle
+                            className="h-6 w-6"
+                            style={{ color: colors.emeraldz, opacity: 0.5 }}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Feedback */}
+              {showFeedback && (
+                <div
+                  className="mt-4 p-4 rounded-xl border-2"
+                  style={{
+                    backgroundColor: userAnswers[currentStep]?.isCorrect
+                      ? `${colors.emeraldz}10`
+                      : `${colors.coralz}10`,
+                    borderColor: userAnswers[currentStep]?.isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz,
+                    color: userAnswers[currentStep]?.isCorrect
+                      ? colors.emeraldz
+                      : colors.coralz,
+                  }}
+                >
+                  <p className="font-medium">{feedbackMessage}</p>
+                </div>
+              )}
+
+              {renderNavigation()}
+            </div>
+          </div>
+        );
 
       case "completion": {
         const finalScore = Math.round((score / totalQuestions) * 100);
@@ -1208,7 +1819,6 @@ const LogicGateExplorer = ({
                       {finalScore}%
                     </span>
                   </div>
-                  {/* ADD: Show attempt information */}
                   <div
                     className="flex justify-between items-center p-3 rounded-lg"
                     style={{ backgroundColor: `${colors.ambez}10` }}
@@ -1262,7 +1872,7 @@ const LogicGateExplorer = ({
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              {/* UPDATED: Only show restart if attempts remaining */}
+              {/* Only show restart if attempts remaining */}
               {attemptsRemaining > 1 && (
                 <Button
                   onClick={handleRestartAssessment}
@@ -1274,8 +1884,8 @@ const LogicGateExplorer = ({
                 </Button>
               )}
 
-              {/* USE UNIVERSAL FINISH FUNCTION */}
-              <Button onClick={onFinish} className="flex items-center gap-2">
+              {/* SIMPLIFIED - Single finish button */}
+              <Button onClick={finishAssessment} className="flex items-center gap-2">
                 <Award className="h-4 w-4" />
                 Finish Assessment
               </Button>
