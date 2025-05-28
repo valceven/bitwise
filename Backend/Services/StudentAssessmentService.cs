@@ -11,9 +11,9 @@ namespace backend.Services
         {
             _studentAssessmentRepository = studentAssessmentRepository;
         }
-        public async Task<ICollection<StudentAssessment>> GetAllStudentAssessmentAsync()
+        public async Task<ICollection<int>> GetAllStudentAssessmentAsync(int studentId)
         {
-            return await _studentAssessmentRepository.GetAllStudentAssessmentsAsync();
+            return await _studentAssessmentRepository.GetAllStudentAssessmentsAsync(studentId);
         }
         public async Task<bool> CompleteStudentAssessment(RecordStudentAssessmentDto recordStudentAssessmentDto)
         {
@@ -43,10 +43,9 @@ namespace backend.Services
                 throw new Exception($"StudentAssessment with ID {studentAssessmentId} not found.");
             }
             studentAssessment.StartTime = DateTime.UtcNow;
-            if (studentAssessment.Attempts < 3)
-            {
-                studentAssessment.Attempts += 1;
-            }
+
+            studentAssessment.Attempts += 1;
+            
             return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);
         }
 

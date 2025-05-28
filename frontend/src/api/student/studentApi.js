@@ -49,7 +49,6 @@ const cancelPendingRequest = async (pendingId) => {
 
 const submitLeaveRequest = async (data) => {
     try {
-        console.log(data);
         const response = await apiService.post("classroom/submit-leave-request", data);
         console.log("Submit Leave Request:", response);
         return response.data;

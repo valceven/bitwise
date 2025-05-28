@@ -308,11 +308,8 @@ const AssessmentView = () => {
     });
   };
 
-  // Universal handleFinish function that respects attempt limits
   const handleFinish = () => {
-    // Check if user has reached max attempts
     if (assessmentStats.attempts >= maxAttempts) {
-      // Show a message or redirect with completion status
       console.log("Assessment completed with max attempts reached");
     }
 
@@ -336,7 +333,6 @@ const AssessmentView = () => {
     setAssessmentStats({ attempts: 0, bestScore: null, lastScore: null });
   };
 
-  // Check if user has exceeded maximum attempts
   const hasExceededAttempts = assessmentStats.attempts >= maxAttempts;
   const canTakeAssessment = !hasExceededAttempts;
 

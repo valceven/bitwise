@@ -6,7 +6,7 @@ namespace backend.Services.Interfaces
 {
     public interface IStudentAssessmentService
     {
-        Task<ICollection<StudentAssessment>> GetAllStudentAssessmentAsync();
+        Task<ICollection<int>> GetAllStudentAssessmentAsync(int studentId);
         Task<bool> CompleteStudentAssessment(RecordStudentAssessmentDto recordStudentAssessmentDto);
         Task<bool> ViewStudentAssessment(int studentAssessmentId);
         Task<ICollection<StudentAssessment>> GetStudentAssessmentByAssessmentId(int AssessmentId);
