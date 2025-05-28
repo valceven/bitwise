@@ -19,7 +19,15 @@ namespace backend.Services
         {
             var studentAssessment = await _studentAssessmentRepository.GetStudentAssessmentById(recordStudentAssessmentDto.StudentAssessmentId);
 
-            studentAssessment.Score = recordStudentAssessmentDto.Score;
+            if (studentAssessment.Attempts > 3)
+            {
+                throw new Exception("Exeeded maximum attempts. Attempts must not exceed 3.");
+            }
+            if (recordStudentAssessmentDto.Score > studentAssessment.Score)
+            {
+                studentAssessment.Score = recordStudentAssessmentDto.Score;
+
+            }
             studentAssessment.SubmittedAt = DateTime.UtcNow;
             studentAssessment.IsCompleted = true;
 
@@ -35,6 +43,11 @@ namespace backend.Services
                 throw new Exception($"StudentAssessment with ID {studentAssessmentId} not found.");
             }
             studentAssessment.StartTime = DateTime.UtcNow;
+
+            if (studentAssessment.Attempts != 3)
+            {
+                studentAssessment.Attempts += 1;
+            }
             return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);
         }
         

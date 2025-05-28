@@ -37,6 +37,17 @@ namespace backend.Presentation
 
             return NotFound(new { message = "No Progress Found for this Student" });
         }
-        
+        [HttpGet("get-student-scores-by-classroom-code")]
+        public async Task<IActionResult> GetStudentScoresByClassroomCode([FromQuery] string classroomCode)
+        {
+            var result = await _studentClassroomService.GetStudentScoresByClassroomCodeAsync(classroomCode);
+
+            if (result != null && result.Any())
+            {
+                return Ok(new { message = "Student Scores Fetched Successfully", scores = result });
+            }
+
+            return NotFound(new { message = "No Scores Found for this Classroom" });
+        }
     }
 }

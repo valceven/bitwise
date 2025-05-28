@@ -30,5 +30,14 @@ namespace backend.Services
             }
             return result;
         }
+        public async Task<ICollection<StudentScores>> GetStudentScoresByClassroomCodeAsync(string classroomCode)
+        {
+            var result = await _studentClassroomRepository.GetStudentScoresByClassroomCodeAsync(classroomCode);
+            if (result == null || !result.Any())
+            {
+                throw new Exception("Error. Cannot find student scores for this classroom");
+            }
+            return result;
+        }
     }
 }

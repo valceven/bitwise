@@ -46,12 +46,20 @@ namespace backend.Presentation
         [HttpGet("get-student-assessment-by-assessment-id")]
         public async Task<IActionResult> GetStudentAssessmentByAssessmentId([FromQuery] int AssessmentId)
         {
-            var studentAssessments = await _studentAssessmentService.GetStudentAssessmentByAssessmentId(AssessmentId);
-            if (studentAssessments == null)
-            {
-                return NotFound(new { message = "No Student Assessment Found" });
+            try
+            { 
+                var studentAssessments = await _studentAssessmentService.GetStudentAssessmentByAssessmentId(AssessmentId);
+                
+                if (studentAssessments == null)
+                {
+                    return NotFound(new { message = "No Student Assessment Found" });
+                }
+                return Ok(studentAssessments);
             }
-            return Ok(studentAssessments);
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
         
     }
