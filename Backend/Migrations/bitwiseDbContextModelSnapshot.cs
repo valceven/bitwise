@@ -355,6 +355,9 @@ namespace backend.Migrations
                     b.Property<int>("StudentId")
                         .HasColumnType("integer");
 
+                    b.Property<double>("TotalScore")
+                        .HasColumnType("double precision");
+
                     b.HasKey("StudentClassroomId");
 
                     b.HasIndex("ClassroomId");

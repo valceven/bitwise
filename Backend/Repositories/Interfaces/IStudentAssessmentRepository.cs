@@ -12,6 +12,6 @@ namespace backend.Repositories.Interfaces
         Task<bool> DeleteStudentAssessmentAsync(int StudentAssessmentId);
         Task<StudentAssessment> GetStudentAssessmentsByStudentId(int StudentId);
         Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsByAssessmentId(int StudentAssessmentId);
-        Task<ICollection<StudentAssessment>> GetStudentAssessmentsByClassroomId(int ClassroomId);
+        Task<ICollection<StudentAssessment>> GetStudentAssessmentsByClassroomCode(string ClassroomCode);
     }
 }

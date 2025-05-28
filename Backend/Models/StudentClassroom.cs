@@ -15,6 +15,7 @@ namespace backend.Models
         public int ClassroomId { get; set; }
 
         public string ClassCode { get; set; }
+        public double TotalScore { get; set; } = 0;
 
         public Student Student { get; set; }
         public Classroom Classroom { get; set; }

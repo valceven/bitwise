@@ -5,10 +5,10 @@ namespace backend.Presentation
 {
     [Route("api/studentClassroom")]
     [ApiController]
-    public class StudentClassroom : ControllerBase
+    public class StudentClassroomController : ControllerBase
     {
         private readonly IStudentClassroomService _studentClassroomService;
-        public StudentClassroom(IStudentClassroomService studentClassroomService)
+        public StudentClassroomController(IStudentClassroomService studentClassroomService)
         {
             _studentClassroomService = studentClassroomService;
         }
@@ -48,6 +48,23 @@ namespace backend.Presentation
             }
 
             return NotFound(new { message = "No Scores Found for this Classroom" });
+        }
+        [HttpGet("get-leaderboards-by-classroom-code")]
+        public async Task<IActionResult> GetLeaderBoardsByClassroomCode([FromQuery] string classroomCode)
+        {
+            try
+            {
+                var leaderBoards = await _studentClassroomService.GetLeaderBoardsByClassroomCodeAsync(classroomCode);
+                if (leaderBoards == null || !leaderBoards.Any())
+                {
+                    return NotFound(new { message = "No Leaderboards Found for this Classroom" });
+                }
+                return Ok(leaderBoards);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

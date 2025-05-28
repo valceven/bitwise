@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.DTOs.StudentClassroom;
+using backend.Models;
 using backend.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -127,6 +128,26 @@ namespace backend.Repositories
                 throw new Exception("An error occurred while fetching student scores.", ex);
             }
         }
+        public async Task<ICollection<StudentClassroom>> GetStudentClassroomByClassCode(string classroomCode)
+        {
+            try
+            {
+                var studentClassrooms = await _context.StudentClassrooms
+                    .Include(sc => sc.Student)
+                        .ThenInclude(s => s.User)
+                    .Include(sc => sc.Classroom)
+                    .Where(sc => sc.Classroom.ClassCode == classroomCode)
+                    .ToListAsync();
+
+                return studentClassrooms;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching student classrooms: {ex.Message}");
+                throw new Exception("An error occurred while fetching student classrooms.", ex);
+            }
+        }
+
     }
 
 }
