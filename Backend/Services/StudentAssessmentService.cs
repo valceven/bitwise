@@ -44,10 +44,8 @@ namespace backend.Services
             }
             studentAssessment.StartTime = DateTime.UtcNow;
 
-            if (studentAssessment.Attempts != 3)
-            {
-                studentAssessment.Attempts += 1;
-            }
+            studentAssessment.Attempts += 1;
+            
             return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);
         }
         

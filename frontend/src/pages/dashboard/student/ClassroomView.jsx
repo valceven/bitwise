@@ -294,6 +294,8 @@ const ClassroomView = ({ classroom, user }) => {
         classroomId: classroom.classroomId,
       };
 
+      console.log(data);
+
       const response = await studentApi.submitLeaveRequest(data);
       if (response) {
         console.log("Submitted Leave Request", response);
@@ -910,8 +912,8 @@ const ClassroomView = ({ classroom, user }) => {
       </div>
 
       {showConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full">
+        <div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full border-black border-2">
             <h3 className="text-xl font-bold mb-4">Leave Classroom?</h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to leave this classroom? You can rejoin
