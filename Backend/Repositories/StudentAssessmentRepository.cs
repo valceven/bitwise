@@ -14,10 +14,12 @@ namespace backend.Repositories
             _context = context;
         }
 
-        public async Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsAsync()
+        public async Task<ICollection<int>> GetAllStudentAssessmentsAsync(int studentId)
         {
             return await _context.StudentAssessments
-                .Include(sa => sa.StudentClassroom)
+                .Where(st => st.StudentClassroom.StudentId == studentId)
+                .Select(st => st.StudentAssessmentId)
+                .OrderBy(id => id)
                 .ToListAsync();
         }
         public async Task<StudentAssessment> GetStudentAssessmentById(int StudentAssessmentId)

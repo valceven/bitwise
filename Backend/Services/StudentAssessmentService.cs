@@ -11,9 +11,9 @@ namespace backend.Services
         {
             _studentAssessmentRepository = studentAssessmentRepository;
         }
-        public async Task<ICollection<StudentAssessment>> GetAllStudentAssessmentAsync()
+        public async Task<ICollection<int>> GetAllStudentAssessmentAsync(int studentId)
         {
-            return await _studentAssessmentRepository.GetAllStudentAssessmentsAsync();
+            return await _studentAssessmentRepository.GetAllStudentAssessmentsAsync(studentId);
         }
         public async Task<bool> CompleteStudentAssessment(RecordStudentAssessmentDto recordStudentAssessmentDto)
         {

@@ -14,16 +14,16 @@ namespace backend.Presentation
         }
 
         [HttpGet("get-all-student-assessments")]
-        public async Task<IActionResult> GetAllStudentAssessments()
+        public async Task<IActionResult> GetAllStudentAssessments(int studentId)
         {
-            var studentAssessments = await _studentAssessmentService.GetAllStudentAssessmentAsync();
+            var studentAssessments = await _studentAssessmentService.GetAllStudentAssessmentAsync(studentId);
             if (studentAssessments == null)
             {
                 return NotFound(new { message = "No Student Assessment Found" });
             }
             return Ok(studentAssessments);
         }
-        [HttpPost("complete-student-assessment")]
+        [HttpPut("complete-student-assessment")]
         public async Task<IActionResult> CompleteStudentAssessment([FromBody] RecordStudentAssessmentDto recordStudentAssessmentDto)
         {
             var result = await _studentAssessmentService.CompleteStudentAssessment(recordStudentAssessmentDto);
@@ -33,7 +33,7 @@ namespace backend.Presentation
             }
             return BadRequest(new { message = "Unexpected Error Occurred" });
         }
-        [HttpPost("view-student-assessment")]
+        [HttpPut("view-student-assessment")]
         public async Task<IActionResult> ViewStudentAssessment([FromQuery] int studentAssessmentId)
         {
             var result = await _studentAssessmentService.ViewStudentAssessment(studentAssessmentId);

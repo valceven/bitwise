@@ -14,6 +14,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/free-mode";
+import { studentTopicApi } from "../../../api/studentTopic/studentTopicApi.js";
+import { studentAssessmentApi } from "../../../api/studentAssessment/studentAssessmentApi.js";
 
 const ClassroomView = ({ classroom, user }) => {
   const navigate = useNavigate();
@@ -23,6 +25,7 @@ const ClassroomView = ({ classroom, user }) => {
   const [lessons, setLessons] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [roadmapResponse, setRoadmapResponse] = useState({});
+  const [assessments, setAsessments] = useState({});
 
   // Swiper instance ref
   const swiperRef = useRef(null);
@@ -233,6 +236,9 @@ const ClassroomView = ({ classroom, user }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const assessmentResponse = await studentAssessmentApi.getStudentAssessments(user.userID);
+        setAsessments(assessmentResponse);
+
         const response = await studentClassroomApi.fetchRoadmapProgress(
           user.userID
         );
@@ -348,18 +354,38 @@ const ClassroomView = ({ classroom, user }) => {
         lessonId: selectedLessonData.lessonId,
       };
 
-      const response = await studentLessonApi.enterLesson(data);
-      console.log("MARS", response);
+      await studentLessonApi.enterLesson(data);
 
-      // Navigate based on type
       if (selectedLessonData.type === "topic") {
-        navigate(
-          `lesson/${selectedLessonData.lessonId}/topic/${selectedLessonData.topicNumber}`
-        );
+
+        const enterTopicData = {
+          classroomId: classroom.classroomId,
+          studentId: user.userID,
+          lessonId: selectedLessonData.topicNumber
+        };
+        
+        try  {
+          const topicResponse = await studentTopicApi.enterTopic(enterTopicData);
+          if (topicResponse) {
+            navigate(
+              `lesson/${selectedLessonData.lessonId}/topic/${selectedLessonData.topicNumber}`
+            );
+          }
+        } catch (errorz) {
+          console.error("Error entering topic:", errorz.message);
+        }
       } else if (selectedLessonData.type === "assessment") {
-        navigate(
-          `lesson/${selectedLessonData.lessonId}/assessment/${selectedLessonData.assessmentNumber}`
-        );
+
+        try {
+          const assessmentResponse = await studentAssessmentApi.enterAssessment(assessments[selectedLessonData.assessmentNumber - 1]);
+          if (assessmentResponse) {
+            navigate(
+              `lesson/${selectedLessonData.lessonId}/assessment/${selectedLessonData.assessmentNumber}`
+            );
+          }
+        } catch (error) {
+          console.error("Error entering assessnebt:", error.message);
+        }
       }
     } catch (error) {
       console.error("Error entering lesson:", error.message);
@@ -565,7 +591,6 @@ const ClassroomView = ({ classroom, user }) => {
         )}
       </div>
 
-      {/* Swiper Slider Container */}
       <div className="flex-1 flex flex-col relative ml-8 w-3/4 h-full">
         <div className="flex justify-center mb-4">
           <div className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow">
