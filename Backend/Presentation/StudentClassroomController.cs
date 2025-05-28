@@ -38,9 +38,9 @@ namespace backend.Presentation
             return NotFound(new { message = "No Progress Found for this Student" });
         }
         [HttpGet("get-student-scores-by-classroom-code")]
-        public async Task<IActionResult> GetStudentScoresByClassroomCode([FromQuery] string classroomCode)
+        public async Task<IActionResult> GetStudentScoresByClassroomCode([FromQuery] string classCode)
         {
-            var result = await _studentClassroomService.GetStudentScoresByClassroomCodeAsync(classroomCode);
+            var result = await _studentClassroomService.GetStudentScoresByClassroomCodeAsync(classCode);
 
             if (result != null && result.Any())
             {

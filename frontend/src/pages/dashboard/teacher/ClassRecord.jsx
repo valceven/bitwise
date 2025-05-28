@@ -1,20 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, User, Trash2, Search, UserPlus, Download, UserX, Filter, SortAsc, SortDesc } from "lucide-react";
 import { CSVLink, CSVDownload } from "react-csv";
+import { teacherApi } from "../../../api/teacher/teacherApi";
+import { useParams } from "react-router-dom";
 
 const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState("name");
   const [sortDirection, setSortDirection] = useState("asc");
   const [filterActive, setFilterActive] = useState(false);
-
-  const csvData = [
-  ["firstname", "lastname", "email"],
-  ["Ahmed", "Tomi", "ah@smthing.co.com"],
-  ["Raed", "Labes", "rl@smthing.co.com"],
-  ["Yezzi", "Min l3b", "ymin@cocococo.com"]
-];
+  const [csvData, setCsvData] = useState([]);
+  const { classCode } = useParams();
   
+
+  useEffect(() => {
+    const loadScores = async () => {
+      try {
+        console.log("HALLO", classCode);
+        const data = await teacherApi.fetchScores(classCode);
+
+        const header = ["Student Name", "Student Email"];
+        for (let i = 1; i <= 9; i++) {
+          header.push(`Assessment ${i}`);
+        }
+
+        const rows = data.scores.map((student) => [
+          student.studentName,
+          student.studentEmail,
+          ...student.assessmentScores,
+        ]);
+
+        setCsvData([header, ...rows]);
+
+      } catch (error) {
+        console.error("An error occurred fetching scores: ", error.message);
+      }
+    };
+
+    if (classCode) {
+      loadScores();
+    }
+  }, [classCode]);
+
   // Assuming we have this data - you'll need to adapt this to your actual data structure
   const studentsWithStats = classroom?.students?.map(student => ({
     ...student,

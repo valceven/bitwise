@@ -50,6 +50,7 @@ const colors = {
 
 export default function HistoricalAssessment({
   onComplete,
+  onFinish,
   attemptsRemaining = 3,
   currentAttempt = 1,
   maxAttempts = 3,
@@ -362,27 +363,23 @@ export default function HistoricalAssessment({
     }
   };
 
-  // Complete the assessment - SIMPLIFIED VERSION
-  const finishAssessment = async () => {
+  // Complete the assessment
+ const finishAssessment = async () => {
     setIsCompleted(true);
-    const finalScore = Math.round((score / totalQuestions) * 100);
+    const finalScore = (score / totalQuestions) * 100;
 
-    // Single callback with all data needed
     if (onComplete) {
-      await onComplete({
-        score,
-        totalQuestions,
-        percentage: finalScore,
-        userAnswers,
-        isCompleted: true
-      });
+      onComplete(score, totalQuestions, Math.round(finalScore));
     }
 
-    console.log("Assessment completed:", {
+    console.log(
+      "Assessment completed with score:",
       score,
+      "out of",
       totalQuestions,
-      percentage: finalScore
-    });
+      ":",
+      Math.round(finalScore) + "%"
+    );
   };
 
   // Toggle review mode
@@ -1170,8 +1167,8 @@ export default function HistoricalAssessment({
                 </Button>
               )}
 
-              {/* SIMPLIFIED - Single finish button */}
-              <Button onClick={finishAssessment} className="flex items-center gap-2">
+              {/* Use the universal finish function */}
+              <Button onClick={onFinish} className="flex items-center gap-2">
                 <Award className="h-4 w-4" />
                 Finish Assessment
               </Button>
