@@ -30,7 +30,7 @@ namespace backend.Services
             }
             studentAssessment.SubmittedAt = DateTime.UtcNow;
             studentAssessment.IsCompleted = true;
-
+            studentAssessment.StudentClassroom.TotalScore += recordStudentAssessmentDto.Score;
             return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);
 
         }
@@ -43,14 +43,13 @@ namespace backend.Services
                 throw new Exception($"StudentAssessment with ID {studentAssessmentId} not found.");
             }
             studentAssessment.StartTime = DateTime.UtcNow;
-
-            if (studentAssessment.Attempts != 3)
+            if (studentAssessment.Attempts < 3)
             {
                 studentAssessment.Attempts += 1;
             }
             return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);
         }
-        
+
         public async Task<ICollection<StudentAssessment>> GetStudentAssessmentByAssessmentId(int AssessmentId)
         {
             return await _studentAssessmentRepository.GetAllStudentAssessmentsByAssessmentId(AssessmentId);
@@ -60,6 +59,6 @@ namespace backend.Services
         {
             return await _studentAssessmentRepository.GetStudentAssessmentsByStudentId(StudentId);
         }
-
+          
     }  
 }

@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using backend.DTOs.StudentClassroom;
+using backend.Models;
+using backend.Presentation;
 
 namespace backend.Repositories.Interfaces
 {
@@ -11,5 +9,6 @@ namespace backend.Repositories.Interfaces
         Task<bool> RemoveStudentFromClassroomAsync(int studentId, int classroomId);
         Task<StudentProgress> GetStudentProgressByStudentClassroomIdAsync(int studentClassroomId);
         Task<ICollection<StudentScores>> GetStudentScoresByClassroomCodeAsync(string classroomCode);
+        Task<ICollection<StudentClassroom>> GetStudentClassroomByClassCode(string classroomCode);
     }
 }

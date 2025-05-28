@@ -5,25 +5,25 @@
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class AddedAttemptsCounterInStudentAssessments : Migration
+    public partial class AddedTotalScoresInStudentClassroom : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "Attempts",
-                table: "StudentAssessments",
-                type: "integer",
+            migrationBuilder.AddColumn<double>(
+                name: "TotalScore",
+                table: "StudentClassrooms",
+                type: "double precision",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0.0);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Attempts",
-                table: "StudentAssessments");
+                name: "TotalScore",
+                table: "StudentClassrooms");
         }
     }
 }

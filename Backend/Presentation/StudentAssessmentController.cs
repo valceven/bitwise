@@ -47,9 +47,9 @@ namespace backend.Presentation
         public async Task<IActionResult> GetStudentAssessmentByAssessmentId([FromQuery] int AssessmentId)
         {
             try
-            { 
+            {
                 var studentAssessments = await _studentAssessmentService.GetStudentAssessmentByAssessmentId(AssessmentId);
-                
+
                 if (studentAssessments == null)
                 {
                     return NotFound(new { message = "No Student Assessment Found" });
@@ -61,6 +61,7 @@ namespace backend.Presentation
                 return BadRequest(new { message = ex.Message });
             }
         }
+        
         
     }
 }
