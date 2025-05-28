@@ -39,5 +39,22 @@ namespace backend.Services
             }
             return result;
         }
+        public async Task<ICollection<LeaderBoardsEntryDto>> GetLeaderBoardsByClassroomCodeAsync(string classroomCode)
+        {
+            var result = await _studentClassroomRepository.GetStudentClassroomByClassCode(classroomCode);
+
+            var leaderBoards = result
+                .OrderByDescending(sa => sa.TotalScore)
+                .Take(10)
+                .Select((sa, index) => new LeaderBoardsEntryDto
+                {
+                    Rank = index + 1,
+                    StudentName = sa.Student.User.Name,
+                    TotalScore = sa.TotalScore,
+                })
+                .ToList();
+            
+            return leaderBoards;
+        }
     }
 }
