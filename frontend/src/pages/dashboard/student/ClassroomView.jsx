@@ -27,18 +27,15 @@ const ClassroomView = ({ classroom, user }) => {
   const [roadmapResponse, setRoadmapResponse] = useState({});
   const [assessments, setAssessments] = useState([]);
 
-  // Swiper instance ref
   const swiperRef = useRef(null);
 
-  // Lesson configuration - defines topics per lesson
   const lessonConfig = [
-    { topicCount: 3, assessmentCount: 3 }, // Lesson 1: topics 1,2,3
-    { topicCount: 3, assessmentCount: 3 }, // Lesson 2: topics 4,5,6
-    { topicCount: 1, assessmentCount: 1 }, // Lesson 3: topic 7
-    { topicCount: 2, assessmentCount: 2 }, // Lesson 4: topics 8,9
+    { topicCount: 3, assessmentCount: 3 }, 
+    { topicCount: 3, assessmentCount: 3 }, 
+    { topicCount: 1, assessmentCount: 1 },
+    { topicCount: 2, assessmentCount: 2 },
   ];
 
-  // Mock sub-lesson data - now using sequential topic numbers 1-9
   const subLessonInfo = {
     1: {
       title: "Introduction to Basics",
@@ -101,7 +98,46 @@ const ClassroomView = ({ classroom, user }) => {
     },
   };
 
-  // Function to get the starting topic number for a lesson
+  // Assessment to Lesson mapping
+  const assessmentToLessonMap = {
+    3: 1,  // Assessment 3 completes Lesson 1
+    6: 2,  // Assessment 6 completes Lesson 2
+    7: 3,  // Assessment 7 completes Lesson 3
+    9: 4   // Assessment 9 completes Lesson 4
+  };
+
+  // Function to check and complete lessons based on assessment completion
+  const checkAndCompleteLessons = async (completedAssessments) => {
+    if (!completedAssessments || !Array.isArray(completedAssessments)) {
+      return;
+    }
+
+    try {
+      for (const assessmentNumber of completedAssessments) {
+        if (assessmentToLessonMap[assessmentNumber]) {
+          const lessonId = assessmentToLessonMap[assessmentNumber];
+          
+          const completeLessonData = {
+            classroomId: classroom.classroomId,
+            lessonId: lessonId,
+            studentId: user.userID
+          };
+
+          console.log(`Assessment ${assessmentNumber} completed - completing lesson ${lessonId}`);
+          
+          try {
+            await studentLessonApi.completeLesson(completeLessonData);
+            console.log(`Successfully completed lesson ${lessonId}`);
+          } catch (lessonError) {
+            console.log(`Lesson ${lessonId} completion call result:`, lessonError.message);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error completing lessons:", error.message);
+    }
+  };
+
   const getLessonStartTopic = (lessonIndex) => {
     let startTopic = 1;
     for (let i = 0; i < lessonIndex; i++) {
@@ -110,14 +146,12 @@ const ClassroomView = ({ classroom, user }) => {
     return startTopic;
   };
 
-  // Function to get topic numbers for a specific lesson
   const getLessonTopics = (lessonIndex) => {
     const startTopic = getLessonStartTopic(lessonIndex);
     const topicCount = lessonConfig[lessonIndex].topicCount;
     return Array.from({ length: topicCount }, (_, i) => startTopic + i);
   };
 
-  // Function to get default topic info if not in subLessonInfo
   const getTopicInfo = (topicNumber) => {
     return (
       subLessonInfo[topicNumber] || {
@@ -129,20 +163,16 @@ const ClassroomView = ({ classroom, user }) => {
     );
   };
 
-  // Function to get assessment data by assessment number
   const getAssessmentData = (assessmentNumber) => {
     return assessments[assessmentNumber - 1] || { score: 0, attempts: 0 };
   };
 
-  // Function to check if assessment has reached max attempts (3)
   const isAssessmentMaxAttempts = (assessmentNumber) => {
     const assessmentData = getAssessmentData(assessmentNumber);
     return assessmentData.attempts >= 3;
   };
 
-  // Function to check if a lesson is unlocked
   const isLessonUnlocked = (lessonIndex) => {
-    // If roadmapResponse is empty or no progress data, only lesson 1 is unlocked
     if (
       !roadmapResponse?.progress ||
       (!roadmapResponse.progress.completedLessons?.length &&
@@ -152,9 +182,8 @@ const ClassroomView = ({ classroom, user }) => {
       return lessonIndex === 0;
     }
 
-    if (lessonIndex === 0) return true; // Lesson 1 always unlocked
+    if (lessonIndex === 0) return true;
 
-    // Check if previous lesson is complete (last assessment of previous lesson is complete)
     const prevLessonIndex = lessonIndex - 1;
     const prevLessonAssessmentCount =
       lessonConfig[prevLessonIndex].assessmentCount;
@@ -257,6 +286,11 @@ const ClassroomView = ({ classroom, user }) => {
 
         console.log("Roadmap Progress:", response);
 
+        // Check and complete lessons based on completed assessments
+        if (response.progress?.completedAssessments) {
+          await checkAndCompleteLessons(response.progress.completedAssessments);
+        }
+
         const lessonResponse = await studentLessonApi.fetchStudentLessons(
           user.userID
         );
@@ -293,6 +327,14 @@ const ClassroomView = ({ classroom, user }) => {
 
     fetchData();
   }, []);
+
+  // Additional useEffect to watch for changes in completed assessments
+  // This will trigger lesson completion when assessments are completed during the session
+  useEffect(() => {
+    if (roadmapResponse.progress?.completedAssessments) {
+      checkAndCompleteLessons(roadmapResponse.progress.completedAssessments);
+    }
+  }, [roadmapResponse.progress?.completedAssessments]);
 
   const handleLeaveClassroom = () => {
     setShowConfirmation(true);

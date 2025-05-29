@@ -16,7 +16,6 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
   useEffect(() => {
     const loadScores = async () => {
       try {
-        console.log("HALLO", classCode);
         const data = await teacherApi.fetchScores(classCode);
 
         const header = ["Student Name", "Student Email"];

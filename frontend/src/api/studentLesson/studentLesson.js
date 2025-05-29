@@ -25,8 +25,19 @@ const fetchStudentLessons = async (studentId) => {
     }
 }
 
+const completeLesson = async (data) => {
+    try {
+        const response = await apiService.put("student-lesson/complete-student-lesson", data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error.response?.data || error.message || "An unknow error occured";
+    }
+}
+
 
 export const studentLessonApi = {
     enterLesson,
     fetchStudentLessons,
+    completeLesson
 }
