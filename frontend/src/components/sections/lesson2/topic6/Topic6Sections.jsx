@@ -7,9 +7,5 @@ export const topic6Sections = [
         content: (
             <BooleanAlgebraSolver />
         )
-    },
-    {
-        title: "Laufey",
-        content: (<div>Hello</div>)
     }
 ];

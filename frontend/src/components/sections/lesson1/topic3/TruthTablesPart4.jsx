@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, SkipBack, SkipForward, ChevronDown, ChevronUp, HelpCircle, Info } from 'lucide-react';
-import TruthTableLessonPart2 from './TruthTablesPart2';
 
 const TruthTableLessonPart4 = () => {
   // Custom colors matching the previous components
@@ -275,12 +274,12 @@ const TruthTableLessonPart4 = () => {
         {columns.map((column, index) => (
           <th 
             key={index} 
-            className={`px-3 py-2 text-center ${
+            className={`px-2 sm:px-3 py-2 text-center text-sm ${
               selectedExample.variables.includes(column)
-                ? 'bg-bluez/20 text-bluez'
+                ? 'bg-blue-100 text-blue-600'
                 : column === 'Output'
-                  ? 'bg-bluez text-white'
-                  : 'bg-lightpurple text-darkpurple'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-purple-100 text-purple-600'
             }`}
           >
             {column}
@@ -293,9 +292,9 @@ const TruthTableLessonPart4 = () => {
   // Render table rows
   const renderTableRows = () => {
     return tableData.map((row, rowIndex) => (
-      <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-offwhite' : 'bg-white'}>
+      <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
         {selectedExample.variables.map((variable, colIndex) => (
-          <td key={`var-${colIndex}`} className="px-3 py-2 text-center border border-gray-200 font-mono">
+          <td key={`var-${colIndex}`} className="px-2 sm:px-3 py-2 text-center border border-gray-200 font-mono text-sm">
             {row[variable]}
           </td>
         ))}
@@ -303,15 +302,15 @@ const TruthTableLessonPart4 = () => {
         {selectedExample.steps.map((step, stepIndex) => (
           <td 
             key={`step-${stepIndex}`} 
-            className={`px-3 py-2 text-center border border-gray-200 font-mono ${
+            className={`px-2 sm:px-3 py-2 text-center border border-gray-200 font-mono text-sm ${
               step.column === 'Output' 
                 ? row[step.column] === 1 
-                  ? 'text-greenz font-bold' 
+                  ? 'text-green-600 font-bold' 
                   : row[step.column] === 0 
-                    ? 'text-redz font-bold' 
+                    ? 'text-red-600 font-bold' 
                     : ''
                 : row[step.column] === 1 
-                  ? 'text-bluez font-bold' 
+                  ? 'text-blue-600 font-bold' 
                   : ''
             }`}
           >
@@ -326,20 +325,20 @@ const TruthTableLessonPart4 = () => {
   const renderCurrentStepExplanation = () => {
     if (currentStep === 0) {
       return (
-        <div className="text-grayz">
+        <div className="text-gray-600">
           Click "Start" or "Next Step" to begin building the truth table.
         </div>
       );
     } else if (currentStep >= selectedExample.steps.length) {
       return (
-        <div className="text-grayz">
+        <div className="text-gray-600">
           <span className="font-bold">Complete!</span> You've built the entire truth table.
         </div>
       );
     } else {
       const currentStepData = selectedExample.steps[currentStep];
       return (
-        <div className="text-grayz">
+        <div className="text-gray-600">
           <span className="font-bold">{currentStepData.title}:</span> Calculate the values for the "{currentStepData.column}" column.
         </div>
       );
@@ -347,32 +346,32 @@ const TruthTableLessonPart4 = () => {
   };
   
   return (
-    <div className="max-w-5xl mx-auto p-8 bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-lg">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-bluez mb-3">Combining Multiple Operators in Truth Tables</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-bluez mb-3">Combining Multiple Operators in Truth Tables</h1>
         <div className="w-24 h-1 bg-bluez mx-auto rounded-full mb-4"></div>
-        <p className="text-grayz">
+        <p className="text-gray-600 text-sm sm:text-base">
           Learn how to build truth tables for complex Boolean expressions with multiple operators
         </p>
       </div>
       
       {/* Example selector */}
-      <div className="bg-white p-5 rounded-lg shadow-sm mb-6">
-        <h2 className="text-lg font-bold text-grayz mb-3">Select an Example:</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="bg-white p-4 sm:p-5 rounded-lg shadow-sm mb-6">
+        <h2 className="text-lg font-bold text-gray-700 mb-3">Select an Example:</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {examples.map((example) => (
             <button
               key={example.id}
               className={`p-3 rounded-lg transition-colors text-left ${
                 selectedExample.id === example.id
                   ? 'bg-bluez text-white'
-                  : 'bg-offwhite text-grayz hover:bg-bluez/10'
+                  : 'bg-gray-50 text-gray-700 hover:bg-blue-50'
               }`}
               onClick={() => setSelectedExample(example)}
             >
-              <div className="font-bold">{example.title}</div>
-              <div className={`text-sm mt-1 ${selectedExample.id === example.id ? 'text-white/80' : 'text-grayz/70'}`}>
+              <div className="font-bold text-sm sm:text-base">{example.title}</div>
+              <div className={`text-xs sm:text-sm mt-1 ${selectedExample.id === example.id ? 'text-white/80' : 'text-gray-500'}`}>
                 {example.expression}
               </div>
             </button>
@@ -380,176 +379,180 @@ const TruthTableLessonPart4 = () => {
         </div>
       </div>
       
-      {/* Main content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column - Controls and information */}
-        <div className="lg:col-span-1">
-          {/* Expression */}
-          <div className="bg-white p-5 rounded-lg shadow-sm mb-6">
-            <h2 className="text-xl font-bold text-bluez mb-3">{selectedExample.expression}</h2>
+      {/* Expression and Controls Section */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+        {/* Expression */}
+        <div className="bg-white p-4 sm:p-5 rounded-lg shadow-sm">
+          <h2 className="text-lg sm:text-xl font-bold text-bluez mb-3 break-all">{selectedExample.expression}</h2>
+          
+          <div className="mb-4">
+            <button
+              className="flex items-center text-bluez hover:text-blue-500 transition-colors text-sm sm:text-base"
+              onClick={() => setShowExplanation(!showExplanation)}
+            >
+              <Info size={18} className="mr-2 flex-shrink-0" />
+              {showExplanation ? 'Hide Explanation' : 'Show Explanation'}
+            </button>
             
-            <div className="mb-4">
-              <button
-                className="flex items-center text-bluez hover:text-bluez/70 transition-colors"
-                onClick={() => setShowExplanation(!showExplanation)}
-              >
-                <Info size={18} className="mr-2" />
-                {showExplanation ? 'Hide Explanation' : 'Show Explanation'}
-              </button>
-              
-              {showExplanation && (
-                <div className="mt-3 p-3 bg-offwhite rounded-lg text-sm text-grayz">
-                  {selectedExample.explanation}
-                </div>
-              )}
-            </div>
-            
-            {/* Current Step */}
-            <div className="bg-bluez/10 p-3 rounded-lg mb-4">
-              <h3 className="font-bold text-bluez mb-2">Current Step:</h3>
+            {showExplanation && (
+              <div className="mt-3 p-3 bg-gray-50 rounded-lg text-xs sm:text-sm text-gray-600">
+                {selectedExample.explanation}
+              </div>
+            )}
+          </div>
+          
+          {/* Current Step */}
+          <div className="bg-blue-50 p-3 rounded-lg mb-4">
+            <h3 className="font-bold text-bluez mb-2 text-sm sm:text-base">Current Step:</h3>
+            <div className="text-xs sm:text-sm">
               {renderCurrentStepExplanation()}
-            </div>
-            
-            {/* Animation controls */}
-            <div className="flex flex-wrap justify-between items-center mb-4">
-              <div className="flex space-x-2 mb-2 sm:mb-0">
-                <button
-                  className="p-2 rounded-lg bg-gray-200 text-grayz hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleReset}
-                  disabled={currentStep === 0}
-                >
-                  <SkipBack size={18} />
-                </button>
-                
-                <button
-                  className="p-2 rounded-lg bg-gray-200 text-grayz hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleStepBack}
-                  disabled={currentStep === 0}
-                >
-                  <ChevronUp size={18} />
-                </button>
-                
-                <button
-                  className="p-2 rounded-lg bg-bluez text-white hover:bg-bluez/90"
-                  onClick={toggleAnimation}
-                >
-                  {isAnimating ? <Pause size={18} /> : <Play size={18} />}
-                </button>
-                
-                <button
-                  className="p-2 rounded-lg bg-gray-200 text-grayz hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleStepForward}
-                  disabled={currentStep >= selectedExample.steps.length}
-                >
-                  <ChevronDown size={18} />
-                </button>
-                
-                <button
-                  className="p-2 rounded-lg bg-gray-200 text-grayz hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => {
-                    while (currentStep < selectedExample.steps.length) {
-                      handleStepForward();
-                    }
-                  }}
-                  disabled={currentStep >= selectedExample.steps.length}
-                >
-                  <SkipForward size={18} />
-                </button>
-              </div>
-              
-              <div className="flex items-center">
-                <span className="text-sm text-grayz mr-2">Speed:</span>
-                <select
-                  className="bg-white border border-gray-300 rounded-md text-sm p-1"
-                  value={animationSpeed}
-                  onChange={(e) => setAnimationSpeed(parseInt(e.target.value))}
-                >
-                  <option value={2500}>Slow</option>
-                  <option value={1500}>Medium</option>
-                  <option value={800}>Fast</option>
-                </select>
-              </div>
-            </div>
-            
-            {/* Progress steps */}
-            <div className="mb-4">
-              <h3 className="font-bold text-grayz mb-2">Build Progress:</h3>
-              <div className="space-y-2">
-                {selectedExample.steps.map((step, index) => (
-                  <div 
-                    key={index}
-                    className={`p-2 rounded-lg flex items-center ${
-                      completedSteps.includes(step.id)
-                        ? 'bg-greenz/20 text-greenz'
-                        : currentStep === index
-                          ? 'bg-bluez/20 text-bluez border border-bluez'
-                          : 'bg-gray-100 text-gray-500'
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 flex items-center justify-center rounded-full mr-2 ${
-                        completedSteps.includes(step.id)
-                          ? 'bg-greenz text-white'
-                          : currentStep === index
-                            ? 'bg-bluez text-white'
-                            : 'bg-gray-300 text-gray-600'
-                      }`}
-                    >
-                      {index + 1}
-                    </div>
-                    <div className="text-sm">{step.title}</div>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
           
-          {/* Tips section */}
-          <div className="bg-white p-5 rounded-lg shadow-sm">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-lg font-bold text-grayz">General Tips</h2>
+          {/* Animation controls */}
+          <div className="space-y-4">
+            <div className="flex flex-wrap justify-center sm:justify-start gap-2">
               <button
-                className="text-bluez hover:text-bluez/70 transition-colors"
-                onClick={() => setShowTips(!showTips)}
+                className="p-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleReset}
+                disabled={currentStep === 0}
+                title="Reset"
               >
-                {showTips ? 'Hide Tips' : 'Show Tips'}
+                <SkipBack size={18} />
+              </button>
+              
+              <button
+                className="p-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleStepBack}
+                disabled={currentStep === 0}
+                title="Previous Step"
+              >
+                <ChevronUp size={18} />
+              </button>
+              
+              <button
+                className="p-2 rounded-lg bg-bluez text-white hover:bg-blue-700"
+                onClick={toggleAnimation}
+                title={isAnimating ? "Pause" : "Play"}
+              >
+                {isAnimating ? <Pause size={18} /> : <Play size={18} />}
+              </button>
+              
+              <button
+                className="p-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleStepForward}
+                disabled={currentStep >= selectedExample.steps.length}
+                title="Next Step"
+              >
+                <ChevronDown size={18} />
+              </button>
+              
+              <button
+                className="p-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => {
+                  while (currentStep < selectedExample.steps.length) {
+                    handleStepForward();
+                  }
+                }}
+                disabled={currentStep >= selectedExample.steps.length}
+                title="Complete All Steps"
+              >
+                <SkipForward size={18} />
               </button>
             </div>
             
-            {showTips && (
-              <ul className="list-disc list-inside space-y-2 text-grayz text-sm">
-                {tips.map((tip, index) => (
-                  <li key={index}>{tip}</li>
-                ))}
-              </ul>
-            )}
+            <div className="flex items-center justify-center sm:justify-start">
+              <span className="text-sm text-gray-600 mr-2">Speed:</span>
+              <select
+                className="bg-white border border-gray-300 rounded-md text-sm p-1"
+                value={animationSpeed}
+                onChange={(e) => setAnimationSpeed(parseInt(e.target.value))}
+              >
+                <option value={2500}>Slow</option>
+                <option value={1500}>Medium</option>
+                <option value={800}>Fast</option>
+              </select>
+            </div>
           </div>
         </div>
         
-        {/* Right column - Truth Table */}
-        <div className="lg:col-span-2">
-          <div className="bg-white p-5 rounded-lg shadow-sm overflow-x-auto">
-            <h2 className="text-lg font-bold text-grayz mb-4">Truth Table for {selectedExample.expression}</h2>
-            
-            <table className="w-full border-collapse">
-              <thead>
-                {renderTableHeader()}
-              </thead>
-              <tbody>
-                {renderTableRows()}
-              </tbody>
-            </table>
-            
-            <div className="mt-4 text-sm text-grayz italic">
-              Click the play button or use the step controls to build the truth table step by step.
-            </div>
+        {/* Progress steps */}
+        <div className="bg-white p-4 sm:p-5 rounded-lg shadow-sm">
+          <h3 className="font-bold text-gray-700 mb-3 text-sm sm:text-base">Build Progress:</h3>
+          <div className="space-y-2">
+            {selectedExample.steps.map((step, index) => (
+              <div 
+                key={index}
+                className={`p-2 sm:p-3 rounded-lg flex items-center ${
+                  completedSteps.includes(step.id)
+                    ? 'bg-green-100 text-green-600'
+                    : currentStep === index
+                      ? 'bg-blue-100 text-bluez border border-blue-300'
+                      : 'bg-gray-100 text-gray-500'
+                }`}
+              >
+                <div
+                  className={`w-6 h-6 flex items-center justify-center rounded-full mr-2 sm:mr-3 flex-shrink-0 ${
+                    completedSteps.includes(step.id)
+                      ? 'bg-green-600 text-white'
+                      : currentStep === index
+                        ? 'bg-bluez text-white'
+                        : 'bg-gray-300 text-gray-600'
+                  }`}
+                >
+                  {index + 1}
+                </div>
+                <div className="text-xs sm:text-sm">{step.title}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
       
+      {/* Truth Table */}
+      <div className="bg-white p-4 sm:p-5 rounded-lg shadow-sm mb-6">
+        <h2 className="text-lg font-bold text-gray-700 mb-4">Truth Table for {selectedExample.expression}</h2>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse min-w-full">
+            <thead>
+              {renderTableHeader()}
+            </thead>
+            <tbody>
+              {renderTableRows()}
+            </tbody>
+          </table>
+        </div>
+        
+        <div className="mt-4 text-xs sm:text-sm text-gray-500 italic text-center sm:text-left">
+          Click the play button or use the step controls to build the truth table step by step.
+        </div>
+      </div>
+      
+      {/* Tips section - Now below the truth table */}
+      <div className="bg-white p-4 sm:p-5 rounded-lg shadow-sm mb-6">
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-lg font-bold text-gray-700">General Tips</h2>
+          <button
+            className="text-blue-600 hover:text-blue-500 transition-colors text-sm sm:text-base"
+            onClick={() => setShowTips(!showTips)}
+          >
+            {showTips ? 'Hide Tips' : 'Show Tips'}
+          </button>
+        </div>
+        
+        {showTips && (
+          <ul className="list-disc list-inside space-y-2 text-gray-600 text-sm">
+            {tips.map((tip, index) => (
+              <li key={index}>{tip}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+      
       {/* Interactive note */}
-      <div className="mt-8 p-4 bg-yellowz/10 rounded-lg border border-yellowz/30 text-center">
-        <p className="text-grayz">
+      <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200 text-center">
+        <p className="text-gray-600 text-sm sm:text-base">
           <span className="font-bold">Learning:</span> Try all the examples to understand different patterns of complex Boolean expressions. 
           Use the step-by-step animation to see how each intermediate value is calculated.
         </p>

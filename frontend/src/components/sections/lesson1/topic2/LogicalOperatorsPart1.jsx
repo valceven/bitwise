@@ -188,107 +188,107 @@ const LogicalOperatorsLessonPart1 = () => {
       </div>
       
       {/* Introduction */}
-      <div className="bg-white p-6 rounded-xl shadow-md mb-8">
-        <div className="flex items-start mb-4">
-          <div className="text-2xl text-darkpurple mr-3">🧠</div>
-          <div>
-            <h2 className="text-xl font-bold text-grayz mb-4">What are Logical Operators?</h2>
+    
+      
+        <div className="text-2xl text-darkpurple mr-3">🧠</div>
+        <div>
+          <h2 className="text-xl font-bold text-grayz mb-4">What are Logical Operators?</h2>
+          
+          <p className="text-grayz mb-4 leading-relaxed bg-offwhite p-4 rounded-md border-l-4 border-bluez">
+            <span className="text-bluez font-medium">Logical operators are symbols or words used to connect two or more logical statements</span> and return a Boolean result — either True (1) or False (0).
+          </p>
+          
+          <p className="text-grayz leading-relaxed mb-6">
+            They are the building blocks of Boolean algebra and digital logic circuits. You'll see them in programming, electronics, and computer architecture.
+          </p>
+          
+          {/* Interactive Operator Selector */}
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl shadow-inner">
+            <h3 className="text-lg font-semibold text-grayz mb-4 text-center">Explore Different Logical Operators</h3>
             
-            <p className="text-grayz mb-4 leading-relaxed bg-offwhite p-4 rounded-md border-l-4 border-bluez">
-              <span className="text-bluez font-medium">Logical operators are symbols or words used to connect two or more logical statements</span> and return a Boolean result — either True (1) or False (0).
-            </p>
-            
-            <p className="text-grayz leading-relaxed mb-6">
-              They are the building blocks of Boolean algebra and digital logic circuits. You'll see them in programming, electronics, and computer architecture.
-            </p>
-            
-            {/* Interactive Operator Selector */}
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl shadow-inner">
-              <h3 className="text-lg font-semibold text-grayz mb-4 text-center">Explore Different Logical Operators</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+              <button
+                className={`p-4 rounded-lg transition-all shadow-sm flex flex-col items-center justify-center ${activeOperator === 'and' ? 'bg-bluez text-white shadow-md' : 'bg-white hover:bg-blue-50 text-grayz'}`}
+                onClick={() => handleOperatorChange('and')}
+              >
+                <span className="text-2xl font-bold mb-1">∧</span>
+                <span className="font-medium">AND</span>
+              </button>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-                <button
-                  className={`p-4 rounded-lg transition-all shadow-sm flex flex-col items-center justify-center ${activeOperator === 'and' ? 'bg-bluez text-white shadow-md' : 'bg-white hover:bg-blue-50 text-grayz'}`}
-                  onClick={() => handleOperatorChange('and')}
+              <button
+                className={`p-4 rounded-lg transition-all shadow-sm flex flex-col items-center justify-center ${activeOperator === 'or' ? 'bg-bluez text-white shadow-md' : 'bg-white hover:bg-blue-50 text-grayz'}`}
+                onClick={() => handleOperatorChange('or')}
+              >
+                <span className="text-2xl font-bold mb-1">∨</span>
+                <span className="font-medium">OR</span>
+              </button>
+              
+              <button
+                className={`p-4 rounded-lg transition-all shadow-sm flex flex-col items-center justify-center ${activeOperator === 'not' ? 'bg-bluez text-white shadow-md' : 'bg-white hover:bg-blue-50 text-grayz'}`}
+                onClick={() => handleOperatorChange('not')}
+              >
+                <span className="text-2xl font-bold mb-1">¬</span>
+                <span className="font-medium">NOT</span>
+              </button>
+              
+              <button
+                className={`p-4 rounded-lg transition-all shadow-sm flex flex-col items-center justify-center ${activeOperator === 'xor' ? 'bg-bluez text-white shadow-md' : 'bg-white hover:bg-blue-50 text-grayz'}`}
+                onClick={() => handleOperatorChange('xor')}
+              >
+                <span className="text-2xl font-bold mb-1">⊕</span>
+                <span className="font-medium">XOR</span>
+              </button>
+            </div>
+            
+            {/* Operator Display */}
+          
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-bluez flex items-center">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
+                    <span className="font-bold text-bluez">{getOperatorSymbol()}</span>
+                  </div>
+                  {activeOperator.toUpperCase()} Operation
+                </h3>
+                <button 
+                  className="bg-blue-50 hover:bg-blue-100 text-bluez hover:text-blue-800 py-2 px-4 rounded-lg flex items-center text-sm transition-colors"
+                  onClick={() => setShowExplanation(!showExplanation)}
                 >
-                  <span className="text-2xl font-bold mb-1">∧</span>
-                  <span className="font-medium">AND</span>
-                </button>
-                
-                <button
-                  className={`p-4 rounded-lg transition-all shadow-sm flex flex-col items-center justify-center ${activeOperator === 'or' ? 'bg-bluez text-white shadow-md' : 'bg-white hover:bg-blue-50 text-grayz'}`}
-                  onClick={() => handleOperatorChange('or')}
-                >
-                  <span className="text-2xl font-bold mb-1">∨</span>
-                  <span className="font-medium">OR</span>
-                </button>
-                
-                <button
-                  className={`p-4 rounded-lg transition-all shadow-sm flex flex-col items-center justify-center ${activeOperator === 'not' ? 'bg-bluez text-white shadow-md' : 'bg-white hover:bg-blue-50 text-grayz'}`}
-                  onClick={() => handleOperatorChange('not')}
-                >
-                  <span className="text-2xl font-bold mb-1">¬</span>
-                  <span className="font-medium">NOT</span>
-                </button>
-                
-                <button
-                  className={`p-4 rounded-lg transition-all shadow-sm flex flex-col items-center justify-center ${activeOperator === 'xor' ? 'bg-bluez text-white shadow-md' : 'bg-white hover:bg-blue-50 text-grayz'}`}
-                  onClick={() => handleOperatorChange('xor')}
-                >
-                  <span className="text-2xl font-bold mb-1">⊕</span>
-                  <span className="font-medium">XOR</span>
+                  <Info size={16} className="mr-1" />
+                  {showExplanation ? "Hide Explanation" : "Show Explanation"}
                 </button>
               </div>
               
-              {/* Operator Display */}
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-semibold text-bluez flex items-center">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-2">
-                      <span className="font-bold text-bluez">{getOperatorSymbol()}</span>
-                    </div>
-                    {activeOperator.toUpperCase()} Operation
-                  </h3>
-                  <button 
-                    className="bg-blue-50 hover:bg-blue-100 text-bluez hover:text-blue-800 py-2 px-4 rounded-lg flex items-center text-sm transition-colors"
-                    onClick={() => setShowExplanation(!showExplanation)}
-                  >
-                    <Info size={16} className="mr-1" />
-                    {showExplanation ? "Hide Explanation" : "Show Explanation"}
-                  </button>
-                </div>
-                
-                {/* Operator Image */}
-                <div className="mb-6 flex justify-center">
-                  {operatorImages[activeOperator] ? (
-                    <img 
-                      src={operatorImages[activeOperator]} 
-                      alt={`${activeOperator.toUpperCase()} gate diagram`}
-                      className="h-32 object-contain border border-gray-200 rounded-lg p-2 bg-gray-50"
-                    />
-                  ) : (
-                    <div className="h-32 w-60 flex items-center justify-center border border-gray-200 rounded-lg p-2 bg-gray-50 text-gray-400">
-                      Image placeholder for {activeOperator.toUpperCase()} operator
-                    </div>
-                  )}
-                </div>
-                
-                {showExplanation && (
-                  <div className="bg-blue-50 p-4 rounded-xl shadow-sm mb-6 transition-all border-l-4 border-bluez">
-                    <p className="text-grayz">{renderExplanation()}</p>
+              {/* Operator Image */}
+              <div className="mb-6 flex justify-center">
+                {operatorImages[activeOperator] ? (
+                  <img 
+                    src={operatorImages[activeOperator]} 
+                    alt={`${activeOperator.toUpperCase()} gate diagram`}
+                    className="h-32 object-contain border border-gray-200 rounded-lg p-2 bg-gray-50"
+                  />
+                ) : (
+                  <div className="h-32 w-60 flex items-center justify-center border border-gray-200 rounded-lg p-2 bg-gray-50 text-gray-400">
+                    Image placeholder for {activeOperator.toUpperCase()} operator
                   </div>
                 )}
-                
-                {/* Truth Table */}
-                <div className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100">
-                  {renderTruthTable()}
-                </div>
               </div>
-            </div>
+              
+              {showExplanation && (
+                <div className="bg-blue-50 p-4 rounded-xl shadow-sm mb-6 transition-all border-l-4 border-bluez">
+                  <p className="text-grayz">{renderExplanation()}</p>
+                </div>
+              )}
+              
+              {/* Truth Table */}
+              <div className="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100">
+                {renderTruthTable()}
+              </div>
+           
           </div>
         </div>
       </div>
-    </div>
+    
+    
   );
 };
 

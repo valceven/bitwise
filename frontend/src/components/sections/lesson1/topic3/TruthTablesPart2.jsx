@@ -221,7 +221,7 @@ const TruthTableLessonPart2 = () => {
   ];
   
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-lg">
+    <>
       {/* Header */}
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-bluez mb-3">How to Construct a Truth Table</h1>
@@ -425,7 +425,7 @@ const TruthTableLessonPart2 = () => {
           </ul>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

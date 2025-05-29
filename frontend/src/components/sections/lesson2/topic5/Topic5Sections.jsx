@@ -4,6 +4,7 @@ import SolvingBooleanLawsPart2 from './SolvingBooleanLawsPart2';
 import SolvingBooleanLawsPart3 from './SolvingBooleanLawsPart3';
 import SolvingBooleanLawsPart4 from './SolvingBooleanLawsPart4';
 
+
  export const topic5Sections = [
     {
       title: "",
@@ -29,4 +30,5 @@ import SolvingBooleanLawsPart4 from './SolvingBooleanLawsPart4';
         <SolvingBooleanLawsPart4/>
       )
     },
+   
   ];
