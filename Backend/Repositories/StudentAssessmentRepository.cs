@@ -31,7 +31,9 @@ namespace backend.Repositories
 
         public async Task<StudentAssessment> GetStudentAssessmentById(int StudentAssessmentId)
         {
-            var studentAssessment = await _context.StudentAssessments.FirstOrDefaultAsync(sa => sa.StudentAssessmentId == StudentAssessmentId);
+            var studentAssessment = await _context.StudentAssessments
+            .Include(sa => sa.StudentClassroom)
+            .FirstOrDefaultAsync(sa => sa.StudentAssessmentId == StudentAssessmentId);
             if (studentAssessment == null)
             {
                 throw new Exception($"StudentAssessment with ID {StudentAssessmentId} not found.");

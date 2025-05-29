@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle,
@@ -9,6 +9,8 @@ import {
   AlertCircle,
   Award,
   Clock,
+  BookOpen,
+  RotateCcw,
 } from "lucide-react";
 
 // Enhanced color palette with more colors
@@ -46,14 +48,16 @@ const TruthTableConstructionAssessment = ({
   attemptsRemaining = 3,
   currentAttempt = 1,
   maxAttempts = 3,
+  studentAssessmentId
 }) => {
-  // Assessment states
+  // Assessment states - FIXED to match HistoricalAssessment pattern
   const [currentStep, setCurrentStep] = useState(0);
-  const [score, setScore] = useState(0);
-  const [userAnswers, setUserAnswers] = useState({});
+  const [userAnswers, setUserAnswers] = useState([]); // Changed from object to array
+  const [isReviewMode, setIsReviewMode] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
-  const [isCompleted, setIsCompleted] = useState(false);
 
   // Interactive states
   const [selectedVariables, setSelectedVariables] = useState(2);
@@ -64,6 +68,16 @@ const TruthTableConstructionAssessment = ({
   const [userRowCalculations, setUserRowCalculations] = useState({});
   const [calculationChecked, setCalculationChecked] = useState(false);
 
+  useEffect(() => {
+    setSelectedOption(null);
+    setShowFeedback(false);
+    setUserTruthTable({});
+    setHighlightCell(null);
+    setExplanationOpen(false);
+    setCalculationChecked(false);
+    setUserRowCalculations({});
+  }, [currentStep]);
+
   // Assessment content
   const assessmentSteps = [
     {
@@ -71,8 +85,6 @@ const TruthTableConstructionAssessment = ({
       title: "Truth Table Construction",
       content:
         "In this assessment, you will learn how to construct truth tables for Boolean expressions. You'll understand the relationship between variables and table size, and build truth tables step by step.",
-      image: "/placeholder.svg?height=300&width=600",
-      imageAlt: "Truth Table Diagram",
     },
     {
       type: "variableExplanation",
@@ -130,8 +142,11 @@ const TruthTableConstructionAssessment = ({
         "NOT B": [1, 0, 1, 0],
         "A AND (NOT B)": [0, 0, 1, 0],
       },
+      question: "What is the result of A AND (NOT B) when A=1 and B=0?",
+      options: ["0", "1", "Cannot be determined", "Error"],
+      correctAnswer: 1,
       explanation:
-        "For A AND (NOT B), we first calculate (NOT B), which inverts B (0 becomes 1, 1 becomes 0). Then we apply the AND operation between A and (NOT B). The result is 1 only when A is 1 AND B is 0.",
+        "When A=1 and B=0: NOT B = NOT 0 = 1, so A AND (NOT B) = 1 AND 1 = 1. The AND operation returns 1 only when both inputs are 1.",
     },
     {
       type: "equivalenceChallenge",
@@ -174,37 +189,54 @@ const TruthTableConstructionAssessment = ({
 
   // Get total number of questions (excluding intro and completion steps)
   const totalQuestions = assessmentSteps.filter(
-    (step) =>
-      step.type !== "intro" && step.type !== "completion" && step.question
+    (step) => step.type !== "intro" && step.type !== "completion"
   ).length;
 
-  // Check if user has already answered current question
-  const hasAnsweredCurrent = () => {
-    return userAnswers[currentStep] !== undefined;
-  };
+  const score = userAnswers.filter((answer) => answer.isCorrect).length;
 
-  // Handle answer selection for multiple choice
+  const hasQuestion = useCallback(() => {
+    const step = assessmentSteps[currentStep];
+    return step.options && step.correctAnswer !== undefined;
+  }, [currentStep, assessmentSteps]);
+
+  const hasAnsweredCurrent = useCallback(() => {
+    return userAnswers.some((answer) => answer.questionIndex === currentStep);
+  }, [currentStep, userAnswers]);
+
+  const getCurrentAnswer = useCallback(() => {
+    return userAnswers.find((answer) => answer.questionIndex === currentStep);
+  }, [currentStep, userAnswers]);
+
   const handleAnswerSelect = (answerIndex) => {
     if (hasAnsweredCurrent()) return;
+    setSelectedOption(answerIndex);
+  };
+
+  const handleShowFeedback = () => {
+    if (selectedOption === null) return;
 
     const currentQuestion = assessmentSteps[currentStep];
-    const isCorrect = answerIndex === currentQuestion.correctAnswer;
+    const isCorrect = currentQuestion.correctAnswer === selectedOption;
 
-    // Update score
     if (isCorrect) {
-      setScore((prevScore) => prevScore + 1);
       setFeedbackMessage("Correct! " + currentQuestion.explanation);
     } else {
-      setFeedbackMessage("Not quite. " + currentQuestion.explanation);
+      setFeedbackMessage(
+        `Not quite. The correct answer is: ${
+          currentQuestion.options[currentQuestion.correctAnswer]
+        }. ${currentQuestion.explanation}`
+      );
     }
 
-    // Update user answers
-    setUserAnswers({
+    setUserAnswers([
       ...userAnswers,
-      [currentStep]: { answer: answerIndex, isCorrect },
-    });
+      {
+        questionIndex: currentStep,
+        selectedAnswer: selectedOption,
+        isCorrect,
+      },
+    ]);
 
-    // Show feedback
     setShowFeedback(true);
   };
 
@@ -265,13 +297,20 @@ const TruthTableConstructionAssessment = ({
     // Calculate partial score (for complex tables)
     const accuracy = correctCount / totalCells;
 
-    // Update score and show feedback
+    // Update user answers using the new pattern
+    const newAnswer = {
+      questionIndex: currentStep,
+      selectedAnswer: null, // For table construction
+      isCorrect: isAllCorrect,
+      accuracy: accuracy,
+    };
+
+    setUserAnswers([...userAnswers, newAnswer]);
+
+    // Show feedback
     if (isAllCorrect) {
-      setScore((prevScore) => prevScore + 1);
       setFeedbackMessage("Perfect! " + step.explanation);
     } else if (accuracy > 0.5) {
-      // Partial credit for more than 50% correct
-      setScore((prevScore) => prevScore + 0.5);
       setFeedbackMessage(
         "You got some correct, but not all. " + step.explanation
       );
@@ -279,13 +318,6 @@ const TruthTableConstructionAssessment = ({
       setFeedbackMessage("Let's review this. " + step.explanation);
     }
 
-    // Update user answers
-    setUserAnswers({
-      ...userAnswers,
-      [currentStep]: { isCorrect: isAllCorrect, accuracy },
-    });
-
-    // Show feedback
     setShowFeedback(true);
   };
 
@@ -319,12 +351,6 @@ const TruthTableConstructionAssessment = ({
   const handleNext = () => {
     if (currentStep < assessmentSteps.length - 1) {
       setCurrentStep(currentStep + 1);
-      setShowFeedback(false);
-      setUserTruthTable({});
-      setHighlightCell(null);
-      setExplanationOpen(false);
-      setCalculationChecked(false);
-      setUserRowCalculations({});
     } else {
       finishAssessment();
     }
@@ -333,40 +359,69 @@ const TruthTableConstructionAssessment = ({
   const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-      setShowFeedback(false);
-      setUserTruthTable({});
-      setHighlightCell(null);
-      setExplanationOpen(false);
-      setCalculationChecked(false);
-      setUserRowCalculations({});
     }
   };
 
-  // Complete the assessment
-  const finishAssessment = () => {
+  // Complete the assessment - FIXED to match HistoricalAssessment pattern
+  const finishAssessment = async () => {
     setIsCompleted(true);
-
-    // Calculate final score
-    const finalScore = Math.round((score / totalQuestions) * 100);
-
-    // Call the onComplete callback if provided
-    if (onComplete) {
-      onComplete(score, totalQuestions, finalScore);
-    }
+    const finalScore = (score / totalQuestions) * 100;
+    
+    const assessmentData = {
+      percentage: Math.round(finalScore),
+      score: score,
+      totalQuestions: totalQuestions,
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts
+    };
 
     console.log(
-      `Assessment completed with score: ${score}/${totalQuestions} (${finalScore}%)`
+      "Assessment completed with score:",
+      score,
+      "out of",
+      totalQuestions,
+      ":",
+      Math.round(finalScore) + "%"
     );
+
+    if (onComplete) {
+      onComplete(assessmentData);
+    }
+  };
+
+  const handleFinishAssessment = () => {
+    const finalScore = (score / totalQuestions) * 100;
+    const assessmentData = {
+      percentage: Math.round(finalScore),
+      score: score,
+      totalQuestions: totalQuestions,
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts
+    };
+    
+    if (onFinish) {
+      onFinish(assessmentData);
+    } else if (onComplete) {
+      onComplete(assessmentData);
+    }
+  };
+
+  // Toggle review mode
+  const toggleReviewMode = () => {
+    setIsReviewMode(!isReviewMode);
   };
 
   // Reset and restart assessment
   const handleRestartAssessment = () => {
     setCurrentStep(0);
-    setScore(0);
-    setUserAnswers({});
+    setUserAnswers([]);
+    setIsReviewMode(false);
+    setIsCompleted(false);
+    setSelectedOption(null);
     setShowFeedback(false);
     setFeedbackMessage("");
-    setIsCompleted(false);
     setUserTruthTable({});
     setHighlightCell(null);
     setSelectedVariables(2);
@@ -430,13 +485,20 @@ const TruthTableConstructionAssessment = ({
   };
 
   // Custom Badge component
-  const Badge = ({ children, color, className }) => {
+  const Badge = ({ children, variant }) => {
+    const baseStyles = "px-2 py-1 text-xs font-semibold rounded-full";
+    const variantStyles =
+      variant === "outline"
+        ? "border border-bluez text-bluez"
+        : "bg-bluez text-white";
+
     return (
       <span
-        className={`px-2 py-1 text-xs font-semibold rounded-full ${className}`}
+        className={`${baseStyles} ${variantStyles}`}
         style={{
-          backgroundColor: `${colors[color]}20`, // 20% opacity
-          color: colors[color],
+          backgroundColor: variant === "outline" ? "transparent" : colors.bluez,
+          color: variant === "outline" ? colors.bluez : colors.white,
+          borderColor: variant === "outline" ? colors.bluez : "transparent",
         }}
       >
         {children}
@@ -638,41 +700,10 @@ const TruthTableConstructionAssessment = ({
     );
   };
 
-  // Navigation buttons
-  const renderNavigation = () => {
-    const isLastStep = currentStep === assessmentSteps.length - 1;
-    const isFirstStep = currentStep === 0;
-    const canProceed =
-      hasAnsweredCurrent() ||
-      assessmentSteps[currentStep].type === "intro" ||
-      assessmentSteps[currentStep].type === "completion";
-
-    return (
-      <div className="flex justify-between mt-6">
-        <Button
-          onClick={handlePrevious}
-          disabled={isFirstStep}
-          variant="outline"
-          className="flex items-center"
-        >
-          <ChevronLeft className="h-4 w-4 mr-1" /> Previous
-        </Button>
-
-        <Button
-          onClick={handleNext}
-          disabled={!canProceed}
-          className="flex items-center"
-        >
-          {isLastStep ? "Finish" : "Next"}{" "}
-          <ChevronRight className="h-4 w-4 ml-1" />
-        </Button>
-      </div>
-    );
-  };
-
   // Render different content based on step type
   const renderStepContent = () => {
     const step = assessmentSteps[currentStep];
+    const currentAnswer = getCurrentAnswer();
 
     switch (step.type) {
       case "intro":
@@ -709,7 +740,6 @@ const TruthTableConstructionAssessment = ({
               {step.content}
             </p>
 
-            {/* ADD: Show attempt information */}
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <p className="text-sm text-blue-700 mb-2">
                 📝 Attempt <strong>{currentAttempt}</strong> of{" "}
@@ -833,106 +863,285 @@ const TruthTableConstructionAssessment = ({
             </div>
 
             {/* Question */}
-            <div className="p-6">
-              <h3
-                className="text-lg font-bold mb-4"
-                style={{ color: colors.grayz }}
-              >
-                {step.question}
-              </h3>
-              <div className="space-y-3">
-                {step.options.map((option, idx) => {
-                  const answered = hasAnsweredCurrent();
-                  const isSelected = answered
-                    ? userAnswers[currentStep]?.answer === idx
-                    : false;
-                  const isCorrect = step.correctAnswer === idx;
-
-                  let bgColor = colors.white;
-                  let borderColor = colors.cyanz;
-
-                  if (answered && isSelected) {
-                    bgColor = userAnswers[currentStep].isCorrect
-                      ? `${colors.emeraldz}20`
-                      : `${colors.coralz}20`;
-                    borderColor = userAnswers[currentStep].isCorrect
-                      ? colors.emeraldz
-                      : colors.coralz;
-                  }
-
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => !answered && handleAnswerSelect(idx)}
-                      className={`p-4 border-2 rounded-xl transition-all transform ${
-                        answered
-                          ? "cursor-default"
-                          : "cursor-pointer hover:scale-105 hover:shadow-md"
-                      }`}
-                      style={{
-                        backgroundColor: bgColor,
-                        borderColor: isSelected ? borderColor : colors.cyanz,
-                        color: colors.grayz,
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{option}</span>
-                        {answered &&
-                          isSelected &&
-                          userAnswers[currentStep].isCorrect && (
-                            <CheckCircle
-                              className="h-6 w-6"
-                              style={{ color: colors.emeraldz }}
-                            />
-                          )}
-                        {answered &&
-                          isSelected &&
-                          !userAnswers[currentStep].isCorrect && (
-                            <XCircle
-                              className="h-6 w-6"
-                              style={{ color: colors.coralz }}
-                            />
-                          )}
-                        {answered && !isSelected && isCorrect && (
-                          <CheckCircle
-                            className="h-6 w-6"
-                            style={{ color: colors.emeraldz, opacity: 0.5 }}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Feedback */}
-              {showFeedback && (
-                <div
-                  className="mt-4 p-4 rounded-xl border-2"
-                  style={{
-                    backgroundColor: userAnswers[currentStep]?.isCorrect
-                      ? `${colors.emeraldz}10`
-                      : `${colors.coralz}10`,
-                    borderColor: userAnswers[currentStep]?.isCorrect
-                      ? colors.emeraldz
-                      : colors.coralz,
-                    color: userAnswers[currentStep]?.isCorrect
-                      ? colors.emeraldz
-                      : colors.coralz,
-                  }}
-                >
-                  <p className="font-medium">{feedbackMessage}</p>
-                </div>
-              )}
-
-              {renderNavigation()}
-            </div>
+            {renderQuestion(step)}
           </div>
         );
 
-      // ... other cases follow similar pattern ...
+      case "variableSelection":
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.ambez}, ${colors.orangez})`,
+                }}
+              >
+                <span className="text-2xl">🎛️</span>
+              </div>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: colors.grayz }}
+              >
+                {step.title}
+              </h2>
+            </div>
+            <p style={{ color: colors.grayz }}>{step.description}</p>
 
-      case "completion":
+            {/* Variable selector */}
+            <div
+              className="rounded-xl shadow-lg overflow-hidden"
+              style={{
+                background: `linear-gradient(135deg, ${colors.white}, ${colors.ambez}10)`,
+              }}
+            >
+              <div className="p-6">
+                <h3
+                  className="text-lg font-bold mb-4"
+                  style={{ color: colors.ambez }}
+                >
+                  Select Number of Variables:
+                </h3>
+                <div className="flex justify-center space-x-4">
+                  {[1, 2, 3].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => setSelectedVariables(num)}
+                      className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                        selectedVariables === num ? "shadow-lg" : "hover:shadow-md"
+                      }`}
+                      style={{
+                        backgroundColor:
+                          selectedVariables === num ? colors.ambez : colors.white,
+                        color:
+                          selectedVariables === num ? colors.white : colors.ambez,
+                        border: `2px solid ${colors.ambez}`,
+                      }}
+                    >
+                      {num} Variable{num > 1 ? "s" : ""}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="mt-6">
+                  <div
+                    className="p-4 rounded-lg text-center"
+                    style={{ backgroundColor: `${colors.mintgreenz}20` }}
+                  >
+                    <p
+                      className="text-lg font-bold"
+                      style={{ color: colors.emeraldz }}
+                    >
+                      With {selectedVariables} variable{selectedVariables > 1 ? "s" : ""}: 2^{selectedVariables} = {Math.pow(2, selectedVariables)} rows
+                    </p>
+                  </div>
+
+                  {/* Generate and show truth table structure */}
+                  <div className="mt-4">
+                    <h4
+                      className="font-bold mb-2"
+                      style={{ color: colors.indigoz }}
+                    >
+                      Truth Table Structure:
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-center border-collapse rounded-lg overflow-hidden">
+                        <thead>
+                          <tr
+                            style={{
+                              background: `linear-gradient(135deg, ${colors.tealz}, ${colors.cyanz})`,
+                            }}
+                          >
+                            {Array.from({ length: selectedVariables }, (_, i) => (
+                              <th key={i} className="p-2 border text-white font-bold">
+                                {String.fromCharCode(65 + i)}
+                              </th>
+                            ))}
+                            <th className="p-2 border text-white font-bold">
+                              Output
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {generateTruthTableRows(selectedVariables).map((row, rowIndex) => (
+                            <tr
+                              key={rowIndex}
+                              style={{
+                                backgroundColor:
+                                  rowIndex % 2 === 0
+                                    ? colors.white
+                                    : `${colors.skyz}10`,
+                              }}
+                            >
+                              {row.map((cell, cellIndex) => (
+                                <td key={cellIndex} className="p-2 border font-medium">
+                                  {cell}
+                                </td>
+                              ))}
+                              <td className="p-2 border font-medium" style={{ color: colors.violetz }}>
+                                ?
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className="mt-4 p-4 rounded-lg"
+                  style={{ backgroundColor: `${colors.lavenderz}20` }}
+                >
+                  <p
+                    className="text-sm"
+                    style={{ color: colors.grayz }}
+                  >
+                    {step.instructionalText}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Question */}
+            {renderQuestion(step)}
+          </div>
+        );
+
+      case "complexTableConstruction":
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.violetz}, ${colors.pinkz})`,
+                }}
+              >
+                <span className="text-2xl">🔨</span>
+              </div>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: colors.grayz }}
+              >
+                {step.title}
+              </h2>
+            </div>
+            <p style={{ color: colors.grayz }}>{step.description}</p>
+
+            {/* Operation explanation */}
+            <div
+              className="p-4 rounded-lg"
+              style={{ backgroundColor: `${colors.skyz}10` }}
+            >
+              <p
+                className="font-medium"
+                style={{ color: colors.grayz }}
+              >
+                {step.operationDescription}
+              </p>
+            </div>
+
+            {/* Truth table */}
+            <TruthTable
+              headers={step.table.headers}
+              rows={step.table.rows}
+              editable={true}
+              onCellChange={handleTruthTableInput}
+              highlightCell={highlightCell}
+              correctAnswers={step.correctAnswers}
+            />
+
+            {!hasAnsweredCurrent() && (
+              <div className="text-center">
+                <Button
+                  onClick={() => checkTruthTableAnswers("complex")}
+                  className="px-6 py-3"
+                >
+                  Check Answers
+                </Button>
+              </div>
+            )}
+
+            {/* Question */}
+            {renderQuestion(step)}
+          </div>
+        );
+
+      case "equivalenceChallenge":
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.rosez}, ${colors.pinkz})`,
+                }}
+              >
+                <span className="text-2xl">🔄</span>
+              </div>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: colors.grayz }}
+              >
+                {step.title}
+              </h2>
+            </div>
+            <p style={{ color: colors.grayz }}>{step.description}</p>
+
+            {/* Question */}
+            {renderQuestion(step)}
+          </div>
+        );
+
+      case "realWorldApplication":
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${colors.limez}, ${colors.emeraldz})`,
+                }}
+              >
+                <span className="text-2xl">🏠</span>
+              </div>
+              <h2
+                className="text-2xl font-bold"
+                style={{ color: colors.grayz }}
+              >
+                {step.title}
+              </h2>
+            </div>
+            <p style={{ color: colors.grayz }}>{step.description}</p>
+
+            {/* Scenario */}
+            <div
+              className="p-6 rounded-xl shadow-lg"
+              style={{
+                background: `linear-gradient(135deg, ${colors.white}, ${colors.limez}10)`,
+              }}
+            >
+              <h3
+                className="text-lg font-bold mb-4"
+                style={{ color: colors.limez }}
+              >
+                Security System Scenario:
+              </h3>
+              <p
+                className="text-base"
+                style={{ color: colors.grayz }}
+              >
+                {step.scenario}
+              </p>
+            </div>
+
+            {/* Question */}
+            {renderQuestion(step)}
+          </div>
+        );
+
+      case "completion": {
         const finalScore = Math.round((score / totalQuestions) * 100);
 
         return (
@@ -1017,7 +1226,6 @@ const TruthTableConstructionAssessment = ({
                       {finalScore}%
                     </span>
                   </div>
-                  {/* ADD: Show attempt information */}
                   <div
                     className="flex justify-between items-center p-3 rounded-lg"
                     style={{ backgroundColor: `${colors.ambez}10` }}
@@ -1033,85 +1241,253 @@ const TruthTableConstructionAssessment = ({
                   className="mt-6 p-4 rounded-xl border-2"
                   style={{
                     backgroundColor:
-                      finalScore >= 70
+                      finalScore >= 80
                         ? `${colors.emeraldz}10`
+                        : finalScore >= 60
+                        ? `${colors.cyanz}10`
                         : `${colors.ambez}10`,
                     borderColor:
-                      finalScore >= 70 ? colors.emeraldz : colors.ambez,
-                    color: finalScore >= 70 ? colors.emeraldz : colors.ambez,
+                      finalScore >= 80
+                        ? colors.emeraldz
+                        : finalScore >= 60
+                        ? colors.cyanz
+                        : colors.ambez,
+                    color:
+                      finalScore >= 80
+                        ? colors.emeraldz
+                        : finalScore >= 60
+                        ? colors.cyanz
+                        : colors.ambez,
                   }}
                 >
                   <p className="font-bold">
-                    {finalScore >= 90
+                    {finalScore >= 80
                       ? "Excellent! 🌟"
-                      : finalScore >= 70
+                      : finalScore >= 60
                       ? "Good job! 👍"
-                      : finalScore >= 50
-                      ? "Nice effort! 💪"
                       : "Keep practicing! 📚"}
                   </p>
                   <p className="text-sm mt-1">
-                    {finalScore >= 90
-                      ? "You have mastered truth table construction!"
-                      : finalScore >= 70
-                      ? "You have a good understanding of truth tables."
-                      : finalScore >= 50
-                      ? "You're on the right track with truth tables."
-                      : "Truth tables take practice. Try again to improve your score."}
+                    {finalScore >= 80
+                      ? "You have mastered truth table construction! You understand how to build truth tables and analyze Boolean expressions."
+                      : finalScore >= 60
+                      ? "You have a good understanding of truth tables. Review the construction process to strengthen your skills."
+                      : "Truth table construction takes practice. Focus on understanding how variables relate to table size and step-by-step construction."}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex gap-4">
-              {/* UPDATED: Only show restart if attempts remaining */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                onClick={toggleReviewMode}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <BookOpen className="h-4 w-4" />
+                {isReviewMode ? "Hide Review" : "Review Answers"}
+              </Button>
+
               {attemptsRemaining > 1 && (
                 <Button
                   onClick={handleRestartAssessment}
-                  size="lg"
+                  variant="outline"
                   className="flex items-center gap-2"
                 >
-                  <Clock className="h-4 w-4" />
+                  <RotateCcw className="h-4 w-4" />
                   Try Again ({attemptsRemaining - 1} attempts left)
                 </Button>
               )}
 
-              {/* USE UNIVERSAL FINISH FUNCTION */}
-              <Button
-                onClick={onFinish}
-                size="lg"
-                className="flex items-center gap-2"
-              >
+              <Button onClick={handleFinishAssessment} className="flex items-center gap-2">
                 <Award className="h-4 w-4" />
                 Finish Assessment
               </Button>
             </div>
           </div>
         );
+      }
 
       default:
         return <div>Unknown step type: {step.type}</div>;
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6 min-h-screen">
-      {/* Progress bar and step indicator */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-3">
-          <div className="text-sm font-bold" style={{ color: colors.indigoz }}>
-            Step {currentStep + 1} of {assessmentSteps.length}
+  // Render question and answer options
+  const renderQuestion = (step) => {
+    if (!step.question || !step.options) return null;
+
+    const currentAnswer = getCurrentAnswer();
+    const answered = hasAnsweredCurrent();
+
+    return (
+      <div className="p-6 rounded-xl">
+        <h3 className="text-lg font-bold mb-4" style={{ color: colors.grayz }}>
+          {step.question}
+        </h3>
+
+        <div className="space-y-3">
+          {step.options?.map((option, idx) => {
+            const isSelected = selectedOption === idx;
+            const isAnswered = answered;
+            const isCorrect = isReviewMode && step.correctAnswer === idx;
+            const isIncorrect =
+              isReviewMode &&
+              currentAnswer?.selectedAnswer === idx &&
+              !currentAnswer.isCorrect;
+
+            let bgColor = colors.white;
+            let borderColor = colors.cyanz;
+
+            if (isSelected) {
+              bgColor = `${colors.lavenderz}20`;
+              borderColor = colors.violetz;
+            }
+            if (isCorrect) {
+              bgColor = `${colors.emeraldz}20`;
+              borderColor = colors.emeraldz;
+            }
+            if (isIncorrect) {
+              bgColor = `${colors.coralz}20`;
+              borderColor = colors.coralz;
+            }
+
+            return (
+              <div
+                key={idx}
+                onClick={() => !isAnswered && handleAnswerSelect(idx)}
+                className={`p-4 border-2 rounded-xl transition-all transform ${
+                  isAnswered
+                    ? "cursor-default"
+                    : "cursor-pointer hover:scale-105 hover:shadow-md"
+                }`}
+                style={{
+                  backgroundColor: bgColor,
+                  borderColor: borderColor,
+                  color: colors.grayz,
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{option}</span>
+                  {isReviewMode && isCorrect && (
+                    <CheckCircle
+                      className="h-6 w-6"
+                      style={{ color: colors.emeraldz }}
+                    />
+                  )}
+                  {isReviewMode && isIncorrect && (
+                    <XCircle
+                      className="h-6 w-6"
+                      style={{ color: colors.coralz }}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Feedback area */}
+        {showFeedback && (
+          <div
+            className="mt-4 p-4 rounded-xl border-2"
+            style={{
+              backgroundColor: currentAnswer?.isCorrect
+                ? `${colors.emeraldz}10`
+                : `${colors.coralz}10`,
+              borderColor: currentAnswer?.isCorrect
+                ? colors.emeraldz
+                : colors.coralz,
+              color: currentAnswer?.isCorrect ? colors.emeraldz : colors.coralz,
+            }}
+          >
+            <p className="font-medium">{feedbackMessage}</p>
           </div>
-          <div className="text-sm font-bold" style={{ color: colors.emeraldz }}>
-            Score: {score} / {totalQuestions}
+        )}
+
+        {renderNavigation()}
+      </div>
+    );
+  };
+
+  // Navigation buttons
+  const renderNavigation = () => {
+    // Don't show navigation for intro and completion
+    if (
+      assessmentSteps[currentStep].type === "intro" ||
+      assessmentSteps[currentStep].type === "completion"
+    ) {
+      return null;
+    }
+
+    const answered = hasAnsweredCurrent();
+    const showSubmitButton = hasQuestion() && !answered;
+
+    return (
+      <div className="flex justify-between pt-6">
+        <Button
+          onClick={handlePrevious}
+          disabled={currentStep <= 0}
+          variant="outline"
+          className="flex items-center gap-1"
+        >
+          <ChevronLeft className="h-4 w-4" /> Previous
+        </Button>
+
+        {showSubmitButton ? (
+          <Button
+            onClick={handleShowFeedback}
+            disabled={selectedOption === null}
+            className="flex items-center gap-1"
+            style={{
+              backgroundColor:
+                selectedOption === null ? "#ccc" : colors.violetz,
+              color: colors.white,
+            }}
+          >
+            Submit Answer
+          </Button>
+        ) : (
+          <Button onClick={handleNext} className="flex items-center gap-1">
+            {currentStep >= assessmentSteps.length - 2 ? "Complete" : "Next"}{" "}
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col w-full max-w-4xl mx-auto pb-16 px-4 min-h-screen">
+      {/* Progress bar */}
+      <div className="p-4 mb-4">
+        <ProgressBar value={progress} />
+        <div className="flex justify-between mt-3 text-sm">
+          <span className="font-bold" style={{ color: colors.indigoz }}>
+            Step {currentStep + 1} of {assessmentSteps.length}
+          </span>
+          <div className="flex gap-2">
+            {isReviewMode && <Badge variant="outline">Review Mode</Badge>}
+            <span className="font-bold" style={{ color: colors.emeraldz }}>
+              Score: {score} / {totalQuestions}
+            </span>
           </div>
         </div>
-        <ProgressBar value={progress} />
       </div>
 
       {/* Main content */}
-      <div className="bg-white rounded-2xl overflow-hidden">
-        <div className="p-6">{renderStepContent()}</div>
+      <div className="rounded-2xl p-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderStepContent()}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -53,20 +53,32 @@ const Typewriter = ({ text, delay = 50, className = "", onComplete }) => {
   return <span className={className}>{displayText}</span>
 }
 
-// Code Debug Detective Game Component
-const CodeDebugDetectiveGame = ({ onComplete }) => {
+// Main Code Debug Detective Game Component
+const CodeDebugDetectiveGame = ({ 
+  onComplete, 
+  attemptsRemaining = 3, 
+  currentAttempt = 1, 
+  maxAttempts = 3, 
+  studentAssessmentId 
+}) => {
+  // Game state
   const [currentCase, setCurrentCase] = useState(0)
   const [score, setScore] = useState(0)
   const [bugsFound, setBugsFound] = useState(0)
   const [gameState, setGameState] = useState('intro') // intro, playing, case_solved, completed
   const [selectedFix, setSelectedFix] = useState(null)
   const [showFeedback, setShowFeedback] = useState(false)
+  const [userAnswers, setUserAnswers] = useState([])
+  
+  // Instruction state
   const [showInstructions, setShowInstructions] = useState(true)
   const [instructionStep, setInstructionStep] = useState(0)
+  
+  // Hint state
   const [showHint, setShowHint] = useState(false)
   const [hintsUsed, setHintsUsed] = useState(0)
 
-  // Instructions for the game
+  // Game instructions
   const instructions = [
     "Welcome, Detective! 🕵️ You've been called to investigate a series of Boolean logic crimes in the code.",
     "Each case contains buggy code with Boolean logic errors. Your mission is to identify and fix these bugs.",
@@ -75,9 +87,8 @@ const CodeDebugDetectiveGame = ({ onComplete }) => {
     "Ready to catch some Boolean bugs? Let's start investigating! 🔍"
   ]
 
-  // Bug cases with progressive difficulty
+  // Debug cases with progressive difficulty
   const debugCases = [
-    // Level 1 - Basic Boolean Logic Bugs
     {
       id: 1,
       title: "The Permission Gate Bug",
@@ -97,7 +108,7 @@ print(can_access_dashboard(False, True))   # Premium user`,
           option: "Change 'and' to 'or'",
           code: "return is_admin or has_premium",
           isCorrect: true,
-          explanation: "OR logic allows access for users who are admin OR have premium (or both)."
+          explanation: "Correct! OR logic allows access for users who are admin OR have premium (or both)."
         },
         {
           option: "Add parentheses around the condition",
@@ -115,11 +126,10 @@ print(can_access_dashboard(False, True))   # Premium user`,
       hint: "Think about the business logic: should a user need BOTH admin AND premium, or just ONE of them?",
       points: 100
     },
-
     {
       id: 2,
       title: "The De Morgan's Law Violation",
-      difficulty: "Rookie",
+      difficulty: "Rookie", 
       scenario: "A validation function is supposed to reject invalid users, but it's letting some through...",
       buggyCode: `def is_invalid_user(is_registered, has_paid_fee):
     # Bug: Incorrect application of De Morgan's law
@@ -154,7 +164,6 @@ print(f"User1 invalid: {user1}, User2 invalid: {user2}")`,
       hint: "Remember De Morgan's law: NOT(A AND B) = (NOT A) OR (NOT B)",
       points: 150
     },
-
     {
       id: 3,
       title: "The Short-Circuit Catastrophe",
@@ -196,11 +205,10 @@ def get_user_data(user_id):
       hint: "In AND operations, put the 'safety check' condition first to prevent errors on the second condition.",
       points: 200
     },
-
     {
       id: 4,
       title: "The Truthy-Falsy Trap",
-      difficulty: "Detective", 
+      difficulty: "Detective",
       scenario: "A username validation system is behaving strangely with empty inputs...",
       buggyCode: `def validate_username(username):
     # Bug: Incorrect truthy/falsy handling
@@ -240,10 +248,9 @@ print(validate_username(None))      # None value`,
       hint: "In Python, empty strings and None are falsy. You don't need to compare to True/False explicitly.",
       points: 250
     },
-
     {
       id: 5,
-      title: "The Complex Condition Chaos", 
+      title: "The Complex Condition Chaos",
       difficulty: "Senior Detective",
       scenario: "A graduation eligibility checker has complex business rules, but students who should graduate aren't being approved...",
       buggyCode: `def can_graduate(grades, attendance, project_complete):
@@ -287,7 +294,6 @@ print(can_graduate([65, 68, 62], 85, True))`,
       hint: "AND has higher precedence than OR. Use parentheses to group related conditions that should be evaluated together.",
       points: 300
     },
-
     {
       id: 6,
       title: "The Bitwise Blunder",
@@ -340,6 +346,7 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
     }
   ]
 
+  // Game control functions
   const startGame = () => {
     setGameState('playing')
     setShowInstructions(false)
@@ -363,10 +370,22 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
 
     const currentBug = debugCases[currentCase]
     const chosenFix = currentBug.fixes[selectedFix]
+    const isCorrect = chosenFix.isCorrect
     
-    if (chosenFix.isCorrect) {
-      const points = currentBug.points - (hintsUsed * 25)
-      setScore(score + Math.max(50, points))
+    // Record the answer
+    const answerData = {
+      caseIndex: currentCase,
+      selectedAnswer: selectedFix,
+      isCorrect: isCorrect,
+      hintsUsed: hintsUsed,
+      caseDifficulty: currentBug.difficulty,
+      caseTitle: currentBug.title
+    }
+    setUserAnswers([...userAnswers, answerData])
+    
+    if (isCorrect) {
+      const points = Math.max(50, currentBug.points - (hintsUsed * 25))
+      setScore(score + points)
       setBugsFound(bugsFound + 1)
       setGameState('case_solved')
     }
@@ -378,7 +397,7 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
         nextCase()
       } else {
         setGameState('completed')
-        if (onComplete) onComplete(score)
+        finishAssessment()
       }
     }, 3000)
   }
@@ -403,6 +422,7 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
     setShowFeedback(false)
     setShowHint(false)
     setHintsUsed(0)
+    setUserAnswers([])
   }
 
   const showHintHandler = () => {
@@ -410,7 +430,30 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
     setHintsUsed(hintsUsed + 1)
   }
 
-  // Intro/Instructions Screen
+  // Calculate final assessment data and call completion handler
+  const finishAssessment = () => {
+    const totalPossiblePoints = debugCases.reduce((sum, bugCase) => sum + bugCase.points, 0)
+    const percentage = Math.round((score / totalPossiblePoints) * 100)
+    
+    const assessmentData = {
+      percentage: percentage,
+      score: score,
+      totalQuestions: debugCases.length,
+      totalPossiblePoints: totalPossiblePoints,
+      bugsFixed: bugsFound,
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts
+    }
+
+    console.log('Code Detective Assessment completed:', assessmentData)
+    
+    if (onComplete) {
+      onComplete(assessmentData)
+    }
+  }
+
+  // Render intro/instructions screen
   if (gameState === 'intro' && showInstructions) {
     return (
       <div className="space-y-8">
@@ -444,6 +487,18 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
           </div>
         </motion.div>
 
+        {/* Show attempt information */}
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-700 mb-2">
+            📝 Attempt <strong>{currentAttempt}</strong> of <strong>{maxAttempts}</strong>
+          </p>
+          <p className="text-xs text-blue-600">
+            {attemptsRemaining > 1
+              ? `You have ${attemptsRemaining - 1} attempts remaining after this one.`
+              : "This is your final attempt!"}
+          </p>
+        </div>
+
         <div className="flex justify-between items-center">
           <div className="flex space-x-2">
             {instructions.map((_, idx) => (
@@ -475,7 +530,7 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
     )
   }
 
-  // Case Solved Screen
+  // Render case solved screen
   if (gameState === 'case_solved') {
     return (
       <motion.div
@@ -501,9 +556,11 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
     )
   }
 
-  // Completion Screen
+  // Render completion screen
   if (gameState === 'completed') {
     const accuracy = Math.round((bugsFound / debugCases.length) * 100)
+    const totalPossiblePoints = debugCases.reduce((sum, bugCase) => sum + bugCase.points, 0)
+    const percentage = Math.round((score / totalPossiblePoints) * 100)
     
     return (
       <motion.div
@@ -520,34 +577,61 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
           Detective Mission Complete! 🎉
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-lg mx-auto">
+        {/* Score Circle - showing percentage */}
+        <div
+          className="w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg mx-auto"
+          style={{
+            background: `conic-gradient(${colors.emeraldz} ${percentage * 3.6}deg, ${colors.offwhite} 0deg)`,
+            color: colors.emeraldz,
+          }}
+        >
+          <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center">
+            {percentage}%
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.violetz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.violetz }}>{percentage}%</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Final Score</div>
+          </div>
           <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.ambez}20` }}>
             <div className="text-2xl font-bold" style={{ color: colors.ambez }}>{score}</div>
-            <div className="text-sm" style={{ color: colors.grayz }}>Total Score</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Points Earned</div>
           </div>
           <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.emeraldz}20` }}>
             <div className="text-2xl font-bold" style={{ color: colors.emeraldz }}>{bugsFound}</div>
             <div className="text-sm" style={{ color: colors.grayz }}>Bugs Fixed</div>
           </div>
-          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.violetz}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.violetz }}>{accuracy}%</div>
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.cyanz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.cyanz }}>{accuracy}%</div>
             <div className="text-sm" style={{ color: colors.grayz }}>Success Rate</div>
           </div>
         </div>
 
         <div className="p-6 rounded-xl" 
-             style={{ backgroundColor: score >= 1200 ? `${colors.emeraldz}10` : score >= 800 ? `${colors.cyanz}10` : `${colors.ambez}10` }}>
+             style={{ backgroundColor: percentage >= 80 ? `${colors.emeraldz}10` : percentage >= 60 ? `${colors.cyanz}10` : `${colors.ambez}10` }}>
           <h3 className="font-bold text-lg mb-2" 
-              style={{ color: score >= 1200 ? colors.emeraldz : score >= 800 ? colors.cyanz : colors.ambez }}>
-            {score >= 1200 ? "Master Detective! 🌟" :
-             score >= 800 ? "Expert Debugger! 🎯" :
-             score >= 400 ? "Good Detective! 👍" : "Rookie Investigator! 📚"}
+              style={{ color: percentage >= 80 ? colors.emeraldz : percentage >= 60 ? colors.cyanz : colors.ambez }}>
+            {percentage >= 80 ? "Master Detective! 🌟" :
+             percentage >= 60 ? "Expert Debugger! 🎯" :
+             percentage >= 40 ? "Good Detective! 👍" : "Rookie Investigator! 📚"}
           </h3>
           <p className="text-sm" style={{ color: colors.grayz }}>
-            {score >= 1200 ? "Outstanding! You've mastered Boolean debugging with minimal hints and perfect accuracy." :
-             score >= 800 ? "Excellent work! You show strong debugging skills and understand Boolean logic well." :
-             score >= 400 ? "Well done! You're developing good debugging instincts and Boolean reasoning." :
+            {percentage >= 80 ? "Outstanding! You've mastered Boolean debugging with minimal hints and perfect accuracy." :
+             percentage >= 60 ? "Excellent work! You show strong debugging skills and understand Boolean logic well." :
+             percentage >= 40 ? "Well done! You're developing good debugging instincts and Boolean reasoning." :
              "Good effort! Keep practicing to improve your bug detection and Boolean logic understanding."}
+          </p>
+        </div>
+
+        {/* Show attempt information */}
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-700 mb-2">
+            📝 Attempt <strong>{currentAttempt}</strong> of <strong>{maxAttempts}</strong>
+          </p>
+          <p className="text-xs text-blue-600">
+            Score: {score} points out of {totalPossiblePoints} possible ({percentage}%)
           </p>
         </div>
 
@@ -567,11 +651,12 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
     )
   }
 
+  // Main game interface for playing cases
   const currentBug = debugCases[currentCase]
   
   return (
     <div className="space-y-6">
-      {/* Game Stats */}
+      {/* Game Stats Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -776,7 +861,7 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
         )}
       </motion.div>
 
-      {/* Progress */}
+      {/* Progress Bar */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -799,12 +884,25 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
   )
 }
 
-export default function CodeDebugDetectiveGamez({ onComplete }) {
+// Main export component
+export default function CodeDebugDetectiveGamez({ 
+  onComplete, 
+  attemptsRemaining = 3, 
+  currentAttempt = 1, 
+  maxAttempts = 3, 
+  studentAssessmentId 
+}) {
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto pb-16 px-4 min-h-screen" 
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.ambez}05)` }}>
       <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
-        <CodeDebugDetectiveGame onComplete={onComplete} />
+        <CodeDebugDetectiveGame 
+          onComplete={onComplete} 
+          attemptsRemaining={attemptsRemaining}
+          currentAttempt={currentAttempt}
+          maxAttempts={maxAttempts}
+          studentAssessmentId={studentAssessmentId}
+        />
       </div>
     </div>
   )

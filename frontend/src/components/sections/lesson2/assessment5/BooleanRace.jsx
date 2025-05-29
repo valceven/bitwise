@@ -54,9 +54,18 @@ const Typewriter = ({ text, delay = 50, className = "", onComplete }) => {
 }
 
 // Boolean Race: SOP vs POS Game Component
-const BooleanRaceGame = ({ onComplete, onFinish }) => {
+const BooleanRaceGame = ({ 
+  onComplete, 
+  onFinish,
+  attemptsRemaining = 3,
+  currentAttempt = 1,
+  maxAttempts = 3,
+  studentAssessmentId 
+}) => {
   const [currentRound, setCurrentRound] = useState(0)
-  const [score, setScore] = useState(0)
+  const [gameScore, setGameScore] = useState(0) // Renamed to avoid confusion
+  const [correctAnswers, setCorrectAnswers] = useState(0) // Track correct answers
+  const [userAnswers, setUserAnswers] = useState([]) // Track all answers for review
   const [timeLeft, setTimeLeft] = useState(30)
   const [gameState, setGameState] = useState('intro') // intro, playing, round_complete, completed
   const [userAnswer, setUserAnswer] = useState("")
@@ -68,6 +77,7 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
   const [currentProblem, setCurrentProblem] = useState(null)
   const [roundsCompleted, setRoundsCompleted] = useState(0)
   const [showSteps, setShowSteps] = useState(false)
+  const [problemsAttempted, setProblemsAttempted] = useState(0) // Track total problems attempted
 
   // Instructions for the game
   const instructions = [
@@ -186,7 +196,7 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
           given: "A·B·C·D + A·B·C'·D + A·B'·C·D + A'·B·C·D",
           givenForm: "SOP",
           targetForm: "POS",
-          answer: "(A+B+C+D')·(A+B+C'+D')·(A+B'+C+D')·(A'+B+C+D')·...",
+          answer: "(A+B+C+D')·(A+B+C'+D')·(A+B'+C+D')·(A'+B+C+D')",
           explanation: "Complex 4-variable conversion requires systematic approach",
           difficulty: "Hard", 
           steps: [
@@ -226,6 +236,9 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
       ]
     }
   ]
+
+  // Calculate total questions
+  const totalQuestions = problemSets.reduce((total, round) => total + round.problems.length, 0)
 
   // Timer effect
   useEffect(() => {
@@ -274,6 +287,18 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
     const isCorrect = userAnswer.trim().toLowerCase().replace(/\s/g, '') === 
                      currentProblem.answer.toLowerCase().replace(/\s/g, '')
     
+    // Record the answer
+    const answer = {
+      questionIndex: problemsAttempted,
+      selectedAnswer: userAnswer.trim(),
+      correctAnswer: currentProblem.answer,
+      isCorrect: isCorrect,
+      problem: currentProblem.given,
+      timeLeft: timeLeft
+    }
+    setUserAnswers([...userAnswers, answer])
+    setProblemsAttempted(problemsAttempted + 1)
+    
     if (isCorrect) {
       const timeBonus = Math.max(0, timeLeft * 2)
       const streakBonus = streak * 10
@@ -281,7 +306,8 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
                              currentProblem.difficulty === 'Medium' ? 30 : 20
       const points = 100 + timeBonus + streakBonus + difficultyBonus
       
-      setScore(score + points)
+      setGameScore(gameScore + points)
+      setCorrectAnswers(correctAnswers + 1)
       setStreak(streak + 1)
       setFeedbackMessage(`Correct! +${points} points (${timeBonus} time bonus, ${streakBonus} streak bonus)`)
     } else {
@@ -298,6 +324,20 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
   }
 
   const handleTimeUp = () => {
+    // Record timeout for current problem if one is active
+    if (currentProblem && !showFeedback) {
+      const timeoutAnswer = {
+        questionIndex: problemsAttempted,
+        selectedAnswer: null, // timeout
+        correctAnswer: currentProblem.answer,
+        isCorrect: false,
+        problem: currentProblem.given,
+        timeLeft: 0
+      }
+      setUserAnswers([...userAnswers, timeoutAnswer])
+      setProblemsAttempted(problemsAttempted + 1)
+    }
+
     setGameState('round_complete')
     setTimeout(() => {
       if (currentRound < problemSets.length) {
@@ -322,31 +362,71 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
     }, 3000)
   }
 
+  // FIXED: Complete game function to match HistoricalAssessment pattern
   const completeGame = () => {
     setGameState('completed')
-    const correctAnswers = Math.floor(score / 100) // Rough estimate based on base points
-    const percentage = Math.round((score / (problemSets.length * 300)) * 100) // Adjusted for multiple problems
     
-    // Call onComplete with score data
+    // Calculate final score based on correct answers (not game points)
+    const finalScore = (correctAnswers / problemsAttempted) * 100
+    
+    const assessmentData = {
+      percentage: Math.round(finalScore),
+      score: correctAnswers, // Number of correct answers
+      totalQuestions: problemsAttempted, // Use actual attempted questions
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts,
+      gameScore: gameScore // Keep the game score for display
+    }
+
+    console.log(
+      "Assessment completed with score:",
+      correctAnswers,
+      "out of",
+      problemsAttempted,
+      ":",
+      Math.round(finalScore) + "%"
+    )
+
     if (onComplete) {
-      onComplete(correctAnswers, problemSets.length * 3, percentage)
+      onComplete(assessmentData)
+    }
+  }
+
+  // FIXED: Add finish function to match other assessments
+  const handleFinishAssessment = () => {
+    const finalScore = problemsAttempted > 0 ? (correctAnswers / problemsAttempted) * 100 : 0
+    
+    const assessmentData = {
+      percentage: Math.round(finalScore),
+      score: correctAnswers,
+      totalQuestions: problemsAttempted,
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts,
+      gameScore: gameScore
     }
     
-    // Call onFinish to let AssessmentView handle completion
     if (onFinish) {
-      onFinish()
+      onFinish(assessmentData)
+    } else if (onComplete) {
+      onComplete(assessmentData)
     }
   }
 
   const resetGame = () => {
     setCurrentRound(0)
-    setScore(0)
+    setGameScore(0)
+    setCorrectAnswers(0)
+    setUserAnswers([])
+    setProblemsAttempted(0)
     setTimeLeft(30)
     setGameState('intro')
     setShowInstructions(true)
     setInstructionStep(0)
     setStreak(0)
     setRoundsCompleted(0)
+    setCurrentProblem(null)
   }
 
   const nextInstruction = () => {
@@ -357,9 +437,186 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
     }
   }
 
-  // Don't render anything when completed - let AssessmentView handle
+  // FIXED: Show completion screen instead of returning null
   if (gameState === 'completed') {
-    return null
+    const finalScore = problemsAttempted > 0 ? Math.round((correctAnswers / problemsAttempted) * 100) : 0
+    
+    return (
+      <div className="flex flex-col items-center space-y-6 text-center">
+        <div
+          className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+          style={{
+            background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})`,
+          }}
+        >
+          <span className="text-3xl">🎉</span>
+        </div>
+        <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
+          Race Complete!
+        </h2>
+
+        <div
+          className="w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg"
+          style={{
+            background: `conic-gradient(${colors.emeraldz} ${
+              finalScore * 3.6
+            }deg, ${colors.offwhite} 0deg)`,
+            color: colors.emeraldz,
+          }}
+        >
+          <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center">
+            {finalScore}%
+          </div>
+        </div>
+
+        <p className="text-lg max-w-md" style={{ color: colors.grayz }}>
+          You've completed the Boolean Race challenge!
+        </p>
+
+        <div
+          className="rounded-xl shadow-lg overflow-hidden w-full max-w-md"
+          style={{
+            background: `linear-gradient(135deg, ${colors.white}, ${colors.cyanz}10)`,
+          }}
+        >
+          <div className="p-6">
+            <h3
+              className="text-lg font-bold mb-4"
+              style={{ color: colors.indigoz }}
+            >
+              Race Results:
+            </h3>
+            <div className="space-y-4">
+              <div
+                className="flex justify-between items-center p-3 rounded-lg"
+                style={{ backgroundColor: `${colors.skyz}10` }}
+              >
+                <span className="font-medium">Problems Attempted:</span>
+                <span
+                  className="font-bold"
+                  style={{ color: colors.indigoz }}
+                >
+                  {problemsAttempted}
+                </span>
+              </div>
+              <div
+                className="flex justify-between items-center p-3 rounded-lg"
+                style={{ backgroundColor: `${colors.emeraldz}10` }}
+              >
+                <span className="font-medium">Correct Answers:</span>
+                <span
+                  className="font-bold"
+                  style={{ color: colors.emeraldz }}
+                >
+                  {correctAnswers} / {problemsAttempted}
+                </span>
+              </div>
+              <div
+                className="flex justify-between items-center p-3 rounded-lg"
+                style={{ backgroundColor: `${colors.violetz}10` }}
+              >
+                <span className="font-medium">Accuracy Rate:</span>
+                <span
+                  className="font-bold text-xl"
+                  style={{ color: colors.violetz }}
+                >
+                  {finalScore}%
+                </span>
+              </div>
+              <div
+                className="flex justify-between items-center p-3 rounded-lg"
+                style={{ backgroundColor: `${colors.orangez}10` }}
+              >
+                <span className="font-medium">Race Score:</span>
+                <span
+                  className="font-bold"
+                  style={{ color: colors.orangez }}
+                >
+                  {gameScore} pts
+                </span>
+              </div>
+              <div
+                className="flex justify-between items-center p-3 rounded-lg"
+                style={{ backgroundColor: `${colors.ambez}10` }}
+              >
+                <span className="font-medium">Attempt:</span>
+                <span className="font-bold" style={{ color: colors.ambez }}>
+                  {currentAttempt} / {maxAttempts}
+                </span>
+              </div>
+            </div>
+
+            <div
+              className="mt-6 p-4 rounded-xl border-2"
+              style={{
+                backgroundColor:
+                  finalScore >= 80
+                    ? `${colors.emeraldz}10`
+                    : finalScore >= 60
+                    ? `${colors.cyanz}10`
+                    : `${colors.ambez}10`,
+                borderColor:
+                  finalScore >= 80
+                    ? colors.emeraldz
+                    : finalScore >= 60
+                    ? colors.cyanz
+                    : colors.ambez,
+                color:
+                  finalScore >= 80
+                    ? colors.emeraldz
+                    : finalScore >= 60
+                    ? colors.cyanz
+                    : colors.ambez,
+              }}
+            >
+              <p className="font-bold">
+                {finalScore >= 80
+                  ? "Excellent Racing! 🌟"
+                  : finalScore >= 60
+                  ? "Good Race! 👍"
+                  : "Keep Racing! 📚"}
+              </p>
+              <p className="text-sm mt-1">
+                {finalScore >= 80
+                  ? "You've mastered SOP and POS conversions! Your Boolean racing skills are top-tier."
+                  : finalScore >= 60
+                  ? "You understand most conversions. Practice the more complex transformations to improve your speed."
+                  : "Boolean conversions take practice. Focus on the basic patterns first, then work up to more complex expressions."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          {attemptsRemaining > 1 && (
+            <button
+              onClick={resetGame}
+              className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all"
+              style={{
+                backgroundColor: "transparent",
+                color: colors.bluez,
+                border: `2px solid ${colors.bluez}`,
+              }}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Race Again ({attemptsRemaining - 1} attempts left)
+            </button>
+          )}
+
+          <button
+            onClick={handleFinishAssessment}
+            className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all"
+            style={{
+              backgroundColor: colors.bluez,
+              color: colors.white,
+            }}
+          >
+            <Award className="h-4 w-4" />
+            Finish Assessment
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // Intro/Instructions Screen
@@ -378,6 +635,21 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
           <h2 className="text-3xl font-bold mb-4" style={{ color: colors.grayz }}>
             Boolean Race: SOP vs POS
           </h2>
+          
+          {/* ADD: Show attempt information */}
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
+            <p className="text-sm text-blue-700 mb-2">
+              📝 Attempt <strong>{currentAttempt}</strong> of{" "}
+              <strong>{maxAttempts}</strong>
+            </p>
+            <p className="text-xs text-blue-600">
+              {attemptsRemaining > 1
+                ? `You have ${
+                    attemptsRemaining - 1
+                  } attempts remaining after this one.`
+                : "This is your final attempt!"}
+            </p>
+          </div>
         </motion.div>
 
         <motion.div
@@ -448,7 +720,10 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
         
         <div className="space-y-2">
           <p className="text-lg font-bold" style={{ color: colors.orangez }}>
-            Score: {score}
+            Score: {gameScore}
+          </p>
+          <p className="text-lg font-bold" style={{ color: colors.emeraldz }}>
+            Correct: {correctAnswers} / {problemsAttempted}
           </p>
           <p className="text-lg" style={{ color: colors.grayz }}>
             {currentRound < problemSets.length ? "Next round starting..." : "Calculating final results..."}
@@ -472,11 +747,15 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Target className="h-5 w-5" style={{ color: colors.orangez }} />
-            <span className="font-bold" style={{ color: colors.orangez }}>Score: {score}</span>
+            <span className="font-bold" style={{ color: colors.orangez }}>Score: {gameScore}</span>
           </div>
           <div className="flex items-center gap-2">
             <Zap className="h-5 w-5" style={{ color: colors.violetz }} />
             <span className="font-bold" style={{ color: colors.violetz }}>Streak: {streak}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5" style={{ color: colors.emeraldz }} />
+            <span className="font-bold" style={{ color: colors.emeraldz }}>Correct: {correctAnswers}</span>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -697,12 +976,26 @@ const BooleanRaceGame = ({ onComplete, onFinish }) => {
   )
 }
 
-export default function BooleanRace({ onComplete, onFinish }) {
+export default function BooleanRace({ 
+  onComplete, 
+  onFinish,
+  attemptsRemaining = 3,
+  currentAttempt = 1,
+  maxAttempts = 3,
+  studentAssessmentId
+}) {
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto pb-16 px-4 min-h-screen" 
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.orangez}05)` }}>
       <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
-        <BooleanRaceGame onComplete={onComplete} onFinish={onFinish} />
+        <BooleanRaceGame 
+          onComplete={onComplete} 
+          onFinish={onFinish}
+          attemptsRemaining={attemptsRemaining}
+          currentAttempt={currentAttempt}
+          maxAttempts={maxAttempts}
+          studentAssessmentId={studentAssessmentId}
+        />
       </div>
     </div>
   )

@@ -54,9 +54,18 @@ const Typewriter = ({ text, delay = 50, className = "", onComplete }) => {
 }
 
 // Law Detective Game Component
-const LawDetectiveGame = ({ onComplete, onFinish }) => {
+const LawDetectiveGame = ({ 
+  onComplete, 
+  onFinish,
+  attemptsRemaining = 3,
+  currentAttempt = 1,
+  maxAttempts = 3,
+  studentAssessmentId 
+}) => {
   const [currentCase, setCurrentCase] = useState(0)
-  const [score, setScore] = useState(0)
+  const [gameScore, setGameScore] = useState(0) // Renamed to avoid confusion
+  const [correctAnswers, setCorrectAnswers] = useState(0) // Track correct answers
+  const [userAnswers, setUserAnswers] = useState([]) // Track all answers for review
   const [streak, setStreak] = useState(0)
   const [timeLeft, setTimeLeft] = useState(15)
   const [gameState, setGameState] = useState('intro') // intro, playing, correct, wrong, completed
@@ -159,6 +168,16 @@ const LawDetectiveGame = ({ onComplete, onFinish }) => {
   }, [timeLeft, gameState])
 
   const handleTimeUp = () => {
+    // Record wrong answer
+    const wrongAnswer = {
+      questionIndex: currentCase,
+      selectedAnswer: null, // timeout
+      correctAnswer: detectiveCases[currentCase].correctLaw,
+      isCorrect: false,
+      timeLeft: 0
+    }
+    setUserAnswers([...userAnswers, wrongAnswer])
+    
     setGameState('wrong')
     setStreak(0)
     setShowFeedback(true)
@@ -177,11 +196,22 @@ const LawDetectiveGame = ({ onComplete, onFinish }) => {
     setSelectedLaw(lawName)
     const isCorrect = lawName === detectiveCases[currentCase].correctLaw
     
+    // Record the answer
+    const answer = {
+      questionIndex: currentCase,
+      selectedAnswer: lawName,
+      correctAnswer: detectiveCases[currentCase].correctLaw,
+      isCorrect: isCorrect,
+      timeLeft: timeLeft
+    }
+    setUserAnswers([...userAnswers, answer])
+    
     if (isCorrect) {
       const timeBonus = Math.max(0, timeLeft * 2)
       const streakBonus = streak * 5
       const points = 100 + timeBonus + streakBonus
-      setScore(score + points)
+      setGameScore(gameScore + points)
+      setCorrectAnswers(correctAnswers + 1)
       setStreak(streak + 1)
       setGameState('correct')
     } else {
@@ -207,19 +237,55 @@ const LawDetectiveGame = ({ onComplete, onFinish }) => {
     setTimeLeft(15)
   }
 
+  // FIXED: Complete game function to match HistoricalAssessment pattern
   const completeGame = () => {
     setGameState('completed')
-    const correctAnswers = detectiveCases.filter((_, index) => index < currentCase + 1).length
-    const percentage = Math.round((score / (detectiveCases.length * 100)) * 100)
     
-    // Call onComplete with score data
+    // Calculate final score based on correct answers (not game points)
+    const finalScore = (correctAnswers / detectiveCases.length) * 100
+    
+    const assessmentData = {
+      percentage: Math.round(finalScore),
+      score: correctAnswers, // Number of correct answers
+      totalQuestions: detectiveCases.length,
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts,
+      gameScore: gameScore // Keep the game score for display
+    }
+
+    console.log(
+      "Assessment completed with score:",
+      correctAnswers,
+      "out of",
+      detectiveCases.length,
+      ":",
+      Math.round(finalScore) + "%"
+    )
+
     if (onComplete) {
-      onComplete(correctAnswers, detectiveCases.length, percentage)
+      onComplete(assessmentData)
+    }
+  }
+
+  // FIXED: Add finish function to match other assessments
+  const handleFinishAssessment = () => {
+    const finalScore = (correctAnswers / detectiveCases.length) * 100
+    
+    const assessmentData = {
+      percentage: Math.round(finalScore),
+      score: correctAnswers,
+      totalQuestions: detectiveCases.length,
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts,
+      gameScore: gameScore
     }
     
-    // Call onFinish to let AssessmentView handle completion
     if (onFinish) {
-      onFinish()
+      onFinish(assessmentData)
+    } else if (onComplete) {
+      onComplete(assessmentData)
     }
   }
 
@@ -231,7 +297,9 @@ const LawDetectiveGame = ({ onComplete, onFinish }) => {
 
   const resetGame = () => {
     setCurrentCase(0)
-    setScore(0)
+    setGameScore(0)
+    setCorrectAnswers(0)
+    setUserAnswers([])
     setStreak(0)
     setTimeLeft(15)
     setGameState('intro')
@@ -249,9 +317,174 @@ const LawDetectiveGame = ({ onComplete, onFinish }) => {
     }
   }
 
-  // Don't render anything when completed - let AssessmentView handle it
+  // FIXED: Show completion screen instead of returning null
   if (gameState === 'completed') {
-    return null
+    const finalScore = Math.round((correctAnswers / detectiveCases.length) * 100)
+    
+    return (
+      <div className="flex flex-col items-center space-y-6 text-center">
+        <div
+          className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+          style={{
+            background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})`,
+          }}
+        >
+          <span className="text-3xl">🎉</span>
+        </div>
+        <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
+          Mission Complete, Detective!
+        </h2>
+
+        <div
+          className="w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg"
+          style={{
+            background: `conic-gradient(${colors.emeraldz} ${
+              finalScore * 3.6
+            }deg, ${colors.offwhite} 0deg)`,
+            color: colors.emeraldz,
+          }}
+        >
+          <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center">
+            {finalScore}%
+          </div>
+        </div>
+
+        <p className="text-lg max-w-md" style={{ color: colors.grayz }}>
+          You've completed your Boolean Law Detective training!
+        </p>
+
+        <div
+          className="rounded-xl shadow-lg overflow-hidden w-full max-w-md"
+          style={{
+            background: `linear-gradient(135deg, ${colors.white}, ${colors.cyanz}10)`,
+          }}
+        >
+          <div className="p-6">
+            <h3
+              className="text-lg font-bold mb-4"
+              style={{ color: colors.indigoz }}
+            >
+              Detective Report:
+            </h3>
+            <div className="space-y-4">
+              <div
+                className="flex justify-between items-center p-3 rounded-lg"
+                style={{ backgroundColor: `${colors.skyz}10` }}
+              >
+                <span className="font-medium">Cases Solved:</span>
+                <span
+                  className="font-bold"
+                  style={{ color: colors.indigoz }}
+                >
+                  {correctAnswers} / {detectiveCases.length}
+                </span>
+              </div>
+              <div
+                className="flex justify-between items-center p-3 rounded-lg"
+                style={{ backgroundColor: `${colors.emeraldz}10` }}
+              >
+                <span className="font-medium">Accuracy Rate:</span>
+                <span
+                  className="font-bold"
+                  style={{ color: colors.emeraldz }}
+                >
+                  {finalScore}%
+                </span>
+              </div>
+              <div
+                className="flex justify-between items-center p-3 rounded-lg"
+                style={{ backgroundColor: `${colors.violetz}10` }}
+              >
+                <span className="font-medium">Game Score:</span>
+                <span
+                  className="font-bold"
+                  style={{ color: colors.violetz }}
+                >
+                  {gameScore} pts
+                </span>
+              </div>
+              <div
+                className="flex justify-between items-center p-3 rounded-lg"
+                style={{ backgroundColor: `${colors.ambez}10` }}
+              >
+                <span className="font-medium">Attempt:</span>
+                <span className="font-bold" style={{ color: colors.ambez }}>
+                  {currentAttempt} / {maxAttempts}
+                </span>
+              </div>
+            </div>
+
+            <div
+              className="mt-6 p-4 rounded-xl border-2"
+              style={{
+                backgroundColor:
+                  finalScore >= 80
+                    ? `${colors.emeraldz}10`
+                    : finalScore >= 60
+                    ? `${colors.cyanz}10`
+                    : `${colors.ambez}10`,
+                borderColor:
+                  finalScore >= 80
+                    ? colors.emeraldz
+                    : finalScore >= 60
+                    ? colors.cyanz
+                    : colors.ambez,
+                color:
+                  finalScore >= 80
+                    ? colors.emeraldz
+                    : finalScore >= 60
+                    ? colors.cyanz
+                    : colors.ambez,
+              }}
+            >
+              <p className="font-bold">
+                {finalScore >= 80
+                  ? "Excellent Detective Work! 🌟"
+                  : finalScore >= 60
+                  ? "Good Investigation! 👍"
+                  : "Keep Practicing! 📚"}
+              </p>
+              <p className="text-sm mt-1">
+                {finalScore >= 80
+                  ? "You've mastered Boolean law identification! Your detective skills are top-notch."
+                  : finalScore >= 60
+                  ? "You understand most Boolean laws. Review the trickier ones to perfect your skills."
+                  : "Boolean laws take practice to master. Try the cases again to strengthen your detective abilities."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4">
+          {attemptsRemaining > 1 && (
+            <button
+              onClick={resetGame}
+              className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all"
+              style={{
+                backgroundColor: "transparent",
+                color: colors.bluez,
+                border: `2px solid ${colors.bluez}`,
+              }}
+            >
+              <RotateCcw className="h-4 w-4" />
+              Try Again ({attemptsRemaining - 1} attempts left)
+            </button>
+          )}
+
+          <button
+            onClick={handleFinishAssessment}
+            className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all"
+            style={{
+              backgroundColor: colors.bluez,
+              color: colors.white,
+            }}
+          >
+            <Award className="h-4 w-4" />
+            Finish Assessment
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // Intro/Instructions Screen
@@ -270,6 +503,21 @@ const LawDetectiveGame = ({ onComplete, onFinish }) => {
           <h2 className="text-3xl font-bold mb-4" style={{ color: colors.grayz }}>
             Law Detective Training Academy
           </h2>
+          
+          {/* ADD: Show attempt information */}
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mb-6">
+            <p className="text-sm text-blue-700 mb-2">
+              📝 Attempt <strong>{currentAttempt}</strong> of{" "}
+              <strong>{maxAttempts}</strong>
+            </p>
+            <p className="text-xs text-blue-600">
+              {attemptsRemaining > 1
+                ? `You have ${
+                    attemptsRemaining - 1
+                  } attempts remaining after this one.`
+                : "This is your final attempt!"}
+            </p>
+          </div>
         </motion.div>
 
         <motion.div
@@ -333,11 +581,15 @@ const LawDetectiveGame = ({ onComplete, onFinish }) => {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Target className="h-5 w-5" style={{ color: colors.violetz }} />
-            <span className="font-bold" style={{ color: colors.violetz }}>Score: {score}</span>
+            <span className="font-bold" style={{ color: colors.violetz }}>Score: {gameScore}</span>
           </div>
           <div className="flex items-center gap-2">
             <Zap className="h-5 w-5" style={{ color: colors.ambez }} />
             <span className="font-bold" style={{ color: colors.ambez }}>Streak: {streak}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5" style={{ color: colors.emeraldz }} />
+            <span className="font-bold" style={{ color: colors.emeraldz }}>Correct: {correctAnswers}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -495,12 +747,26 @@ const LawDetectiveGame = ({ onComplete, onFinish }) => {
   )
 }
 
-export default function BooleanLawDetectiveGame({ onComplete, onFinish }) {
+export default function BooleanLawsAssessment({ 
+  onComplete, 
+  onFinish,
+  attemptsRemaining = 3,
+  currentAttempt = 1,
+  maxAttempts = 3,
+  studentAssessmentId
+}) {
   return (
     <div className="flex flex-col w-full max-w-4xl mx-auto pb-16 px-4 min-h-screen" 
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.cyanz}05)` }}>
       <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
-        <LawDetectiveGame onComplete={onComplete} onFinish={onFinish} />
+        <LawDetectiveGame 
+          onComplete={onComplete} 
+          onFinish={onFinish}
+          attemptsRemaining={attemptsRemaining}
+          currentAttempt={currentAttempt}
+          maxAttempts={maxAttempts}
+          studentAssessmentId={studentAssessmentId}
+        />
       </div>
     </div>
   )
