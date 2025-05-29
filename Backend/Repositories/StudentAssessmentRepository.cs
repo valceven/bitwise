@@ -100,6 +100,23 @@ namespace backend.Repositories
                 throw new Exception($"StudentAssessments with Classroom ID {classroomCode} not found.");
             }
             return studentAssessments;
-        } 
+        }
+
+        public async Task<List<StudentAssessment>> GetStudentAssessmentByClasscodeAsync(int assessmentId, string classCode)
+        {
+            var studentAssessments = await _context.StudentAssessments
+                .Include(sa => sa.StudentClassroom)
+                    .ThenInclude(sc => sc.Student)
+                        .ThenInclude(s => s.User)
+                .Where(sa => sa.AssessmentId == assessmentId && sa.StudentClassroom.ClassCode == classCode)
+                .ToListAsync();
+
+            if (studentAssessments == null || !studentAssessments.Any())
+            {
+                throw new Exception($"StudentAssessments with Assessment ID {assessmentId} and Class Code {classCode} not found.");
+            }
+
+            return studentAssessments;
+        }
     }
 }

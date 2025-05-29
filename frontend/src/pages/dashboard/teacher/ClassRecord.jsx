@@ -100,7 +100,7 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
   };
 
   // Get max score for progress bar scaling
-  const maxScore = Math.max(...rankingData.map(student => student.totalScore), 100);
+  const maxScore = 900;
 
   return (
     <div className="bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden">

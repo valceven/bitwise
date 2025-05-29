@@ -11,6 +11,6 @@ namespace backend.Services.Interfaces
         Task<bool> ViewStudentAssessment(int studentAssessmentId);
         Task<ICollection<StudentAssessment>> GetStudentAssessmentByAssessmentId(int AssessmentId);
         Task<StudentAssessment> GetStudentAssessmentByStudentId(int StudentId);
-
+        Task<List<ReturnStudentAssessmentLeaderboardDto>> GetStudentAssessmentByClasscodeAsync(GetStudentAssessmentLeaderboardDto getStudAssLead);
     }
 }

@@ -58,6 +58,31 @@ namespace backend.Services
         {
             return await _studentAssessmentRepository.GetStudentAssessmentsByStudentId(StudentId);
         }
-          
+        
+        public async Task<List<ReturnStudentAssessmentLeaderboardDto>> GetStudentAssessmentByClasscodeAsync(GetStudentAssessmentLeaderboardDto getStudAssLead)
+        {
+            int assessmentId = getStudAssLead.AssessmentId;
+            string classCode = getStudAssLead.ClassCode;
+
+            var studentAssessments = await _studentAssessmentRepository.GetStudentAssessmentByClasscodeAsync(assessmentId, classCode);
+
+            if (studentAssessments == null || !studentAssessments.Any())
+            {
+                throw new Exception($"No student assessments found for Assessment ID {assessmentId} and Class Code {classCode}.");
+            }
+
+            var leaderboard = studentAssessments
+                .OrderByDescending(sa => sa.Score)
+                .Select((sa, index) => new ReturnStudentAssessmentLeaderboardDto
+                {
+                    Rank = index + 1,
+                    StudentName = sa.StudentClassroom.Student.User.Name,
+                    Score = sa.Score,
+                    IsCompleted = sa.IsCompleted
+                })
+                .ToList();
+
+            return leaderboard;
+        }
     }  
 }

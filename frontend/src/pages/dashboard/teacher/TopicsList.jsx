@@ -169,43 +169,7 @@ export const TopicsList = ({ topics, lessonId, onBack }) => {
                             <FileText size={16} className="text-purplez" />
                           </div>
                         </div>
-                        
-                        {/* Average Score with visual gauge */}
-                        <div className="mb-4">
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="text-gray-600">Average Score</span>
-                            <div className="flex items-center">
-                              <Award size={16} className="mr-1 text-yellow-500" />
-                              <span className="font-medium text-grayz">{assessment.averageScore}%</span>
-                            </div>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className={`h-2 rounded-full ${
-                                assessment.averageScore >= 80 ? "bg-greenz" :
-                                assessment.averageScore >= 70 ? "bg-yellowz" : "bg-redz"
-                              }`}
-                              style={{ width: `${assessment.averageScore}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        
-                        {/* Completion Rate */}
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="text-gray-600">Completion</span>
-                            <div className="flex items-center">
-                              <CheckCircle size={16} className="mr-1 text-bluez" />
-                              <span className="font-medium text-grayz">{assessment.completionRate}%</span>
-                            </div>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-purplez h-2 rounded-full" 
-                              style={{ width: `${assessment.completionRate}%` }}
-                            ></div>
-                          </div>
-                        </div>
+
                         
                         {/* View Details button */}
                         <div className="mt-4 text-center">

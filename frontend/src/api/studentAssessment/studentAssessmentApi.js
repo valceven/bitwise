@@ -29,7 +29,6 @@ const getStudentAssessments = async (studentId) => {
 
 const finishAssessment = async (data) => {
     try {
-        console.log("MRSSS", data);
         const response = await apiService.put("student-assessment/complete-student-assessment", data);
         return response.data;
     } catch (error) {
@@ -38,8 +37,19 @@ const finishAssessment = async (data) => {
     }
 }
 
+const fetchStudentAssessmentsLeaderboard = async (data) => {
+    try {
+        const response = await apiService.post("student-assessment/get-student-assessment-by-classcode", data);
+        return response.data;
+    } catch (error) {
+        console.error("Error occured while getting student assessments leaderboard", error.message);
+        throw error.response?.data || error.message || "Error fetching student assessments leaderboard";
+    }
+}
+
 export const studentAssessmentApi = {
     enterAssessment,
     getStudentAssessments,
-    finishAssessment
+    finishAssessment,
+    fetchStudentAssessmentsLeaderboard
 };
