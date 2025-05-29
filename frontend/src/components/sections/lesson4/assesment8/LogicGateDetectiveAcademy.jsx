@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle, XCircle, ChevronLeft, ChevronRight, Clock, Award, BookOpen, ArrowRight, Info, Zap, Target, Timer, Star, RotateCcw, Play, Settings, Search, Lightbulb, Cpu, AlertTriangle, Shield, Calculator, Home } from "lucide-react"
 
-// Enhanced color palette (same as previous)
+// Enhanced color palette
 const colors = {
   greenz: "#27AE60",
   darkpurple: "#9B51E0",
@@ -30,7 +30,7 @@ const colors = {
   skyz: "#0EA5E9"
 }
 
-// Typewriter Component (same as previous)
+// Typewriter Component
 const Typewriter = ({ text, delay = 50, className = "", onComplete }) => {
   const [displayText, setDisplayText] = useState("")
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -172,10 +172,17 @@ const TruthTable = ({ inputs, output, title = "Truth Table" }) => {
 }
 
 // Logic Gate Detective Game Component
-const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
+const LogicGateDetectiveGame = ({ 
+  onComplete,
+  onFinish,
+  attemptsRemaining = 3, 
+  currentAttempt = 1, 
+  maxAttempts = 3, 
+  studentAssessmentId 
+}) => {
   const [currentCase, setCurrentCase] = useState(0)
   const [score, setScore] = useState(0)
-  const [casesolved, setCasesSolved] = useState(0)
+  const [casesSolved, setCasesSolved] = useState(0)
   const [gameState, setGameState] = useState('intro') // intro, playing, case_solved, completed
   const [selectedAnswer, setSelectedAnswer] = useState(null)
   const [showFeedback, setShowFeedback] = useState(false)
@@ -183,7 +190,9 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
   const [instructionStep, setInstructionStep] = useState(0)
   const [showHint, setShowHint] = useState(false)
   const [hintsUsed, setHintsUsed] = useState(0)
-  const [droppedGates, setDroppedGates] = useState({})
+  const [userAnswers, setUserAnswers] = useState([])
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [multiQuestionAnswers, setMultiQuestionAnswers] = useState({})
 
   // Instructions for the game
   const instructions = [
@@ -303,17 +312,37 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
       id: 5,
       title: "The Universal Gate Challenge",
       difficulty: "Senior Detective",
-      scenario: "A manufacturing plant only has NAND gates available. They need to create a NOT gate function. Can you identify what configuration works?",
+      scenario: "A manufacturing plant only has NAND gates available. They need to create a NOT gate function using only NAND gates. Which configuration creates an inverter?",
       caseType: "circuit_building",
       device: "🏭 Manufacturing Logic Controller",
       challenge: "Build a NOT gate using only NAND gates",
-      availableGates: ["NAND", "NAND", "NAND"],
-      targetTruthTable: {
+      truthTable: {
         inputs: [{ "A": 0 }, { "A": 1 }],
         output: [1, 0]
       },
-      correctCircuit: ["Connect input A to both inputs of a NAND gate"],
-      hint: "Remember: A NAND A = NOT A. Connect the same input to both NAND inputs!",
+      options: [
+        { 
+          gate: "Single NAND with both inputs connected to A", 
+          isCorrect: true, 
+          explanation: "Correct! When both inputs of a NAND gate receive the same signal A, it outputs NOT A. NAND(A,A) = NOT(A AND A) = NOT A" 
+        },
+        { 
+          gate: "Two NAND gates in series", 
+          isCorrect: false, 
+          explanation: "Two NANDs in series would create a buffer (A → NOT A → A), not an inverter." 
+        },
+        { 
+          gate: "NAND gate with one input grounded", 
+          isCorrect: false, 
+          explanation: "With one input at 0, NAND always outputs 1 regardless of the other input - not useful as an inverter." 
+        },
+        { 
+          gate: "Parallel NAND gates", 
+          isCorrect: false, 
+          explanation: "Parallel connections don't change the logic function - still need the input connected to both terminals of a single NAND." 
+        }
+      ],
+      hint: "Remember: A NAND A = NOT A. What happens when you connect the same input to both terminals of a NAND gate?",
       points: 300
     },
 
@@ -321,7 +350,7 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
       id: 6,
       title: "The Calculator Crisis - Half Adder",
       difficulty: "Senior Detective", 
-      scenario: "A calculator's binary adder is broken. You need to build a half-adder that adds two bits and produces Sum and Carry outputs.",
+      scenario: "A calculator's binary adder is broken. You need to identify the correct gates for a half-adder that adds two bits and produces Sum and Carry outputs.",
       caseType: "circuit_analysis",
       device: "🧮 Digital Calculator",
       circuitDescription: "Two inputs A and B. Sum = A XOR B, Carry = A AND B",
@@ -337,22 +366,26 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
       },
       questions: [
         {
-          question: "What gate produces the Sum output?",
+          question: "What gate produces the Sum output (0+0=0, 0+1=1, 1+0=1, 1+1=0)?",
           options: ["XOR", "AND", "OR", "NAND"],
           correct: 0,
-          explanation: "XOR gives 1 when inputs are different - perfect for binary addition sum!"
+          explanation: "XOR gives 1 when inputs are different - perfect for binary addition sum! It handles the case where 1+1=10 (sum=0, carry=1)."
         },
         {
-          question: "What gate produces the Carry output?", 
+          question: "What gate produces the Carry output (only 1 when both inputs are 1)?", 
           options: ["OR", "AND", "XOR", "NOT"],
           correct: 1,
-          explanation: "AND gives 1 only when both inputs are 1 - exactly when we need a carry bit!"
+          explanation: "AND gives 1 only when both inputs are 1 - exactly when we need a carry bit in binary addition!"
         }
       ],
-      hint: "Think about binary addition: 1+1=10 (sum=0, carry=1). Which gates match this behavior?",
+      hint: "Think about binary addition: 0+1=1 (sum=1, carry=0), but 1+1=10 (sum=0, carry=1). Which gates match this behavior?",
       points: 350
     }
   ]
+
+  // Calculate totals
+  const totalQuestions = detectiveCases.length
+  const totalPossiblePoints = detectiveCases.reduce((sum, case_) => sum + case_.points, 0)
 
   const startGame = () => {
     setGameState('playing')
@@ -369,26 +402,61 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
 
   const selectAnswer = (answerIndex) => {
     if (showFeedback) return
+    console.log('Selecting answer:', answerIndex, 'for case:', currentCase + 1)
     setSelectedAnswer(answerIndex)
   }
 
-  const submitAnswer = () => {
-    if (selectedAnswer === null) return
+  const selectMultiQuestionAnswer = (questionIndex, answerIndex) => {
+    if (showFeedback) return
+    console.log('Multi-question answer:', questionIndex, answerIndex)
+    setMultiQuestionAnswers({
+      ...multiQuestionAnswers,
+      [questionIndex]: answerIndex
+    })
+  }
 
+  const submitAnswer = () => {
     const currentProblem = detectiveCases[currentCase]
-    let isCorrect = false
+    let isCorrect = false 
+    let explanation = ""
     
-    if (currentProblem.caseType === 'gate_identification') {
-      isCorrect = currentProblem.options[selectedAnswer].isCorrect
+    if (currentProblem.caseType === 'gate_identification' || currentProblem.caseType === 'circuit_building') {
+      if (selectedAnswer !== null) {
+        isCorrect = currentProblem.options[selectedAnswer].isCorrect
+        explanation = currentProblem.options[selectedAnswer].explanation
+      }
     } else if (currentProblem.caseType === 'circuit_analysis') {
-      // Handle multi-question cases - simplified for this example
-      isCorrect = true
+      // Check all questions are answered
+      const allQuestionsAnswered = currentProblem.questions.every((_, idx) => 
+        multiQuestionAnswers.hasOwnProperty(idx)
+      )
+      
+      if (allQuestionsAnswered) {
+        // Check if all answers are correct
+        isCorrect = currentProblem.questions.every((question, idx) => 
+          multiQuestionAnswers[idx] === question.correct
+        )
+        explanation = isCorrect ? "All correct! Great understanding of half-adder logic." : "Some answers were incorrect. Review binary addition logic."
+      }
     }
     
+    // Record the answer
+    const answerData = {
+      questionIndex: currentCase,
+      selectedAnswer: selectedAnswer,
+      multiQuestionAnswers: multiQuestionAnswers,
+      isCorrect: isCorrect,
+      hintsUsed: hintsUsed,
+      caseDifficulty: currentProblem.difficulty,
+      caseTitle: currentProblem.title,
+      pointsEarned: isCorrect ? Math.max(50, currentProblem.points - (hintsUsed * 25)) : 0
+    }
+    setUserAnswers([...userAnswers, answerData])
+    
     if (isCorrect) {
-      const points = currentProblem.points - (hintsUsed * 25)
-      setScore(score + Math.max(50, points))
-      setCasesSolved(casesolved + 1)
+      const points = Math.max(50, currentProblem.points - (hintsUsed * 25))
+      setScore(score + points)
+      setCasesSolved(casesSolved + 1)
       setGameState('case_solved')
     }
     
@@ -404,27 +472,19 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
   }
 
   const nextCase = () => {
+    console.log(`Moving from case ${currentCase + 1} to case ${currentCase + 2}`)
     setCurrentCase(currentCase + 1)
     setSelectedAnswer(null)
+    setMultiQuestionAnswers({})
     setShowFeedback(false)
     setGameState('playing')
     setShowHint(false)
     setHintsUsed(0)
+    setCurrentQuestionIndex(0)
   }
 
   const completeGame = () => {
     setGameState('completed')
-    const percentage = Math.round((casesolved / detectiveCases.length) * 100)
-    
-    // Call onComplete with score data
-    if (onComplete) {
-      onComplete(casesolved, detectiveCases.length, percentage)
-    }
-    
-    // Call onFinish to let AssessmentView handle completion
-    if (onFinish) {
-      onFinish()
-    }
   }
 
   const resetGame = () => {
@@ -435,10 +495,12 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
     setShowInstructions(true)
     setInstructionStep(0)
     setSelectedAnswer(null)
+    setMultiQuestionAnswers({})
     setShowFeedback(false)
     setShowHint(false)
     setHintsUsed(0)
-    setDroppedGates({})
+    setUserAnswers([])
+    setCurrentQuestionIndex(0)
   }
 
   const showHintHandler = () => {
@@ -446,9 +508,24 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
     setHintsUsed(hintsUsed + 1)
   }
 
-  // Don't render anything when completed - let AssessmentView handle it
-  if (gameState === 'completed') {
-    return null
+  const handleFinish = () => {
+    const finalScore = Math.round((score / totalPossiblePoints) * 100)
+    const assessmentData = {
+      percentage: finalScore,
+      score: score,
+      totalQuestions: totalQuestions,
+      totalPossiblePoints: totalPossiblePoints,
+      casesSolved: casesSolved,
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts
+    }
+    
+    if (onFinish) {
+      onFinish(assessmentData)
+    } else if (onComplete) {
+      onComplete(assessmentData)
+    }
   }
 
   // Intro/Instructions Screen
@@ -484,6 +561,18 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
             />
           </div>
         </motion.div>
+
+        {/* Show attempt information */}
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-700 mb-2">
+            📝 Attempt <strong>{currentAttempt}</strong> of <strong>{maxAttempts}</strong>
+          </p>
+          <p className="text-xs text-blue-600">
+            {attemptsRemaining > 1
+              ? `You have ${attemptsRemaining - 1} attempts remaining after this one.`
+              : "This is your final attempt!"}
+          </p>
+        </div>
 
         <div className="flex justify-between items-center">
           <div className="flex space-x-2">
@@ -542,6 +631,145 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
     )
   }
 
+  // Completion Screen (Fixed - now shows proper results)
+  if (gameState === 'completed') {
+    const accuracy = Math.round((casesSolved / detectiveCases.length) * 100)
+    const finalScore = Math.round((score / totalPossiblePoints) * 100)
+    
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center space-y-6"
+      >
+        <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center"
+             style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.cyanz})` }}>
+          <Award className="h-12 w-12 text-white" />
+        </div>
+        
+        <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
+          Logic Gate Detective Mission Complete! 🎉
+        </h2>
+        
+        {/* Score Circle */}
+        <div
+          className="w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg mx-auto"
+          style={{
+            background: `conic-gradient(${colors.violetz} ${finalScore * 3.6}deg, ${colors.offwhite} 0deg)`,
+            color: colors.violetz,
+          }}
+        >
+          <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center">
+            {finalScore}%
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.violetz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.violetz }}>{finalScore}%</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Final Score</div>
+          </div>
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.ambez}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.ambez }}>{score}</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Points Earned</div>
+          </div>
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.emeraldz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.emeraldz }}>{casesSolved}</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Cases Solved</div>
+          </div>
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.cyanz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.cyanz }}>{accuracy}%</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Success Rate</div>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-xl" 
+             style={{ backgroundColor: finalScore >= 80 ? `${colors.emeraldz}10` : finalScore >= 60 ? `${colors.cyanz}10` : `${colors.ambez}10` }}>
+          <h3 className="font-bold text-lg mb-2" 
+              style={{ color: finalScore >= 80 ? colors.emeraldz : finalScore >= 60 ? colors.cyanz : colors.ambez }}>
+            {finalScore >= 80 ? "Master Logic Detective! ⚡" :
+             finalScore >= 60 ? "Expert Circuit Analyst! 🔌" :
+             finalScore >= 40 ? "Good Logic Investigator! 👍" : "Rookie Gate Detective! 📚"}
+          </h3>
+          <p className="text-sm" style={{ color: colors.grayz }}>
+            {finalScore >= 80 ? "Outstanding! You've mastered digital logic gates and circuit analysis with exceptional skill." :
+             finalScore >= 60 ? "Excellent work! You demonstrate strong understanding of logic gates and their applications." :
+             finalScore >= 40 ? "Well done! You're developing solid skills in digital logic and circuit analysis." :
+             "Good effort! Keep practicing to improve your logic gate identification and circuit understanding."}
+          </p>
+        </div>
+
+        {/* Results Summary */}
+        <div className="rounded-xl shadow-lg overflow-hidden w-full max-w-md mx-auto"
+             style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.cyanz}10)` }}>
+          <div className="p-6">
+            <h3 className="text-lg font-bold mb-4" style={{ color: colors.indigoz }}>
+              Your Results:
+            </h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.skyz}10` }}>
+                <span className="font-medium">Cases Investigated:</span>
+                <span className="font-bold" style={{ color: colors.indigoz }}>
+                  {totalQuestions} / {totalQuestions}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.emeraldz}10` }}>
+                <span className="font-medium">Cases Solved:</span>
+                <span className="font-bold" style={{ color: colors.emeraldz }}>
+                  {casesSolved} / {totalQuestions}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.violetz}10` }}>
+                <span className="font-medium">Final Score:</span>
+                <span className="font-bold text-xl" style={{ color: colors.violetz }}>
+                  {finalScore}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.ambez}10` }}>
+                <span className="font-medium">Attempt:</span>
+                <span className="font-bold" style={{ color: colors.ambez }}>
+                  {currentAttempt} / {maxAttempts}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Only show restart if attempts remaining */}
+          {attemptsRemaining > 1 && (
+            <motion.button
+              onClick={resetGame}
+              className="px-6 py-3 rounded-lg font-medium transition-all"
+              style={{ backgroundColor: colors.cyanz, color: colors.white }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <RotateCcw className="h-4 w-4 mr-2 inline" />
+              🔄 Try Again ({attemptsRemaining - 1} attempts left)
+            </motion.button>
+          )}
+          
+          {/* Finish Assessment Button */}
+          <motion.button
+            onClick={handleFinish}
+            className="px-6 py-3 rounded-lg font-medium transition-all"
+            style={{ backgroundColor: colors.emeraldz, color: colors.white }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Award className="h-4 w-4 mr-2 inline" />
+            Finish Assessment
+          </motion.button>
+        </div>
+      </motion.div>
+    )
+  }
+
   const currentProblem = detectiveCases[currentCase]
   
   return (
@@ -560,7 +788,7 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
           </div>
           <div className="flex items-center gap-2">
             <Settings className="h-5 w-5" style={{ color: colors.emeraldz }} />
-            <span className="font-bold" style={{ color: colors.emeraldz }}>Solved: {casesolved}</span>
+            <span className="font-bold" style={{ color: colors.emeraldz }}>Solved: {casesSolved}</span>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -663,8 +891,8 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
         )}
       </motion.div>
 
-      {/* Answer Options */}
-      {currentProblem.caseType === 'gate_identification' && (
+      {/* Answer Options - Gate Identification & Circuit Building */}
+      {(currentProblem.caseType === 'gate_identification' || currentProblem.caseType === 'circuit_building') && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -672,10 +900,10 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
           className="space-y-4"
         >
           <h4 className="text-lg font-bold text-center" style={{ color: colors.grayz }}>
-            🔧 Which Logic Gate Is Responsible?
+            🔧 {currentProblem.caseType === 'circuit_building' ? 'Choose the Correct Configuration:' : 'Which Logic Gate Is Responsible?'}
           </h4>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {currentProblem.options.map((option, idx) => {
               const isSelected = selectedAnswer === idx
               const isCorrectAnswer = showFeedback && option.isCorrect
@@ -686,7 +914,7 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
                   key={idx}
                   onClick={() => selectAnswer(idx)}
                   disabled={showFeedback}
-                  className="p-6 rounded-xl border-2 transition-all transform hover:scale-102 text-center"
+                  className="p-6 rounded-xl border-2 transition-all transform text-center"
                   style={{
                     backgroundColor: isCorrectAnswer ? `${colors.emeraldz}20` : 
                                    isWrongAnswer ? `${colors.coralz}20` :
@@ -703,9 +931,11 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
                   transition={{ delay: 0.7 + idx * 0.1 }}
                 >
                   <div className="flex flex-col items-center space-y-3">
-                    <LogicGateSymbol gateType={option.gate} className="w-20 h-16" />
+                    {currentProblem.caseType === 'gate_identification' && (
+                      <LogicGateSymbol gateType={option.gate} className="w-20 h-16" />
+                    )}
                     <span className="font-bold text-lg" style={{ color: colors.grayz }}>
-                      {option.gate} Gate
+                      {currentProblem.caseType === 'gate_identification' ? `${option.gate} Gate` : option.gate}
                     </span>
                     {isCorrectAnswer && <CheckCircle className="h-6 w-6" style={{ color: colors.emeraldz }} />}
                     {isWrongAnswer && <XCircle className="h-6 w-6" style={{ color: colors.coralz }} />}
@@ -726,7 +956,7 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
         </motion.div>
       )}
 
-      {/* Circuit Analysis Questions */}
+      {/* Circuit Analysis Questions (Multi-Question) */}
       {currentProblem.caseType === 'circuit_analysis' && currentProblem.questions && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -734,35 +964,64 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
           transition={{ delay: 0.6 }}
           className="space-y-6"
         >
+          <h4 className="text-lg font-bold text-center" style={{ color: colors.grayz }}>
+            🔧 Circuit Analysis Questions:
+          </h4>
+          
           {currentProblem.questions.map((question, qIdx) => (
             <div key={qIdx} className="p-6 rounded-xl" 
                  style={{ backgroundColor: `${colors.cyanz}10` }}>
               <h4 className="font-bold mb-4" style={{ color: colors.cyanz }}>
                 Question {qIdx + 1}: {question.question}
               </h4>
-              <div className="grid grid-cols-2 gap-3">
-                {question.options.map((option, oIdx) => (
-                  <button
-                    key={oIdx}
-                    onClick={() => selectAnswer(qIdx * 10 + oIdx)} // Simple encoding
-                    className="p-3 rounded-lg border transition-all"
-                    style={{
-                      backgroundColor: selectedAnswer === qIdx * 10 + oIdx ? `${colors.violetz}20` : colors.white,
-                      borderColor: selectedAnswer === qIdx * 10 + oIdx ? colors.violetz : colors.grayz
-                    }}
-                  >
-                    <LogicGateSymbol gateType={option} className="w-16 h-12 mx-auto mb-2" />
-                    <div className="font-bold" style={{ color: colors.grayz }}>{option}</div>
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {question.options.map((option, oIdx) => {
+                  const isSelected = multiQuestionAnswers[qIdx] === oIdx
+                  const isCorrectAnswer = showFeedback && oIdx === question.correct
+                  const isWrongAnswer = showFeedback && multiQuestionAnswers[qIdx] === oIdx && oIdx !== question.correct
+                  
+                  return (
+                    <button
+                      key={oIdx}
+                      onClick={() => selectMultiQuestionAnswer(qIdx, oIdx)}
+                      disabled={showFeedback}
+                      className="p-3 rounded-lg border-2 transition-all"
+                      style={{
+                        backgroundColor: isCorrectAnswer ? `${colors.emeraldz}20` :
+                                       isWrongAnswer ? `${colors.coralz}20` :
+                                       isSelected ? `${colors.violetz}20` : colors.white,
+                        borderColor: isCorrectAnswer ? colors.emeraldz :
+                                   isWrongAnswer ? colors.coralz :
+                                   isSelected ? colors.violetz : colors.grayz
+                      }}
+                    >
+                      <LogicGateSymbol gateType={option} className="w-16 h-12 mx-auto mb-2" />
+                      <div className="font-bold" style={{ color: colors.grayz }}>{option}</div>
+                      {isCorrectAnswer && <CheckCircle className="h-4 w-4 mx-auto mt-1" style={{ color: colors.emeraldz }} />}
+                      {isWrongAnswer && <XCircle className="h-4 w-4 mx-auto mt-1" style={{ color: colors.coralz }} />}
+                    </button>
+                  )
+                })}
               </div>
+              
+              {showFeedback && (
+                <div className="mt-4 p-3 rounded-lg" 
+                     style={{ backgroundColor: `${colors.white}80` }}>
+                  <p className="text-sm" style={{ color: colors.grayz }}>
+                    {question.explanation}
+                  </p>
+                </div>
+              )}
             </div>
           ))}
         </motion.div>
       )}
 
       {/* Submit Button */}
-      {selectedAnswer !== null && !showFeedback && (
+      {((selectedAnswer !== null && (currentProblem.caseType === 'gate_identification' || currentProblem.caseType === 'circuit_building')) ||
+        (currentProblem.caseType === 'circuit_analysis' && 
+         currentProblem.questions.every((_, idx) => multiQuestionAnswers.hasOwnProperty(idx)))) && 
+       !showFeedback && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -801,12 +1060,26 @@ const LogicGateDetectiveGame = ({ onComplete, onFinish }) => {
   )
 }
 
-export default function LogicGateDetectiveAcademy({ onComplete, onFinish }) {
+export default function LogicGateDetectiveAcademy({ 
+  onComplete,
+  onFinish,
+  attemptsRemaining = 3, 
+  currentAttempt = 1, 
+  maxAttempts = 3, 
+  studentAssessmentId 
+}) {
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto pb-16 px-4 min-h-screen" 
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.violetz}05)` }}>
       <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
-        <LogicGateDetectiveGame onComplete={onComplete} onFinish={onFinish} />
+        <LogicGateDetectiveGame 
+          onComplete={onComplete}
+          onFinish={onFinish}
+          attemptsRemaining={attemptsRemaining}
+          currentAttempt={currentAttempt}
+          maxAttempts={maxAttempts}
+          studentAssessmentId={studentAssessmentId}
+        />
       </div>
     </div>
   )

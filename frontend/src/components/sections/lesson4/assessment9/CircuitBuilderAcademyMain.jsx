@@ -394,7 +394,14 @@ const TruthTable = ({ inputs, expectedOutput, actualOutput, title = "Truth Table
 }
 
 // Circuit Builder Academy Component
-const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
+const CircuitBuilderAcademy = ({ 
+  onComplete, 
+  onFinish,
+  attemptsRemaining = 3, 
+  currentAttempt = 1, 
+  maxAttempts = 3, 
+  studentAssessmentId 
+}) => {
   const [currentCase, setCurrentCase] = useState(0)
   const [score, setScore] = useState(0)
   const [circuitsBuilt, setCircuitsBuilt] = useState(0)
@@ -403,6 +410,8 @@ const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
   const [instructionStep, setInstructionStep] = useState(0)
   const [showHint, setShowHint] = useState(false)
   const [hintsUsed, setHintsUsed] = useState(0)
+  const [userAnswers, setUserAnswers] = useState([])
+  const [isCompleted, setIsCompleted] = useState(false)
   
   // Circuit building state
   const [gates, setGates] = useState([])
@@ -571,6 +580,10 @@ const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
       description: "Connect B and C to an AND gate, then connect A and the AND gate output to an OR gate, with the OR output going to Y."
     }
   ]
+
+  // Calculate totals
+  const totalQuestions = architectCases.length
+  const totalPossiblePoints = architectCases.reduce((sum, case_) => sum + case_.points, 0)
 
   // Initialize gates for current case
   useEffect(() => {
@@ -880,9 +893,24 @@ const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
     // Also check if there are any circuit errors
     const hasErrors = circuitErrors.length > 0
     
+    // Record the answer
+    const answerData = {
+      questionIndex: currentCase,
+      isCorrect: isCorrect && !hasErrors,
+      hintsUsed: hintsUsed,
+      caseDifficulty: currentProblem.difficulty,
+      caseTitle: currentProblem.title,
+      circuitCorrect: isCorrect,
+      circuitErrors: [...circuitErrors],
+      actualOutput: [...results],
+      expectedOutput: [...currentProblem.truthTable.output],
+      pointsEarned: (isCorrect && !hasErrors) ? Math.max(100, currentProblem.points - (hintsUsed * 25)) : 0
+    }
+    setUserAnswers([...userAnswers, answerData])
+    
     if (isCorrect && !hasErrors) {
-      const points = currentProblem.points - (hintsUsed * 25)
-      setScore(score + Math.max(100, points))
+      const points = Math.max(100, currentProblem.points - (hintsUsed * 25))
+      setScore(score + points)
       setCircuitsBuilt(circuitsBuilt + 1)
       setGameState('case_solved')
       
@@ -915,16 +943,26 @@ const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
 
   const completeGame = () => {
     setGameState('completed')
-    const percentage = Math.round((circuitsBuilt / architectCases.length) * 100)
-    
-    // Call onComplete with score data
-    if (onComplete) {
-      onComplete(circuitsBuilt, architectCases.length, percentage)
+    setIsCompleted(true)
+  }
+
+  const handleFinish = () => {
+    const finalScore = Math.round((score / totalPossiblePoints) * 100)
+    const assessmentData = {
+      percentage: finalScore,
+      score: score,
+      totalQuestions: totalQuestions,
+      totalPossiblePoints: totalPossiblePoints,
+      circuitsBuilt: circuitsBuilt,
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts
     }
     
-    // Call onFinish to let AssessmentView handle completion
     if (onFinish) {
-      onFinish()
+      onFinish(assessmentData)
+    } else if (onComplete) {
+      onComplete(assessmentData)
     }
   }
 
@@ -937,6 +975,8 @@ const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
     setInstructionStep(0)
     setShowHint(false)
     setHintsUsed(0)
+    setUserAnswers([])
+    setIsCompleted(false)
     setGates([])
     setConnections([])
     setActualOutput([])
@@ -951,9 +991,143 @@ const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
     setHintsUsed(hintsUsed + 1)
   }
 
-  // Don't render anything when completed - let AssessmentView handle it
+  // Completion Screen (Fixed - now shows proper results)
   if (gameState === 'completed') {
-    return null
+    const accuracy = Math.round((circuitsBuilt / architectCases.length) * 100)
+    const finalScore = Math.round((score / totalPossiblePoints) * 100)
+    
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center space-y-6"
+      >
+        <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center"
+             style={{ background: `linear-gradient(135deg, ${colors.emeraldz}, ${colors.tealz})` }}>
+          <Award className="h-12 w-12 text-white" />
+        </div>
+        
+        <h2 className="text-3xl font-bold" style={{ color: colors.grayz }}>
+          Circuit Architect Mission Complete! 🎉
+        </h2>
+        
+        {/* Score Circle */}
+        <div
+          className="w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg mx-auto"
+          style={{
+            background: `conic-gradient(${colors.indigoz} ${finalScore * 3.6}deg, ${colors.offwhite} 0deg)`,
+            color: colors.indigoz,
+          }}
+        >
+          <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center">
+            {finalScore}%
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.indigoz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.indigoz }}>{finalScore}%</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Final Score</div>
+          </div>
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.ambez}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.ambez }}>{score}</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Points Earned</div>
+          </div>
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.emeraldz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.emeraldz }}>{circuitsBuilt}</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Circuits Built</div>
+          </div>
+          <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.tealz}20` }}>
+            <div className="text-2xl font-bold" style={{ color: colors.tealz }}>{accuracy}%</div>
+            <div className="text-sm" style={{ color: colors.grayz }}>Success Rate</div>
+          </div>
+        </div>
+
+        <div className="p-6 rounded-xl" 
+             style={{ backgroundColor: finalScore >= 80 ? `${colors.emeraldz}10` : finalScore >= 60 ? `${colors.tealz}10` : `${colors.ambez}10` }}>
+          <h3 className="font-bold text-lg mb-2" 
+              style={{ color: finalScore >= 80 ? colors.emeraldz : finalScore >= 60 ? colors.tealz : colors.ambez }}>
+            {finalScore >= 80 ? "Master Circuit Architect! 🏗️" :
+             finalScore >= 60 ? "Expert Digital Designer! ⚡" :
+             finalScore >= 40 ? "Good Circuit Builder! 👍" : "Apprentice Engineer! 📚"}
+          </h3>
+          <p className="text-sm" style={{ color: colors.grayz }}>
+            {finalScore >= 80 ? "Outstanding! You've mastered digital circuit design and Boolean logic implementation." :
+             finalScore >= 60 ? "Excellent work! You show strong skills in circuit building and logic gate connections." :
+             finalScore >= 40 ? "Well done! You're developing solid circuit design skills and Boolean understanding." :
+             "Good effort! Keep practicing to improve your circuit building and Boolean logic skills."}
+          </p>
+        </div>
+
+        {/* Results Summary */}
+        <div className="rounded-xl shadow-lg overflow-hidden w-full max-w-md mx-auto"
+             style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.tealz}10)` }}>
+          <div className="p-6">
+            <h3 className="text-lg font-bold mb-4" style={{ color: colors.indigoz }}>
+              Your Results:
+            </h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.skyz}10` }}>
+                <span className="font-medium">Circuits Designed:</span>
+                <span className="font-bold" style={{ color: colors.indigoz }}>
+                  {totalQuestions} / {totalQuestions}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.emeraldz}10` }}>
+                <span className="font-medium">Successfully Built:</span>
+                <span className="font-bold" style={{ color: colors.emeraldz }}>
+                  {circuitsBuilt} / {totalQuestions}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.indigoz}10` }}>
+                <span className="font-medium">Final Score:</span>
+                <span className="font-bold text-xl" style={{ color: colors.indigoz }}>
+                  {finalScore}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.ambez}10` }}>
+                <span className="font-medium">Attempt:</span>
+                <span className="font-bold" style={{ color: colors.ambez }}>
+                  {currentAttempt} / {maxAttempts}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Only show restart if attempts remaining */}
+          {attemptsRemaining > 1 && (
+            <motion.button
+              onClick={resetGame}
+              className="px-6 py-3 rounded-lg font-medium transition-all"
+              style={{ backgroundColor: colors.tealz, color: colors.white }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <RotateCcw className="h-4 w-4 mr-2 inline" />
+              🔄 Try Again ({attemptsRemaining - 1} attempts left)
+            </motion.button>
+          )}
+          
+          {/* Finish Assessment Button */}
+          <motion.button
+            onClick={handleFinish}
+            className="px-6 py-3 rounded-lg font-medium transition-all"
+            style={{ backgroundColor: colors.emeraldz, color: colors.white }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Award className="h-4 w-4 mr-2 inline" />
+            Finish Assessment
+          </motion.button>
+        </div>
+      </motion.div>
+    )
   }
 
   // Intro/Instructions Screen
@@ -989,6 +1163,18 @@ const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
             />
           </div>
         </motion.div>
+
+        {/* Show attempt information */}
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-700 mb-2">
+            📝 Attempt <strong>{currentAttempt}</strong> of <strong>{maxAttempts}</strong>
+          </p>
+          <p className="text-xs text-blue-600">
+            {attemptsRemaining > 1
+              ? `You have ${attemptsRemaining - 1} attempts remaining after this one.`
+              : "This is your final attempt!"}
+          </p>
+        </div>
 
         <div className="flex justify-between items-center">
           <div className="flex space-x-2">
@@ -1370,12 +1556,26 @@ const CircuitBuilderAcademy = ({ onComplete, onFinish }) => {
   )
 }
 
-export default function CircuitBuilderAcademyMain({ onComplete, onFinish }) {
+export default function CircuitBuilderAcademyMain({ 
+  onComplete, 
+  onFinish,
+  attemptsRemaining = 3, 
+  currentAttempt = 1, 
+  maxAttempts = 3, 
+  studentAssessmentId 
+}) {
   return (
     <div className="flex flex-col w-full max-w-7xl mx-auto pb-16 px-4 min-h-screen" 
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.indigoz}05)` }}>
       <div className="rounded-2xl shadow-xl p-8" style={{ backgroundColor: colors.white }}>
-        <CircuitBuilderAcademy onComplete={onComplete} onFinish={onFinish} />
+        <CircuitBuilderAcademy 
+          onComplete={onComplete} 
+          onFinish={onFinish}
+          attemptsRemaining={attemptsRemaining}
+          currentAttempt={currentAttempt}
+          maxAttempts={maxAttempts}
+          studentAssessmentId={studentAssessmentId}
+        />
       </div>
     </div>
   )

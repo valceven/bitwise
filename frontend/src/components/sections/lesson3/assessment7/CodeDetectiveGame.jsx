@@ -55,7 +55,8 @@ const Typewriter = ({ text, delay = 50, className = "", onComplete }) => {
 
 // Main Code Debug Detective Game Component
 const CodeDebugDetectiveGame = ({ 
-  onComplete, 
+  onComplete,
+  onFinish,
   attemptsRemaining = 3, 
   currentAttempt = 1, 
   maxAttempts = 3, 
@@ -69,6 +70,7 @@ const CodeDebugDetectiveGame = ({
   const [selectedFix, setSelectedFix] = useState(null)
   const [showFeedback, setShowFeedback] = useState(false)
   const [userAnswers, setUserAnswers] = useState([])
+  const [isCompleted, setIsCompleted] = useState(false)
   
   // Instruction state
   const [showInstructions, setShowInstructions] = useState(true)
@@ -87,7 +89,7 @@ const CodeDebugDetectiveGame = ({
     "Ready to catch some Boolean bugs? Let's start investigating! 🔍"
   ]
 
-  // Debug cases with progressive difficulty
+  // Debug cases with progressive difficulty - FIXED STRUCTURE
   const debugCases = [
     {
       id: 1,
@@ -262,9 +264,7 @@ print(validate_username(None))      # None value`,
     good_attendance = attendance >= 80
     
     # Bug: Incorrect precedence and logic
-    return passing_grades and good_attendance or \\
-           project_complete and passing_grades or \\
-           project_complete and good_attendance and min(grades) >= 60
+    return passing_grades and good_attendance or project_complete and passing_grades or project_complete and good_attendance and min(grades) >= 60
 
 # Test case that should pass but doesn't:
 # Good project, decent grades (>= 60), good attendance
@@ -274,7 +274,7 @@ print(can_graduate([65, 68, 62], 85, True))`,
       fixes: [
         {
           option: "Add parentheses around OR groups",
-          code: "return (passing_grades and good_attendance) or \\\n           (project_complete and passing_grades) or \\\n           (project_complete and good_attendance and min(grades) >= 60)",
+          code: "return (passing_grades and good_attendance) or (project_complete and passing_grades) or (project_complete and good_attendance and min(grades) >= 60)",
           isCorrect: true,
           explanation: "Correct! Parentheses ensure proper evaluation of each graduation path separately."
         },
@@ -346,6 +346,23 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
     }
   ]
 
+  // Calculate total questions and total possible points
+  const totalQuestions = debugCases.length
+  const totalPossiblePoints = debugCases.reduce((sum, bugCase) => sum + bugCase.points, 0)
+
+  // Add debugging to check current case data
+  useEffect(() => {
+    const currentBug = debugCases[currentCase]
+    if (currentBug) {
+      console.log(`Current case ${currentCase + 1}:`, {
+        title: currentBug.title,
+        difficulty: currentBug.difficulty,
+        fixesCount: currentBug.fixes?.length || 0,
+        fixes: currentBug.fixes?.map(f => f.option) || []
+      })
+    }
+  }, [currentCase])
+
   // Game control functions
   const startGame = () => {
     setGameState('playing')
@@ -362,24 +379,35 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
 
   const selectFix = (fixIndex) => {
     if (showFeedback) return
+    console.log('Selecting fix option:', fixIndex, 'for case:', currentCase + 1)
     setSelectedFix(fixIndex)
   }
 
   const submitFix = () => {
-    if (selectedFix === null) return
+    if (selectedFix === null) {
+      console.log('No fix selected, cannot submit')
+      return
+    }
 
     const currentBug = debugCases[currentCase]
     const chosenFix = currentBug.fixes[selectedFix]
     const isCorrect = chosenFix.isCorrect
     
+    console.log(`Submitting fix for case ${currentCase + 1}:`, {
+      selectedFix,
+      chosenFix: chosenFix.option,
+      isCorrect
+    })
+    
     // Record the answer
     const answerData = {
-      caseIndex: currentCase,
+      questionIndex: currentCase,
       selectedAnswer: selectedFix,
       isCorrect: isCorrect,
       hintsUsed: hintsUsed,
       caseDifficulty: currentBug.difficulty,
-      caseTitle: currentBug.title
+      caseTitle: currentBug.title,
+      pointsEarned: isCorrect ? Math.max(50, currentBug.points - (hintsUsed * 25)) : 0
     }
     setUserAnswers([...userAnswers, answerData])
     
@@ -403,6 +431,7 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
   }
 
   const nextCase = () => {
+    console.log(`Moving from case ${currentCase + 1} to case ${currentCase + 2}`)
     setCurrentCase(currentCase + 1)
     setSelectedFix(null)
     setShowFeedback(false)
@@ -423,6 +452,7 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
     setShowHint(false)
     setHintsUsed(0)
     setUserAnswers([])
+    setIsCompleted(false)
   }
 
   const showHintHandler = () => {
@@ -431,14 +461,14 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
   }
 
   // Calculate final assessment data and call completion handler
-  const finishAssessment = () => {
-    const totalPossiblePoints = debugCases.reduce((sum, bugCase) => sum + bugCase.points, 0)
-    const percentage = Math.round((score / totalPossiblePoints) * 100)
+  const finishAssessment = async () => {
+    setIsCompleted(true)
+    const finalScore = Math.round((score / totalPossiblePoints) * 100)
     
     const assessmentData = {
-      percentage: percentage,
+      percentage: finalScore,
       score: score,
-      totalQuestions: debugCases.length,
+      totalQuestions: totalQuestions,
       totalPossiblePoints: totalPossiblePoints,
       bugsFixed: bugsFound,
       userAnswers: userAnswers,
@@ -449,6 +479,26 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
     console.log('Code Detective Assessment completed:', assessmentData)
     
     if (onComplete) {
+      onComplete(assessmentData)
+    }
+  }
+
+  const handleFinishAssessment = () => {
+    const finalScore = Math.round((score / totalPossiblePoints) * 100)
+    const assessmentData = {
+      percentage: finalScore,
+      score: score,
+      totalQuestions: totalQuestions,
+      totalPossiblePoints: totalPossiblePoints,
+      bugsFixed: bugsFound,
+      userAnswers: userAnswers,
+      currentAttempt: currentAttempt,
+      maxAttempts: maxAttempts
+    }
+    
+    if (onFinish) {
+      onFinish(assessmentData)
+    } else if (onComplete) {
       onComplete(assessmentData)
     }
   }
@@ -559,8 +609,7 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
   // Render completion screen
   if (gameState === 'completed') {
     const accuracy = Math.round((bugsFound / debugCases.length) * 100)
-    const totalPossiblePoints = debugCases.reduce((sum, bugCase) => sum + bugCase.points, 0)
-    const percentage = Math.round((score / totalPossiblePoints) * 100)
+    const finalScore = Math.round((score / totalPossiblePoints) * 100)
     
     return (
       <motion.div
@@ -581,18 +630,18 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
         <div
           className="w-40 h-40 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg mx-auto"
           style={{
-            background: `conic-gradient(${colors.emeraldz} ${percentage * 3.6}deg, ${colors.offwhite} 0deg)`,
+            background: `conic-gradient(${colors.emeraldz} ${finalScore * 3.6}deg, ${colors.offwhite} 0deg)`,
             color: colors.emeraldz,
           }}
         >
           <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center">
-            {percentage}%
+            {finalScore}%
           </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
           <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.violetz}20` }}>
-            <div className="text-2xl font-bold" style={{ color: colors.violetz }}>{percentage}%</div>
+            <div className="text-2xl font-bold" style={{ color: colors.violetz }}>{finalScore}%</div>
             <div className="text-sm" style={{ color: colors.grayz }}>Final Score</div>
           </div>
           <div className="p-4 rounded-xl" style={{ backgroundColor: `${colors.ambez}20` }}>
@@ -610,41 +659,86 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
         </div>
 
         <div className="p-6 rounded-xl" 
-             style={{ backgroundColor: percentage >= 80 ? `${colors.emeraldz}10` : percentage >= 60 ? `${colors.cyanz}10` : `${colors.ambez}10` }}>
+             style={{ backgroundColor: finalScore >= 80 ? `${colors.emeraldz}10` : finalScore >= 60 ? `${colors.cyanz}10` : `${colors.ambez}10` }}>
           <h3 className="font-bold text-lg mb-2" 
-              style={{ color: percentage >= 80 ? colors.emeraldz : percentage >= 60 ? colors.cyanz : colors.ambez }}>
-            {percentage >= 80 ? "Master Detective! 🌟" :
-             percentage >= 60 ? "Expert Debugger! 🎯" :
-             percentage >= 40 ? "Good Detective! 👍" : "Rookie Investigator! 📚"}
+              style={{ color: finalScore >= 80 ? colors.emeraldz : finalScore >= 60 ? colors.cyanz : colors.ambez }}>
+            {finalScore >= 80 ? "Master Detective! 🌟" :
+             finalScore >= 60 ? "Expert Debugger! 🎯" :
+             finalScore >= 40 ? "Good Detective! 👍" : "Rookie Investigator! 📚"}
           </h3>
           <p className="text-sm" style={{ color: colors.grayz }}>
-            {percentage >= 80 ? "Outstanding! You've mastered Boolean debugging with minimal hints and perfect accuracy." :
-             percentage >= 60 ? "Excellent work! You show strong debugging skills and understand Boolean logic well." :
-             percentage >= 40 ? "Well done! You're developing good debugging instincts and Boolean reasoning." :
+            {finalScore >= 80 ? "Outstanding! You've mastered Boolean debugging with minimal hints and perfect accuracy." :
+             finalScore >= 60 ? "Excellent work! You show strong debugging skills and understand Boolean logic well." :
+             finalScore >= 40 ? "Well done! You're developing good debugging instincts and Boolean reasoning." :
              "Good effort! Keep practicing to improve your bug detection and Boolean logic understanding."}
           </p>
         </div>
 
-        {/* Show attempt information */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-700 mb-2">
-            📝 Attempt <strong>{currentAttempt}</strong> of <strong>{maxAttempts}</strong>
-          </p>
-          <p className="text-xs text-blue-600">
-            Score: {score} points out of {totalPossiblePoints} possible ({percentage}%)
-          </p>
+        {/* Results Summary - matching Historical Assessment format */}
+        <div className="rounded-xl shadow-lg overflow-hidden w-full max-w-md mx-auto"
+             style={{ background: `linear-gradient(135deg, ${colors.white}, ${colors.cyanz}10)` }}>
+          <div className="p-6">
+            <h3 className="text-lg font-bold mb-4" style={{ color: colors.indigoz }}>
+              Your Results:
+            </h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.skyz}10` }}>
+                <span className="font-medium">Cases Investigated:</span>
+                <span className="font-bold" style={{ color: colors.indigoz }}>
+                  {totalQuestions} / {totalQuestions}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.emeraldz}10` }}>
+                <span className="font-medium">Bugs Fixed:</span>
+                <span className="font-bold" style={{ color: colors.emeraldz }}>
+                  {bugsFound} / {totalQuestions}
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.violetz}10` }}>
+                <span className="font-medium">Final Score:</span>
+                <span className="font-bold text-xl" style={{ color: colors.violetz }}>
+                  {finalScore}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center p-3 rounded-lg"
+                   style={{ backgroundColor: `${colors.ambez}10` }}>
+                <span className="font-medium">Attempt:</span>
+                <span className="font-bold" style={{ color: colors.ambez }}>
+                  {currentAttempt} / {maxAttempts}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="flex justify-center gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Only show restart if attempts remaining */}
+          {attemptsRemaining > 1 && (
+            <motion.button
+              onClick={resetGame}
+              className="px-6 py-3 rounded-lg font-medium transition-all"
+              style={{ backgroundColor: colors.cyanz, color: colors.white }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <RotateCcw className="h-4 w-4 mr-2 inline" />
+              🔄 Try Again ({attemptsRemaining - 1} attempts left)
+            </motion.button>
+          )}
+          
+          {/* Finish Assessment Button */}
           <motion.button
-            onClick={resetGame}
+            onClick={handleFinishAssessment}
             className="px-6 py-3 rounded-lg font-medium transition-all"
-            style={{ backgroundColor: colors.cyanz, color: colors.white }}
+            style={{ backgroundColor: colors.emeraldz, color: colors.white }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <RotateCcw className="h-4 w-4 mr-2 inline" />
-            Investigate Again
+            <Award className="h-4 w-4 mr-2 inline" />
+            Finish Assessment
           </motion.button>
         </div>
       </motion.div>
@@ -653,6 +747,33 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
 
   // Main game interface for playing cases
   const currentBug = debugCases[currentCase]
+  
+  // Safety check - make sure currentBug exists
+  if (!currentBug) {
+    console.error('Current bug not found for case:', currentCase)
+    return (
+      <div className="text-center p-8">
+        <div className="text-red-500 mb-4">Error: Case not found</div>
+        <button onClick={resetGame} className="px-4 py-2 bg-blue-500 text-white rounded">
+          Reset Game
+        </button>
+      </div>
+    )
+  }
+  
+  // Safety check - make sure fixes array exists
+  if (!currentBug.fixes || !Array.isArray(currentBug.fixes) || currentBug.fixes.length === 0) {
+    console.error('No fixes found for case:', currentCase, currentBug)
+    return (
+      <div className="text-center p-8">
+        <div className="text-red-500 mb-4">Error: No fix options available for this case</div>
+        <div className="text-sm text-gray-600 mb-4">Case: {currentBug.title}</div>
+        <button onClick={resetGame} className="px-4 py-2 bg-blue-500 text-white rounded">
+          Reset Game
+        </button>
+      </div>
+    )
+  }
   
   return (
     <div className="space-y-6">
@@ -793,6 +914,13 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
           🔧 Choose the Correct Fix:
         </h4>
         
+        {/* Debug info for Senior Detective cases */}
+        {currentBug.difficulty === "Senior Detective" && (
+          <div className="text-center text-xs p-2 bg-gray-100 rounded" style={{ color: colors.grayz }}>
+            <p>Debug: Case {currentCase + 1} | Fixes: {currentBug.fixes.length} | Selected: {selectedFix !== null ? selectedFix + 1 : 'None'}</p>
+          </div>
+        )}
+        
         <div className="space-y-3">
           {currentBug.fixes.map((fix, idx) => {
             const isSelected = selectedFix === idx
@@ -801,10 +929,13 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
             
             return (
               <motion.button
-                key={idx}
-                onClick={() => selectFix(idx)}
+                key={`case-${currentCase}-fix-${idx}`}
+                onClick={() => {
+                  console.log(`Clicking fix option ${idx} for case ${currentCase + 1}: ${currentBug.title}`)
+                  selectFix(idx)
+                }}
                 disabled={showFeedback}
-                className="w-full p-4 rounded-xl border-2 transition-all transform hover:scale-102 text-left"
+                className="w-full p-4 rounded-xl border-2 transition-all transform text-left"
                 style={{
                   backgroundColor: isCorrectAnswer ? `${colors.emeraldz}20` : 
                                  isWrongAnswer ? `${colors.coralz}20` :
@@ -812,7 +943,9 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
                   borderColor: isCorrectAnswer ? colors.emeraldz :
                              isWrongAnswer ? colors.coralz :
                              isSelected ? colors.ambez : colors.cyanz,
-                  opacity: showFeedback ? (fix.isCorrect ? 1 : 0.7) : 1
+                  opacity: showFeedback ? (fix.isCorrect ? 1 : 0.7) : 1,
+                  cursor: showFeedback ? 'default' : 'pointer',
+                  borderWidth: isSelected ? '3px' : '2px'
                 }}
                 whileHover={{ scale: showFeedback ? 1 : 1.02 }}
                 whileTap={{ scale: showFeedback ? 1 : 0.98 }}
@@ -822,13 +955,20 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold" style={{ color: colors.grayz }}>
+                    {isSelected && <span style={{ color: colors.ambez }}>✓ </span>}
                     Option {idx + 1}: {fix.option}
                   </span>
+                  {isSelected && !showFeedback && (
+                    <div className="px-2 py-1 rounded-full text-xs font-bold"
+                         style={{ backgroundColor: colors.ambez, color: colors.white }}>
+                      SELECTED
+                    </div>
+                  )}
                   {isCorrectAnswer && <CheckCircle className="h-5 w-5" style={{ color: colors.emeraldz }} />}
                   {isWrongAnswer && <XCircle className="h-5 w-5" style={{ color: colors.coralz }} />}
                 </div>
                 
-                <pre className="bg-gray-100 p-2 rounded text-sm font-mono mb-2" 
+                <pre className="bg-gray-100 p-2 rounded text-sm font-mono mb-2 whitespace-pre-wrap" 
                      style={{ color: colors.grayz }}>
                   {fix.code}
                 </pre>
@@ -850,6 +990,11 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
             animate={{ opacity: 1, scale: 1 }}
             className="text-center"
           >
+            <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: `${colors.ambez}10` }}>
+              <p className="text-sm font-medium" style={{ color: colors.ambez }}>
+                ✅ Option {selectedFix + 1} selected: "{currentBug.fixes[selectedFix].option}"
+              </p>
+            </div>
             <button
               onClick={submitFix}
               className="px-8 py-3 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
@@ -886,7 +1031,8 @@ print(f"New permissions: {new_perms}")  # Should be 7 (READ|WRITE|DELETE)`,
 
 // Main export component
 export default function CodeDebugDetectiveGamez({ 
-  onComplete, 
+  onComplete,
+  onFinish,
   attemptsRemaining = 3, 
   currentAttempt = 1, 
   maxAttempts = 3, 
@@ -897,7 +1043,8 @@ export default function CodeDebugDetectiveGamez({
          style={{ background: `linear-gradient(135deg, ${colors.offwhite}, ${colors.ambez}05)` }}>
       <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: colors.white }}>
         <CodeDebugDetectiveGame 
-          onComplete={onComplete} 
+          onComplete={onComplete}
+          onFinish={onFinish}
           attemptsRemaining={attemptsRemaining}
           currentAttempt={currentAttempt}
           maxAttempts={maxAttempts}
