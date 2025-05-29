@@ -101,7 +101,7 @@ const AssessmentNotFound = ({ assessmentId, onReturn }) => (
   </div>
 );
 
-const MaxAttemptsReached = ({ assessmentData, onReturn }) => (
+const MaxAttemptsReached = ({ assessmentStats, onReturn, onReset }) => (
   <div className="bg-white rounded-lg shadow p-8 text-center">
     <div className="w-16 h-16 bg-red-100 rounded-full mx-auto flex items-center justify-center mb-4">
       <AlertTriangle className="w-8 h-8 text-red-500" />
@@ -112,16 +112,13 @@ const MaxAttemptsReached = ({ assessmentData, onReturn }) => (
     <p className="text-gray-600 mb-4">
       You have used all 3 attempts for this assessment.
     </p>
-    <p className="text-gray-600 mb-6">
-      Current attempts: {assessmentData.attempts} / 3
-    </p>
 
-    {assessmentData.score !== null && assessmentData.score !== undefined && (
+    {assessmentStats.bestScore && (
       <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
         <div className="flex items-center justify-center space-x-2">
           <Trophy className="w-5 h-5 text-green-600" />
           <span className="text-lg font-semibold text-green-800">
-            Your Best Score: {assessmentData.score}%
+            Your Best Score: {assessmentStats.bestScore}%
           </span>
         </div>
       </div>
@@ -139,50 +136,20 @@ const MaxAttemptsReached = ({ assessmentData, onReturn }) => (
   </div>
 );
 
-const AssessmentStats = ({ assessmentData, maxAttempts, canRetry }) => (
-  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <Clock className="w-5 h-5 text-blue-600" />
-          <span className="text-blue-800 font-medium">
-            Attempts: {assessmentData.attempts} / {maxAttempts}
-          </span>
-        </div>
-        {assessmentData.score !== null && assessmentData.score !== undefined && (
-          <div className="flex items-center space-x-2">
-            <Trophy className="w-5 h-5 text-green-600" />
-            <span className="text-green-800 font-medium">
-              Best Score: {assessmentData.score}%
-            </span>
-          </div>
-        )}
-      </div>
-      {canRetry && (
-        <div className="flex items-center space-x-2">
-          <CheckCircle className="w-5 h-5 text-green-600" />
-          <span className="text-green-800 font-medium">Ready to attempt</span>
-        </div>
-      )}
-    </div>
-  </div>
-);
-
 const AssessmentView = () => {
   const { topicId, assessmentId, classCode } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const [assessmentStats, setAssessmentStats] = useState({
+    attempts: 0,
+    bestScore: null,
+    lastScore: null,
+  });
 
-  // Get the passed assessment data from navigation state
+  const location = useLocation();
   const passedAssessmentData = location.state?.assessmentData;
-  
-  // Extract data with fallbacks
   const studentAssessmentId = passedAssessmentData?.studentAssessmentId;
-  const attempts = passedAssessmentData?.attempts || 0;
-  const currentScore = passedAssessmentData?.score || null;
-
-  console.log("Passed assessment data:", passedAssessmentData);
+  const attempts = passedAssessmentData?.attempts;
 
   const currentAssessmentId = useMemo(
     () => assessmentId || topicId,
@@ -193,31 +160,23 @@ const AssessmentView = () => {
   const maxAttempts = 3;
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 300);
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 300);
+  
+      return () => clearTimeout(timer);
+    }, [currentAssessmentId]);
 
-    return () => clearTimeout(timer);
-  }, [currentAssessmentId]);
-
-  // Handle assessment completion
+  // SIMPLIFIED - Single function handles everything
   const handleAssessmentComplete = async (assessmentData) => {
     try {
-      console.log("Assessment completed with data:", assessmentData);
-      
-      // Validate that we have the required data
-      if (!assessmentData || assessmentData.percentage === undefined) {
-        console.error('Invalid assessment data received:', assessmentData);
-        alert('Assessment data is incomplete. Please try again.');
-        return;
-      }
-      
-      console.log(assessmentData);
-      const scorePercentage = assessmentData.percentage;
-      
+      console.log("Assessment completed:", assessmentData);
+    
+
+      // Submit to API if available (non-blocking)
       if (studentAssessmentId) {
         const apiData = {
-          score: scorePercentage,
+          score: assessmentData.percentage,
           studentAssessmentId: studentAssessmentId,
         };
 
@@ -226,18 +185,13 @@ const AssessmentView = () => {
           console.log('Assessment submitted successfully:', response);
         } catch (apiError) {
           console.error('API submission failed:', apiError);
+          // Continue anyway - don't block the user
         }
-      } else {
-        console.warn('No studentAssessmentId provided - cannot save to API');
       }
 
+      // Navigate back to classroom
       navigate(`/app/classroom/student/${classCode}`, {
         replace: true,
-        state: {
-          assessmentCompleted: currentAssessmentId,
-          finalScore: scorePercentage,
-          assessmentData: assessmentData, // Pass full data if needed
-        },
       });
 
     } catch (error) {
@@ -249,8 +203,12 @@ const AssessmentView = () => {
   const handleReturn = () =>
     navigate(`/app/classroom/student/${classCode}`, { replace: true });
 
-  // Check if attempts exceeded using passed data
-  const hasExceededAttempts = attempts >= maxAttempts;
+  const handleResetAttempts = () => {
+    assessmentDataHook.resetAttempts();
+    setAssessmentStats({ attempts: 0, bestScore: null, lastScore: null });
+  };
+
+  const hasExceededAttempts = assessmentStats.attempts >= maxAttempts;
   const canTakeAssessment = !hasExceededAttempts;
 
   const renderAssessment = () => {
@@ -266,8 +224,9 @@ const AssessmentView = () => {
     if (hasExceededAttempts) {
       return (
         <MaxAttemptsReached
-          assessmentData={passedAssessmentData}
+          assessmentStats={assessmentStats}
           onReturn={handleReturn}
+          onReset={handleResetAttempts}
         />
       );
     }
@@ -275,49 +234,16 @@ const AssessmentView = () => {
     const Component = config.component;
     return (
       <Component
-        onComplete={handleAssessmentComplete}
-        onFinish={handleAssessmentComplete}
-        attemptsRemaining={maxAttempts - attempts}
-        currentAttempt={attempts + 1}
+        onComplete={handleAssessmentComplete}  // SIMPLIFIED - Single callback
+        attemptsRemaining={maxAttempts - assessmentStats.attempts}
+        currentAttempt={assessmentStats.attempts + 1}
         maxAttempts={maxAttempts}
         studentAssessmentId={studentAssessmentId}
-        initialData={passedAssessmentData}
       />
     );
   };
 
   if (loading) return <LoadingSpinner />;
-
-  // Show error if no assessment data passed
-  if (!passedAssessmentData) {
-    return (
-      <div className="min-h-screen relative">
-        <EditBackground />
-        <div className="relative z-10">
-          <div className="max-w-4xl mx-auto py-6">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full mx-auto flex items-center justify-center mb-4">
-                <AlertTriangle className="w-8 h-8 text-red-500" />
-              </div>
-              <h2 className="text-xl font-semibold text-red-800 mb-2">
-                Missing Assessment Data
-              </h2>
-              <p className="text-red-600 mb-6">
-                No assessment data was provided. Please return to lessons and try again.
-              </p>
-              <button
-                onClick={handleReturn}
-                className="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Return to Lessons
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen relative">
@@ -334,9 +260,8 @@ const AssessmentView = () => {
               Back to Lessons
             </button>
 
-            {/* Show assessment stats using passed data */}
             <AssessmentStats
-              assessmentData={passedAssessmentData}
+              stats={assessmentStats}
               maxAttempts={maxAttempts}
               canRetry={canTakeAssessment}
             />

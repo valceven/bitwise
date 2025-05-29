@@ -30,7 +30,7 @@ namespace backend.Services
             }
             studentAssessment.SubmittedAt = DateTime.UtcNow;
             studentAssessment.IsCompleted = true;
-            studentAssessment.StudentClassroom.TotalScore += recordStudentAssessmentDto.Score;
+            //studentAssessment.StudentClassroom.TotalScore += recordStudentAssessmentDto.Score;
             return await _studentAssessmentRepository.UpdateStudentAssessmentAsync(studentAssessment);
 
         }

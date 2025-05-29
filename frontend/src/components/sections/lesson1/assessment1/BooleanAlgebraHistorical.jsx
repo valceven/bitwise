@@ -365,22 +365,50 @@ export default function HistoricalAssessment({
 
   // Complete the assessment
  const finishAssessment = async () => {
-    setIsCompleted(true);
-    const finalScore = (score / totalQuestions) * 100;
-
-    if (onComplete) {
-      onComplete(score, totalQuestions, Math.round(finalScore));
-    }
-
-    console.log(
-      "Assessment completed with score:",
-      score,
-      "out of",
-      totalQuestions,
-      ":",
-      Math.round(finalScore) + "%"
-    );
+  setIsCompleted(true);
+  const finalScore = (score / totalQuestions) * 100;
+  
+  const assessmentData = {
+    percentage: Math.round(finalScore),
+    score: score,
+    totalQuestions: totalQuestions,
+    userAnswers: userAnswers,
+    currentAttempt: currentAttempt,
+    maxAttempts: maxAttempts
   };
+
+  console.log(
+    "Assessment completed with score:",
+    score,
+    "out of",
+    totalQuestions,
+    ":",
+    Math.round(finalScore) + "%"
+  );
+
+  if (onComplete) {
+    onComplete(assessmentData);
+  }
+};
+
+const handleFinishAssessment = () => {
+  const finalScore = (score / totalQuestions) * 100;
+  const assessmentData = {
+    percentage: Math.round(finalScore),
+    score: score,
+    totalQuestions: totalQuestions,
+    userAnswers: userAnswers,
+    currentAttempt: currentAttempt,
+    maxAttempts: maxAttempts
+  };
+  
+  if (onFinish) {
+    onFinish(assessmentData);
+  } else if (onComplete) {
+    onComplete(assessmentData);
+  }
+};
+
 
   // Toggle review mode
   const toggleReviewMode = () => {
@@ -1168,7 +1196,7 @@ export default function HistoricalAssessment({
               )}
 
               {/* Use the universal finish function */}
-              <Button onClick={onFinish} className="flex items-center gap-2">
+              <Button onClick={handleFinishAssessment} className="flex items-center gap-2">
                 <Award className="h-4 w-4" />
                 Finish Assessment
               </Button>
