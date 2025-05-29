@@ -6,11 +6,12 @@ import { useParams } from "react-router-dom";
 
 const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState("name");
+  const [sortField, setSortField] = useState("rank");
   const [sortDirection, setSortDirection] = useState("asc");
   const [filterActive, setFilterActive] = useState(false);
   const [csvData, setCsvData] = useState([]);
   const { classCode } = useParams();
+  const [rankingData, setRankingData] = useState([]);
   
 
   useEffect(() => {
@@ -36,17 +37,23 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
       }
     };
 
+    const loadRankingScores = async () => {
+      try {
+        const rankingScores = await teacherApi.fetchRankingScores(classCode);
+        setRankingData(rankingScores);
+      } catch (error) {
+        console.error("An error occured fetching leaderboard scores: ", error.message);
+      }
+    }
+
     if (classCode) {
       loadScores();
+      loadRankingScores();
     }
   }, [classCode]);
 
-  // Assuming we have this data - you'll need to adapt this to your actual data structure
-  const studentsWithStats = classroom?.students?.map(student => ({
-    ...student,
-    progress: Math.floor(Math.random() * 100), // Replace with actual progress data
-    lastActive: new Date(Date.now() - Math.floor(Math.random() * 10) * 86400000).toLocaleDateString(), // Replace with actual last active data
-  })) || [];
+  // Use ranking data instead of classroom students
+  const studentsWithStats = rankingData || [];
   
   const handleSort = (field) => {
     if (sortField === field) {
@@ -61,16 +68,12 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
     return [...studentsWithStats].sort((a, b) => {
       let comparison = 0;
       
-      if (sortField === "name") {
-        comparison = a.name?.localeCompare(b.name) || 0;
-      } else if (sortField === "email") {
-        comparison = a.email?.localeCompare(b.email) || 0;
-      } else if (sortField === "joinedAt") {
-        const dateA = new Date(a.joinedAt || 0);
-        const dateB = new Date(b.joinedAt || 0);
-        comparison = dateA - dateB;
-      } else if (sortField === "progress") {
-        comparison = (a.progress || 0) - (b.progress || 0);
+      if (sortField === "studentName") {
+        comparison = a.studentName?.localeCompare(b.studentName) || 0;
+      } else if (sortField === "rank") {
+        comparison = (a.rank || 0) - (b.rank || 0);
+      } else if (sortField === "totalScore") {
+        comparison = (a.totalScore || 0) - (b.totalScore || 0);
       }
       
       return sortDirection === "asc" ? comparison : -comparison;
@@ -78,14 +81,14 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
   };
   
   const filteredStudents = getSortedStudents().filter(student => 
-    student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (student.studentIdNumber && student.studentIdNumber.toString().includes(searchTerm))
+    student.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleRemoveClick = (student) => {
-    if (window.confirm(`Are you sure you want to remove ${student.name} from this class?`)) {
-      onRemoveStudent(student.studentId, classroom.classroomId);
+    if (window.confirm(`Are you sure you want to remove ${student.studentName} from this class?`)) {
+      // You'll need to get the actual studentId from somewhere or modify this function
+      // For now, using studentName as identifier
+      onRemoveStudent(student.studentName, classroom.classroomId);
     }
   };
 
@@ -95,6 +98,9 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
       <SortAsc size={14} className="text-bluez" /> : 
       <SortDesc size={14} className="text-bluez" />;
   };
+
+  // Get max score for progress bar scaling
+  const maxScore = Math.max(...rankingData.map(student => student.totalScore), 100);
 
   return (
     <div className="bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden">
@@ -163,7 +169,7 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
           <div className="relative flex-1 min-w-[240px]">
             <input
               type="text"
-              placeholder="Search students by name, email or ID..."
+              placeholder="Search students by name..."
               className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bluez"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -192,39 +198,39 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Progress
+                  Score Range
                 </label>
                 <select className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bluez">
-                  <option value="">All Progress Levels</option>
-                  <option value="0-25">0-25%</option>
-                  <option value="26-50">26-50%</option>
-                  <option value="51-75">51-75%</option>
-                  <option value="76-100">76-100%</option>
+                  <option value="">All Scores</option>
+                  <option value="0-25">0-25 points</option>
+                  <option value="26-50">26-50 points</option>
+                  <option value="51-75">51-75 points</option>
+                  <option value="76-100">76+ points</option>
                 </select>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Join Date
+                  Rank Range
                 </label>
                 <select className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bluez">
-                  <option value="">All Time</option>
-                  <option value="this-week">This Week</option>
-                  <option value="this-month">This Month</option>
-                  <option value="last-month">Last Month</option>
-                  <option value="this-year">This Year</option>
+                  <option value="">All Ranks</option>
+                  <option value="1-5">Top 5</option>
+                  <option value="6-10">6-10</option>
+                  <option value="11-20">11-20</option>
+                  <option value="21+">21+</option>
                 </select>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Activity
+                  Performance
                 </label>
                 <select className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bluez">
-                  <option value="">All Activity</option>
-                  <option value="today">Active Today</option>
-                  <option value="this-week">Active This Week</option>
-                  <option value="inactive">Inactive (2 weeks)</option>
+                  <option value="">All Performance</option>
+                  <option value="excellent">Excellent (Top 25%)</option>
+                  <option value="good">Good (Top 50%)</option>
+                  <option value="needs-improvement">Needs Improvement</option>
                 </select>
               </div>
             </div>
@@ -240,44 +246,29 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
                   <th 
                     scope="col" 
                     className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort("name")}
+                    onClick={() => handleSort("rank")}
                   >
                     <div className="flex items-center">
-                      Student <SortIcon field="name" />
+                      Rank <SortIcon field="rank" />
                     </div>
                   </th>
                   <th 
                     scope="col" 
                     className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort("email")}
+                    onClick={() => handleSort("studentName")}
                   >
                     <div className="flex items-center">
-                      Email <SortIcon field="email" />
-                    </div>
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">
-                    Student ID#
-                  </th>
-                  <th 
-                    scope="col" 
-                    className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort("joinedAt")}
-                  >
-                    <div className="flex items-center">
-                      Joined <SortIcon field="joinedAt" />
+                      Student <SortIcon field="studentName" />
                     </div>
                   </th>
                   <th 
                     scope="col" 
                     className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort("progress")}
+                    onClick={() => handleSort("totalScore")}
                   >
                     <div className="flex items-center">
-                      Progress <SortIcon field="progress" />
+                      Total Score <SortIcon field="totalScore" />
                     </div>
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">
-                    Last Active
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">
                     Actions
@@ -287,60 +278,61 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredStudents.length > 0 ? (
                   filteredStudents.map((student, index) => (
-                    <tr key={student.id} className={index % 2 === 0 ? 'bg-white' : 'bg-offwhite'}>
+                    <tr key={`${student.rank}-${student.studentName}`} className={index % 2 === 0 ? 'bg-white' : 'bg-offwhite'}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                            student.rank === 1 ? 'bg-yellow-500' :
+                            student.rank === 2 ? 'bg-gray-400' :
+                            student.rank === 3 ? 'bg-amber-600' :
+                            'bg-bluez'
+                          }`}>
+                            {student.rank === 1 && '🥇'}
+                            {student.rank === 2 && '🥈'}
+                            {student.rank === 3 && '🥉'}
+                            {student.rank > 3 && student.rank}
+                          </div>
+                          <div className="ml-3">
+                            <div className="text-sm font-medium text-grayz">#{student.rank}</div>
+                          </div>
+                        </div>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden bg-lightpurple flex items-center justify-center">
-                            {student.profileImg ? (
-                              <img src={student.profileImg} alt={student.name} className="h-10 w-10 object-cover" />
-                            ) : (
-                              <User size={20} className="text-darkpurple" />
-                            )}
+                            <User size={20} className="text-darkpurple" />
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-grayz">{student.name}</div>
+                            <div className="text-sm font-medium text-grayz">{student.studentName}</div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{student.email}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {student.studentIdNumber || "-"}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {new Date(student.joinedAt || Date.now()).toLocaleDateString()}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="flex items-center text-xs mb-1">
-                            <span className="font-medium text-grayz">{student.progress}%</span>
+                          <div className="flex items-center text-sm mb-1">
+                            <span className="font-bold text-grayz mr-2">{student.totalScore} pts</span>
+                            <span className="text-xs text-gray-500">
+                              ({maxScore > 0 ? Math.round((student.totalScore / maxScore) * 100) : 0}%)
+                            </span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div className="w-full bg-gray-200 rounded-full h-2">
                             <div 
-                              className={`h-1.5 rounded-full ${
-                                student.progress > 75 ? 'bg-greenz' : 
-                                student.progress > 50 ? 'bg-yellowz' : 
-                                student.progress > 25 ? 'bg-orangez' : 'bg-redz'
+                              className={`h-2 rounded-full ${
+                                student.totalScore > maxScore * 0.75 ? 'bg-greenz' : 
+                                student.totalScore > maxScore * 0.5 ? 'bg-yellowz' : 
+                                student.totalScore > maxScore * 0.25 ? 'bg-orangez' : 'bg-redz'
                               }`}
-                              style={{ width: `${student.progress}%` }}
+                              style={{ 
+                                width: maxScore > 0 ? `${Math.min((student.totalScore / maxScore) * 100, 100)}%` : '0%' 
+                              }}
                             ></div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {student.lastActive}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => console.log("View student details:", student.id)}
+                            onClick={() => console.log("View student details:", student.studentName)}
                             className="p-1 text-bluez hover:bg-blue-50 rounded"
                             title="View details"
                           >
@@ -366,16 +358,16 @@ const ClassRecord = ({ classroom, onBack, onRemoveStudent }) => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center">
+                    <td colSpan="4" className="px-6 py-8 text-center">
                       <div className="flex flex-col items-center">
                         <div className="p-3 bg-gray-100 rounded-full mb-3">
                           <Search size={24} className="text-gray-400" />
                         </div>
                         <p className="text-gray-500 font-medium">
-                          {searchTerm ? "No students found matching your search" : "No students in this class yet"}
+                          {searchTerm ? "No students found matching your search" : "No ranking data available yet"}
                         </p>
                         <p className="text-sm text-gray-400 mt-1">
-                          {searchTerm ? "Try a different search term or clear the search" : "Add students to get started"}
+                          {searchTerm ? "Try a different search term or clear the search" : "Students need to complete assessments to appear in rankings"}
                         </p>
                       </div>
                     </td>

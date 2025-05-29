@@ -96,8 +96,15 @@ const fetchScores = async (classCode) => {
     const response = await apiService.get("/studentClassroom/get-student-scores-by-classroom-code", {
       params: { classCode }
     });
-    console.log(response);
     return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message || "An unknown error occurred";
+  }
+}
+
+const fetchRankingScores = async (classCode) => {
+  try {
+
   } catch (error) {
     throw error.response?.data || error.message || "An unknown error occurred";
   }

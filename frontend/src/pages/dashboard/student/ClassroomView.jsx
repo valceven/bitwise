@@ -98,15 +98,13 @@ const ClassroomView = ({ classroom, user }) => {
     },
   };
 
-  // Assessment to Lesson mapping
   const assessmentToLessonMap = {
-    3: 1,  // Assessment 3 completes Lesson 1
-    6: 2,  // Assessment 6 completes Lesson 2
-    7: 3,  // Assessment 7 completes Lesson 3
-    9: 4   // Assessment 9 completes Lesson 4
+    3: 1,
+    6: 2,
+    7: 3,
+    9: 4
   };
 
-  // Function to check and complete lessons based on assessment completion
   const checkAndCompleteLessons = async (completedAssessments) => {
     if (!completedAssessments || !Array.isArray(completedAssessments)) {
       return;
@@ -199,12 +197,9 @@ const ClassroomView = ({ classroom, user }) => {
     );
   };
 
-  // Function to check if a topic is unlocked
   const isTopicUnlocked = (topicNumber, lessonIndex) => {
-    // If lesson is locked, all topics are locked
     if (!isLessonUnlocked(lessonIndex)) return false;
 
-    // If roadmapResponse is empty, only topic 1 is unlocked
     if (
       !roadmapResponse?.progress ||
       (!roadmapResponse.progress.completedLessons?.length &&
@@ -214,10 +209,8 @@ const ClassroomView = ({ classroom, user }) => {
       return topicNumber === 1;
     }
 
-    // Topic 1 is always unlocked if lesson is unlocked
     if (topicNumber === 1) return true;
 
-    // Check if previous topic's assessment is completed
     const prevAssessmentNumber = topicNumber - 1;
     return (
       roadmapResponse.progress.completedAssessments?.includes(
@@ -226,12 +219,9 @@ const ClassroomView = ({ classroom, user }) => {
     );
   };
 
-  // Function to check if an assessment is unlocked
   const isAssessmentUnlocked = (assessmentNumber, lessonIndex) => {
-    // If lesson is locked, all assessments are locked
     if (!isLessonUnlocked(lessonIndex)) return false;
 
-    // If roadmapResponse is empty, only assessment 1 is unlocked if topic 1 is completed
     if (
       !roadmapResponse?.progress ||
       (!roadmapResponse.progress.completedLessons?.length &&
