@@ -13,5 +13,6 @@ namespace backend.Repositories.Interfaces
         Task<StudentAssessment> GetStudentAssessmentsByStudentId(int StudentId);
         Task<ICollection<StudentAssessment>> GetAllStudentAssessmentsByAssessmentId(int StudentAssessmentId);
         Task<ICollection<StudentAssessment>> GetStudentAssessmentsByClassroomCode(string ClassroomCode);
+        Task<List<StudentAssessment>> GetStudentAssessmentByClasscodeAsync(int AssessmentId, string ClassCode);
     }
 }

@@ -61,6 +61,25 @@ namespace backend.Presentation
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost("get-student-assessment-by-classcode")]
+        public async Task<IActionResult> GetStudentAssessmentByClasscode([FromBody] GetStudentAssessmentLeaderboardDto getStudAssLead)
+        {
+            try
+            {
+                var studentAssessments = await _studentAssessmentService.GetStudentAssessmentByClasscodeAsync(getStudAssLead);
+
+                if (studentAssessments == null)
+                {
+                    return NotFound(new { message = "No Student Assessment Found" });
+                }
+                return Ok(studentAssessments);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
         
         
     }

@@ -104,7 +104,10 @@ const fetchScores = async (classCode) => {
 
 const fetchRankingScores = async (classCode) => {
   try {
-
+    const response = await apiService.get("/studentClassroom/get-leaderboards-by-classroom-code", {
+      params: { classroomCode: classCode }
+    });
+    return response.data;
   } catch (error) {
     throw error.response?.data || error.message || "An unknown error occurred";
   }
@@ -120,5 +123,6 @@ export const teacherApi = {
   updateClassroom,
   deleteClassroom,
   archiveClassroom,
-  fetchScores
+  fetchScores,
+  fetchRankingScores
 };
