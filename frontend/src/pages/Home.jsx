@@ -18,7 +18,7 @@ import summerflower from "../assets/summerflower.svg";
 import bg_text from "../assets/bg_text.svg";
 import halfasterisk from "../assets/halfasterisk.svg";
 import rectangle_diamond from "../assets/rectangle_diamond.svg";
-import roadmapSample from "../assets/roadmapsample.png";
+import roadmapSample from "../assets/roadmapsample1.png";
 import booleImg from "../assets/GeorgeBoole.png";
 import vennImg from "../assets/venn.jpg";
 import circuitImg from "../assets/circuits.jpg";

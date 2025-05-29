@@ -48,12 +48,6 @@ function LoginPage() {
           </Link>
         </h3>
         <LoginForm />
-        <Link
-          to="/forgotpassword"
-          className="underline hover:no-underline text-sm mt-4"
-        >
-          Forget password?
-        </Link>
       </div>
     </div>
   );

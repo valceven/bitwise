@@ -118,10 +118,8 @@ const DashboardSidebar = ({ user }) => {
       )}
 
       <div className="bg-white w-full absolute flex items-center p-4 px-6 space-x-4">
-        <div className="h-8 w-8 bg-gray-300 rounded-full ml-auto"></div>
-
         <div
-          className="relative"
+          className="relative ml-auto"
           onMouseEnter={() => setShowDropdown(true)}
           onMouseLeave={() => setShowDropdown(false)}
         >

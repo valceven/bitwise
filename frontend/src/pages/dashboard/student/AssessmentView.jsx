@@ -140,7 +140,7 @@ const MaxAttemptsReached = ({ assessmentData, onReturn }) => (
 );
 
 const AssessmentStats = ({ assessmentData, maxAttempts, canRetry }) => (
-  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-2">
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">
@@ -149,14 +149,15 @@ const AssessmentStats = ({ assessmentData, maxAttempts, canRetry }) => (
             Attempts: {assessmentData.attempts} / {maxAttempts}
           </span>
         </div>
-        {assessmentData.score !== null && assessmentData.score !== undefined && (
-          <div className="flex items-center space-x-2">
-            <Trophy className="w-5 h-5 text-green-600" />
-            <span className="text-green-800 font-medium">
-              Best Score: {assessmentData.score}%
-            </span>
-          </div>
-        )}
+        {assessmentData.score !== null &&
+          assessmentData.score !== undefined && (
+            <div className="flex items-center space-x-2">
+              <Trophy className="w-5 h-5 text-green-600" />
+              <span className="text-green-800 font-medium">
+                Best Score: {assessmentData.score}%
+              </span>
+            </div>
+          )}
       </div>
       {canRetry && (
         <div className="flex items-center space-x-2">
@@ -176,7 +177,7 @@ const AssessmentView = () => {
 
   // Get the passed assessment data from navigation state
   const passedAssessmentData = location.state?.assessmentData;
-  
+
   // Extract data with fallbacks
   const studentAssessmentId = passedAssessmentData?.studentAssessmentId;
   const attempts = passedAssessmentData?.attempts || 0;
@@ -188,7 +189,7 @@ const AssessmentView = () => {
     () => assessmentId || topicId,
     [assessmentId, topicId]
   );
-  
+
   const config = ASSESSMENT_CONFIG[currentAssessmentId];
   const maxAttempts = 3;
 
@@ -204,17 +205,17 @@ const AssessmentView = () => {
   const handleAssessmentComplete = async (assessmentData) => {
     try {
       console.log("Assessment completed with data:", assessmentData);
-      
+
       // Validate that we have the required data
       if (!assessmentData || assessmentData.percentage === undefined) {
-        console.error('Invalid assessment data received:', assessmentData);
-        alert('Assessment data is incomplete. Please try again.');
+        console.error("Invalid assessment data received:", assessmentData);
+        alert("Assessment data is incomplete. Please try again.");
         return;
       }
-      
+
       console.log(assessmentData);
       const scorePercentage = assessmentData.percentage;
-      
+
       if (studentAssessmentId) {
         const apiData = {
           score: scorePercentage,
@@ -223,12 +224,12 @@ const AssessmentView = () => {
 
         try {
           const response = await studentAssessmentApi.finishAssessment(apiData);
-          console.log('Assessment submitted successfully:', response);
+          console.log("Assessment submitted successfully:", response);
         } catch (apiError) {
-          console.error('API submission failed:', apiError);
+          console.error("API submission failed:", apiError);
         }
       } else {
-        console.warn('No studentAssessmentId provided - cannot save to API');
+        console.warn("No studentAssessmentId provided - cannot save to API");
       }
 
       navigate(`/app/classroom/student/${classCode}`, {
@@ -239,10 +240,9 @@ const AssessmentView = () => {
           assessmentData: assessmentData, // Pass full data if needed
         },
       });
-
     } catch (error) {
-      console.error('Error completing assessment:', error);
-      alert('Failed to save assessment. Please try again.');
+      console.error("Error completing assessment:", error);
+      alert("Failed to save assessment. Please try again.");
     }
   };
 
@@ -303,7 +303,8 @@ const AssessmentView = () => {
                 Missing Assessment Data
               </h2>
               <p className="text-red-600 mb-6">
-                No assessment data was provided. Please return to lessons and try again.
+                No assessment data was provided. Please return to lessons and
+                try again.
               </p>
               <button
                 onClick={handleReturn}
@@ -328,7 +329,7 @@ const AssessmentView = () => {
           <div className="py-6">
             <button
               onClick={handleReturn}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center px-4 py-2 mb-6 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Lessons
