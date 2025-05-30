@@ -1121,7 +1121,7 @@ export default function BooleanRace({
   studentAssessmentId,
 }) {
   return (
-    <div className="flex flex-col w-full max-w-5xl mx-auto pb-16 px-4 min-h-screen">
+    <div className="flex flex-col w-full max-w-5xl mx-auto px-4 min-h-screen">
       <div className="rounded-2xl p-6">
         <BooleanRaceGame
           onComplete={onComplete}

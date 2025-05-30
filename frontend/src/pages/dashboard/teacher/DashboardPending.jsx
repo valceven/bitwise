@@ -2,9 +2,25 @@ import React, { useEffect, useState } from "react";
 import { teacherApi } from "../../../api/teacher/teacherApi";
 import { studentApi } from "../../../api/student/studentApi";
 import { useUser } from "../../../context/UserContext";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { Check, X, UserCheck, UserX, Clock, Search, AlertCircle, Users, RefreshCw, CheckSquare, SquareCheck, Filter, Bell, LogOut, LogIn } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  Check,
+  X,
+  UserCheck,
+  UserX,
+  Clock,
+  Search,
+  AlertCircle,
+  Users,
+  RefreshCw,
+  CheckSquare,
+  SquareCheck,
+  Filter,
+  Bell,
+  LogOut,
+  LogIn,
+} from "lucide-react";
 
 const DashboardPending = () => {
   const [classrooms, setClassrooms] = useState([]);
@@ -14,52 +30,60 @@ const DashboardPending = () => {
   const [activeTab, setActiveTab] = useState("join"); // "join" or "leave"
   const { user } = useUser();
   useEffect(() => {
-      document.title = "Pending Requests";
-    }, []);
+    document.title = "Pending Requests";
+  }, []);
 
   const fetchPending = async () => {
     try {
       setRefreshing(true);
       const response = await teacherApi.fetchPendingStudents(user.userID);
       console.log("Teacher Pending:", response);
-      
-      const transformedClassrooms = response.map(classroom => {
-        const joinStudents = classroom.pendingStudents.filter(student => student.request === 'Join Class');
-        const leaveStudents = classroom.pendingStudents.filter(student => student.request === 'Leave Class' || student.request === 'Leave Classroom');
-        
+
+      const transformedClassrooms = response.map((classroom) => {
+        const joinStudents = classroom.pendingStudents.filter(
+          (student) => student.request === "Join Class"
+        );
+        const leaveStudents = classroom.pendingStudents.filter(
+          (student) =>
+            student.request === "Leave Class" ||
+            student.request === "Leave Classroom"
+        );
+
         return {
           name: classroom.className,
           classCode: classroom.classCode,
           classroomId: classroom.classroomId,
-          students: classroom.pendingStudents.map(student => ({
+          students: classroom.pendingStudents.map((student) => ({
             name: student.name,
             email: student.email,
             studentId: student.studentId,
             request: student.request,
-            joinedAt: student.date
+            joinedAt: student.date,
           })),
-          joinRequests: joinStudents.map(student => ({
+          joinRequests: joinStudents.map((student) => ({
             name: student.name,
             email: student.email,
             studentId: student.studentId,
             request: student.request,
-            joinedAt: new Date().toISOString()
+            joinedAt: new Date().toISOString(),
           })),
-          leaveRequests: leaveStudents.map(student => ({
+          leaveRequests: leaveStudents.map((student) => ({
             name: student.name,
             email: student.email,
             studentId: student.studentId,
             request: student.request,
-            joinedAt: new Date().toISOString()
+            joinedAt: new Date().toISOString(),
           })),
           selectedJoinStudents: [],
-          selectedLeaveStudents: []
+          selectedLeaveStudents: [],
         };
       });
-      
+
       setClassrooms(transformedClassrooms);
     } catch (error) {
-      console.error(error.response?.data || error.message || "An unknown error occurred");
+      console.error(
+        error.response?.data || error.message || "An unknown error occurred"
+      );
       toast.error("Failed to fetch pending students");
     } finally {
       setLoading(false);
@@ -77,12 +101,16 @@ const DashboardPending = () => {
     setClassrooms((prev) =>
       prev.map((cls) => {
         if (cls.classroomId !== classroom.classroomId) return cls;
-        
+
         if (requestType === "join") {
-          const allIds = checked ? Array.from({ length: cls.joinRequests.length }, (_, i) => i) : [];
+          const allIds = checked
+            ? Array.from({ length: cls.joinRequests.length }, (_, i) => i)
+            : [];
           return { ...cls, selectedJoinStudents: allIds };
         } else {
-          const allIds = checked ? Array.from({ length: cls.leaveRequests.length }, (_, i) => i) : [];
+          const allIds = checked
+            ? Array.from({ length: cls.leaveRequests.length }, (_, i) => i)
+            : [];
           return { ...cls, selectedLeaveStudents: allIds };
         }
       })
@@ -93,15 +121,17 @@ const DashboardPending = () => {
     setClassrooms((prev) =>
       prev.map((cls) => {
         if (cls.classroomId !== classroom.classroomId) return cls;
-        
+
         if (requestType === "join") {
-          const alreadySelected = cls.selectedJoinStudents.includes(studentIndex);
+          const alreadySelected =
+            cls.selectedJoinStudents.includes(studentIndex);
           const newSelected = alreadySelected
             ? cls.selectedJoinStudents.filter((i) => i !== studentIndex)
             : [...cls.selectedJoinStudents, studentIndex];
           return { ...cls, selectedJoinStudents: newSelected };
         } else {
-          const alreadySelected = cls.selectedLeaveStudents.includes(studentIndex);
+          const alreadySelected =
+            cls.selectedLeaveStudents.includes(studentIndex);
           const newSelected = alreadySelected
             ? cls.selectedLeaveStudents.filter((i) => i !== studentIndex)
             : [...cls.selectedLeaveStudents, studentIndex];
@@ -121,8 +151,8 @@ const DashboardPending = () => {
         status: true,
         studentId: student.studentId,
         classroomId: classroom.classroomId,
-        classCode: classroom.classCode
-      }; 
+        classCode: classroom.classCode,
+      };
 
       if (requestType === "join") {
         try {
@@ -141,36 +171,47 @@ const DashboardPending = () => {
           throw error;
         }
       }
-      
+
       // Remove the student from the appropriate array by matching studentId
-      setClassrooms(prev => 
+      setClassrooms((prev) =>
         prev.map((cls) => {
           if (cls.classroomId !== classroom.classroomId) return cls;
-          
+
           if (requestType === "join") {
             return {
               ...cls,
-              joinRequests: cls.joinRequests.filter(s => s.studentId !== student.studentId),
-              selectedJoinStudents: [] // Clear selections after action
+              joinRequests: cls.joinRequests.filter(
+                (s) => s.studentId !== student.studentId
+              ),
+              selectedJoinStudents: [], // Clear selections after action
             };
           } else {
             return {
               ...cls,
-              leaveRequests: cls.leaveRequests.filter(s => s.studentId !== student.studentId),
-              selectedLeaveStudents: [] // Clear selections after action
+              leaveRequests: cls.leaveRequests.filter(
+                (s) => s.studentId !== student.studentId
+              ),
+              selectedLeaveStudents: [], // Clear selections after action
             };
           }
         })
       );
-      
+
       const actionText = requestType === "join" ? "added to" : "removed from";
-      toast.success(`${student.name} was successfully ${actionText} ${classroom.name}`, {
-        position: "bottom-right",
-        autoClose: 3000,
-      });
+      toast.success(
+        `${student.name} was successfully ${actionText} ${classroom.name}`,
+        {
+          position: "bottom-right",
+          autoClose: 3000,
+        }
+      );
     } catch (error) {
-      console.error(error.response?.data || error.message || "An unknown error occurred");
-      toast.error(`Failed to ${requestType === "join" ? "accept" : "remove"} student`);
+      console.error(
+        error.response?.data || error.message || "An unknown error occurred"
+      );
+      toast.error(
+        `Failed to ${requestType === "join" ? "accept" : "remove"} student`
+      );
     }
   };
 
@@ -184,46 +225,56 @@ const DashboardPending = () => {
         status: false,
         studentId: student.studentId,
         classroomId: classroom.classroomId,
-        classCode: classroom.classCode
+        classCode: classroom.classCode,
       };
 
       await teacherApi.rejectPendingStudent(data);
-      
+
       // Remove the student from the appropriate array by matching studentId
-      setClassrooms(prev => 
+      setClassrooms((prev) =>
         prev.map((cls) => {
           if (cls.classroomId !== classroom.classroomId) return cls;
-          
+
           if (requestType === "join") {
             return {
               ...cls,
-              joinRequests: cls.joinRequests.filter(s => s.studentId !== student.studentId),
-              selectedJoinStudents: [] // Clear selections after action
+              joinRequests: cls.joinRequests.filter(
+                (s) => s.studentId !== student.studentId
+              ),
+              selectedJoinStudents: [], // Clear selections after action
             };
           } else {
             return {
               ...cls,
-              leaveRequests: cls.leaveRequests.filter(s => s.studentId !== student.studentId),
-              selectedLeaveStudents: [] // Clear selections after action
+              leaveRequests: cls.leaveRequests.filter(
+                (s) => s.studentId !== student.studentId
+              ),
+              selectedLeaveStudents: [], // Clear selections after action
             };
           }
         })
       );
-      
+
       toast.error(`${student.name}'s request was rejected`, {
         position: "bottom-right",
         autoClose: 3000,
       });
     } catch (error) {
-      console.error(error.response?.data || error.message || "An unknown error occurred");
+      console.error(
+        error.response?.data || error.message || "An unknown error occurred"
+      );
       toast.error("Failed to reject student");
     }
   };
 
   const handleBulkAction = async (classroom, action, requestType) => {
-    const currentRequests = requestType === "join" ? classroom.joinRequests : classroom.leaveRequests;
-    const selectedIndexes = requestType === "join" ? classroom.selectedJoinStudents : classroom.selectedLeaveStudents;
-    
+    const currentRequests =
+      requestType === "join" ? classroom.joinRequests : classroom.leaveRequests;
+    const selectedIndexes =
+      requestType === "join"
+        ? classroom.selectedJoinStudents
+        : classroom.selectedLeaveStudents;
+
     if (selectedIndexes.length === 0) {
       toast.info("Please select at least one student", {
         position: "bottom-right",
@@ -231,20 +282,22 @@ const DashboardPending = () => {
       });
       return;
     }
-    
+
     // Get selected students based on their indices
-    const selectedStudents = selectedIndexes.map(index => currentRequests[index]);
-    
+    const selectedStudents = selectedIndexes.map(
+      (index) => currentRequests[index]
+    );
+
     try {
       // Process each selected student
       for (const student of selectedStudents) {
-        if (action === 'accept') {
+        if (action === "accept") {
           await handleAccept(student, classroom, requestType);
-        } else if (action === 'reject') {
+        } else if (action === "reject") {
           await handleReject(student, classroom, requestType);
         }
       }
-      
+
       toast.success(`Bulk ${action} completed successfully`, {
         position: "bottom-right",
         autoClose: 3000,
@@ -260,40 +313,47 @@ const DashboardPending = () => {
 
   // Filter students based on search term
   const filteredClassrooms = classrooms
-    .map(classroom => ({
+    .map((classroom) => ({
       ...classroom,
-      joinRequests: classroom.joinRequests.filter(student => 
-        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.studentId.toString().includes(searchTerm)
+      joinRequests: classroom.joinRequests.filter(
+        (student) =>
+          student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          student.studentId.toString().includes(searchTerm)
       ),
-      leaveRequests: classroom.leaveRequests.filter(student => 
-        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.studentId.toString().includes(searchTerm)
-      )
+      leaveRequests: classroom.leaveRequests.filter(
+        (student) =>
+          student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          student.studentId.toString().includes(searchTerm)
+      ),
     }))
-    .filter(classroom => 
-      (activeTab === "join" && classroom.joinRequests.length > 0) || 
-      (activeTab === "leave" && classroom.leaveRequests.length > 0)
+    .filter(
+      (classroom) =>
+        (activeTab === "join" && classroom.joinRequests.length > 0) ||
+        (activeTab === "leave" && classroom.leaveRequests.length > 0)
     );
 
   // Calculate totals correctly
-  const totalJoinRequests = classrooms.reduce((total, classroom) => 
-    total + classroom.joinRequests.length, 0);
-    
-  const totalLeaveRequests = classrooms.reduce((total, classroom) => 
-    total + classroom.leaveRequests.length, 0);
+  const totalJoinRequests = classrooms.reduce(
+    (total, classroom) => total + classroom.joinRequests.length,
+    0
+  );
 
-  // Get classrooms with current tab's requests  
-  const classroomsWithCurrentRequests = classrooms.filter(classroom => 
-    activeTab === "join" 
-      ? classroom.joinRequests.length > 0 
+  const totalLeaveRequests = classrooms.reduce(
+    (total, classroom) => total + classroom.leaveRequests.length,
+    0
+  );
+
+  // Get classrooms with current tab's requests
+  const classroomsWithCurrentRequests = classrooms.filter((classroom) =>
+    activeTab === "join"
+      ? classroom.joinRequests.length > 0
       : classroom.leaveRequests.length > 0
   );
 
   return (
-    <div className="w-full p-6 bg-gray-50 min-h-screen">
+    <div className="w-full p-6 bg-gray-50 ">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
@@ -308,7 +368,7 @@ const DashboardPending = () => {
                   Student requests waiting for your approval
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => {
                   setRefreshing(true);
                   fetchPending().then(() => setRefreshing(false));
@@ -317,17 +377,20 @@ const DashboardPending = () => {
                 className="ml-auto p-2 bg-white/20 rounded-lg hover:bg-white/30 transition flex items-center text-white"
                 title="Refresh pending requests"
               >
-                <RefreshCw size={20} className={refreshing ? "animate-spin" : ""} />
+                <RefreshCw
+                  size={20}
+                  className={refreshing ? "animate-spin" : ""}
+                />
               </button>
             </div>
           </div>
-          
+
           <div className="flex border-b border-gray-200">
-            <button 
+            <button
               className={`flex-1 py-3 px-4 text-center font-medium ${
-                activeTab === "join" 
-                ? "text-bluez border-b-2 border-bluez bg-blue-50/50" 
-                : "text-gray-500 hover:bg-gray-50"
+                activeTab === "join"
+                  ? "text-bluez border-b-2 border-bluez bg-blue-50/50"
+                  : "text-gray-500 hover:bg-gray-50"
               }`}
               onClick={() => setActiveTab("join")}
             >
@@ -336,11 +399,11 @@ const DashboardPending = () => {
                 Join Requests ({totalJoinRequests})
               </div>
             </button>
-            <button 
+            <button
               className={`flex-1 py-3 px-4 text-center font-medium ${
-                activeTab === "leave" 
-                ? "text-redz border-b-2 border-redz bg-red-50/50" 
-                : "text-gray-500 hover:bg-gray-50"
+                activeTab === "leave"
+                  ? "text-redz border-b-2 border-redz bg-red-50/50"
+                  : "text-gray-500 hover:bg-gray-50"
               }`}
               onClick={() => setActiveTab("leave")}
             >
@@ -350,33 +413,48 @@ const DashboardPending = () => {
               </div>
             </button>
           </div>
-          
+
           <div className="p-4 bg-offwhite border-b border-gray-200">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-white rounded-lg p-4 shadow-sm flex items-center">
-                <div className={`p-3 rounded-full ${activeTab === "join" ? "bg-blue-100" : "bg-red-100"} mr-3`}>
-                  <Users size={20} className={activeTab === "join" ? "text-bluez" : "text-redz"} />
+                <div
+                  className={`p-3 rounded-full ${
+                    activeTab === "join" ? "bg-blue-100" : "bg-red-100"
+                  } mr-3`}
+                >
+                  <Users
+                    size={20}
+                    className={
+                      activeTab === "join" ? "text-bluez" : "text-redz"
+                    }
+                  />
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-grayz">
-                    {activeTab === "join" ? totalJoinRequests : totalLeaveRequests}
+                    {activeTab === "join"
+                      ? totalJoinRequests
+                      : totalLeaveRequests}
                   </div>
                   <div className="text-sm text-gray-500">
                     Total {activeTab === "join" ? "Join" : "Leave"} Requests
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-lg p-4 shadow-sm flex items-center">
                 <div className="p-3 rounded-full bg-purple-100 mr-3">
                   <Clock size={20} className="text-darkpurple" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-grayz">{classroomsWithCurrentRequests.length}</div>
-                  <div className="text-sm text-gray-500">Classrooms with Requests</div>
+                  <div className="text-2xl font-bold text-grayz">
+                    {classroomsWithCurrentRequests.length}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Classrooms with Requests
+                  </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-lg p-4 shadow-sm flex items-center">
                 <div className="relative w-full">
                   <input
@@ -386,72 +464,107 @@ const DashboardPending = () => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
-                  <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Search
+                    size={16}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
+
         {/* Content */}
         {loading ? (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
             <div className="inline-block p-3 bg-blue-100 rounded-full mb-4">
               <RefreshCw size={30} className="text-bluez animate-spin" />
             </div>
-            <h2 className="text-xl font-medium text-grayz mb-2">Loading pending requests</h2>
-            <p className="text-gray-500">Please wait while we fetch the latest requests...</p>
+            <h2 className="text-xl font-medium text-grayz mb-2">
+              Loading pending requests
+            </h2>
+            <p className="text-gray-500">
+              Please wait while we fetch the latest requests...
+            </p>
           </div>
         ) : filteredClassrooms.length > 0 ? (
           <div className="space-y-6">
             {filteredClassrooms.map((cls, classIndex) => {
-              const currentRequests = activeTab === "join" ? cls.joinRequests : cls.leaveRequests;
-              const currentSelected = activeTab === "join" ? cls.selectedJoinStudents : cls.selectedLeaveStudents;
-              const isAllSelected = currentSelected.length === currentRequests.length && currentRequests.length > 0;
+              const currentRequests =
+                activeTab === "join" ? cls.joinRequests : cls.leaveRequests;
+              const currentSelected =
+                activeTab === "join"
+                  ? cls.selectedJoinStudents
+                  : cls.selectedLeaveStudents;
+              const isAllSelected =
+                currentSelected.length === currentRequests.length &&
+                currentRequests.length > 0;
               const hasSelected = currentSelected.length > 0;
-              
+
               return (
-                <div key={classIndex} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                  <div className={`p-4 border-b border-gray-200 ${
-                    activeTab === "join" ? "bg-blue-50/50" : "bg-red-50/50"
-                  } flex flex-wrap justify-between items-center`}>
+                <div
+                  key={classIndex}
+                  className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+                >
+                  <div
+                    className={`p-4 border-b border-gray-200 ${
+                      activeTab === "join" ? "bg-blue-50/50" : "bg-red-50/50"
+                    } flex flex-wrap justify-between items-center`}
+                  >
                     <div className="flex items-center">
-                      <h2 className="text-lg font-bold text-grayz">{cls.name}</h2>
-                      <span className={`ml-2 px-2 py-0.5 ${
-                        activeTab === "join" 
-                        ? "bg-blue-100 text-bluez" 
-                        : "bg-red-100 text-redz"
-                      } text-xs rounded-full`}>
-                        {currentRequests.length} {currentRequests.length === 1 ? 'request' : 'requests'}
+                      <h2 className="text-lg font-bold text-grayz">
+                        {cls.name}
+                      </h2>
+                      <span
+                        className={`ml-2 px-2 py-0.5 ${
+                          activeTab === "join"
+                            ? "bg-blue-100 text-bluez"
+                            : "bg-red-100 text-redz"
+                        } text-xs rounded-full`}
+                      >
+                        {currentRequests.length}{" "}
+                        {currentRequests.length === 1 ? "request" : "requests"}
                       </span>
-                      <span className="ml-2 text-sm text-gray-500">Code: {cls.classCode}</span>
+                      <span className="ml-2 text-sm text-gray-500">
+                        Code: {cls.classCode}
+                      </span>
                     </div>
-                    
+
                     <div className="flex space-x-2 mt-2 sm:mt-0">
-                      <button 
+                      <button
                         className={`px-3 py-1.5 rounded text-sm font-medium flex items-center ${
-                          hasSelected 
-                            ? activeTab === "join" 
-                              ? 'bg-greenz text-white hover:bg-green-600' 
-                              : 'bg-redz text-white hover:bg-red-600'
-                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          hasSelected
+                            ? activeTab === "join"
+                              ? "bg-greenz text-white hover:bg-green-600"
+                              : "bg-redz text-white hover:bg-red-600"
+                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
                         }`}
-                        onClick={() => handleBulkAction(cls, 'accept', activeTab)}
+                        onClick={() =>
+                          handleBulkAction(cls, "accept", activeTab)
+                        }
                         disabled={!hasSelected}
                       >
                         {activeTab === "join" ? (
-                          <><UserCheck size={16} className="mr-1.5" /> Accept Selected</>
+                          <>
+                            <UserCheck size={16} className="mr-1.5" /> Accept
+                            Selected
+                          </>
                         ) : (
-                          <><LogOut size={16} className="mr-1.5" /> Approve Removal</>
+                          <>
+                            <LogOut size={16} className="mr-1.5" /> Approve
+                            Removal
+                          </>
                         )}
                       </button>
-                      <button 
+                      <button
                         className={`px-3 py-1.5 rounded text-sm font-medium flex items-center ${
-                          hasSelected 
-                            ? 'bg-gray-700 text-white hover:bg-gray-800' 
-                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          hasSelected
+                            ? "bg-gray-700 text-white hover:bg-gray-800"
+                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
                         }`}
-                        onClick={() => handleBulkAction(cls, 'reject', activeTab)}
+                        onClick={() =>
+                          handleBulkAction(cls, "reject", activeTab)
+                        }
                         disabled={!hasSelected}
                       >
                         <UserX size={16} className="mr-1.5" />
@@ -459,7 +572,7 @@ const DashboardPending = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
@@ -470,15 +583,31 @@ const DashboardPending = () => {
                                 type="checkbox"
                                 className="h-4 w-4 text-bluez border-gray-300 rounded focus:ring-bluez focus:ring-offset-0"
                                 checked={isAllSelected}
-                                onChange={(e) => toggleSelectAll(cls, e.target.checked, activeTab)}
+                                onChange={(e) =>
+                                  toggleSelectAll(
+                                    cls,
+                                    e.target.checked,
+                                    activeTab
+                                  )
+                                }
                               />
                             </div>
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Student</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Email</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Student ID</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">Date Requested</th>
-                          <th className="px-6 py-3 text-center text-xs font-medium text-grayz uppercase tracking-wider">Actions</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">
+                            Student
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">
+                            Email
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">
+                            Student ID
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-grayz uppercase tracking-wider">
+                            Date Requested
+                          </th>
+                          <th className="px-6 py-3 text-center text-xs font-medium text-grayz uppercase tracking-wider">
+                            Actions
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
@@ -486,9 +615,13 @@ const DashboardPending = () => {
                           <tr
                             key={studentIndex}
                             className={`${
-                              currentSelected.includes(studentIndex) 
-                                ? activeTab === "join" ? 'bg-blue-50' : 'bg-red-50'
-                                : studentIndex % 2 === 0 ? 'bg-white' : 'bg-offwhite'
+                              currentSelected.includes(studentIndex)
+                                ? activeTab === "join"
+                                  ? "bg-blue-50"
+                                  : "bg-red-50"
+                                : studentIndex % 2 === 0
+                                ? "bg-white"
+                                : "bg-offwhite"
                             } hover:bg-blue-50/50 transition-colors`}
                           >
                             <td className="pl-6 py-4">
@@ -496,8 +629,12 @@ const DashboardPending = () => {
                                 <input
                                   type="checkbox"
                                   className="h-4 w-4 text-bluez border-gray-300 rounded focus:ring-bluez focus:ring-offset-0"
-                                  checked={currentSelected.includes(studentIndex)}
-                                  onChange={() => toggleStudent(cls, studentIndex, activeTab)}
+                                  checked={currentSelected.includes(
+                                    studentIndex
+                                  )}
+                                  onChange={() =>
+                                    toggleStudent(cls, studentIndex, activeTab)
+                                  }
                                 />
                               </div>
                             </td>
@@ -509,7 +646,9 @@ const DashboardPending = () => {
                                   </div>
                                 </div>
                                 <div className="ml-4">
-                                  <div className="text-sm font-medium text-grayz">{student.name}</div>
+                                  <div className="text-sm font-medium text-grayz">
+                                    {student.name}
+                                  </div>
                                 </div>
                               </div>
                             </td>
@@ -525,18 +664,26 @@ const DashboardPending = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-center">
                               <div className="flex items-center justify-center space-x-3">
                                 <button
-                                  onClick={() => handleAccept(student, cls, activeTab)}
+                                  onClick={() =>
+                                    handleAccept(student, cls, activeTab)
+                                  }
                                   className={`p-1.5 ${
-                                    activeTab === "join" 
-                                      ? "text-greenz hover:bg-green-50" 
+                                    activeTab === "join"
+                                      ? "text-greenz hover:bg-green-50"
                                       : "text-redz hover:bg-red-50"
                                   } rounded-full transition`}
-                                  title={activeTab === "join" ? "Accept" : "Approve Removal"}
+                                  title={
+                                    activeTab === "join"
+                                      ? "Accept"
+                                      : "Approve Removal"
+                                  }
                                 >
                                   <Check size={18} className="stroke-2" />
                                 </button>
                                 <button
-                                  onClick={() => handleReject(student, cls, activeTab)}
+                                  onClick={() =>
+                                    handleReject(student, cls, activeTab)
+                                  }
                                   className="p-1.5 text-gray-700 hover:bg-gray-100 rounded-full transition"
                                   title="Reject"
                                 >
@@ -560,16 +707,21 @@ const DashboardPending = () => {
                 <div className="inline-block p-3 bg-blue-100 rounded-full mb-4">
                   <Search size={30} className="text-bluez" />
                 </div>
-                <h2 className="text-xl font-medium text-grayz mb-2">No matching students found</h2>
+                <h2 className="text-xl font-medium text-grayz mb-2">
+                  No matching students found
+                </h2>
                 <p className="text-gray-500">
-                  No students match your search term "{searchTerm}". Try a different search.
+                  No students match your search term "{searchTerm}". Try a
+                  different search.
                 </p>
               </>
             ) : (
               <>
-                <div className={`inline-block p-3 ${
-                  activeTab === "join" ? "bg-blue-100" : "bg-red-100"
-                } rounded-full mb-4`}>
+                <div
+                  className={`inline-block p-3 ${
+                    activeTab === "join" ? "bg-blue-100" : "bg-red-100"
+                  } rounded-full mb-4`}
+                >
                   {activeTab === "join" ? (
                     <LogIn size={30} className="text-bluez" />
                   ) : (
@@ -580,7 +732,9 @@ const DashboardPending = () => {
                   No pending {activeTab === "join" ? "join" : "leave"} requests
                 </h2>
                 <p className="text-gray-500">
-                  You're all caught up! There are no pending {activeTab === "join" ? "join" : "leave"} requests at this time.
+                  You're all caught up! There are no pending{" "}
+                  {activeTab === "join" ? "join" : "leave"} requests at this
+                  time.
                 </p>
               </>
             )}
@@ -591,7 +745,9 @@ const DashboardPending = () => {
                 fetchPending().then(() => setRefreshing(false));
               }}
               className={`mt-4 px-4 py-2 ${
-                activeTab === "join" ? "bg-bluez hover:bg-blue-700" : "bg-redz hover:bg-red-700"
+                activeTab === "join"
+                  ? "bg-bluez hover:bg-blue-700"
+                  : "bg-redz hover:bg-red-700"
               } text-white rounded-lg transition`}
             >
               {searchTerm ? "Clear Search" : "Refresh"}
@@ -599,10 +755,10 @@ const DashboardPending = () => {
           </div>
         )}
       </div>
-      
-      <ToastContainer 
-        toastClassName="border shadow-sm rounded-lg text-black" 
-        bodyClassName="text-sm font-medium" 
+
+      <ToastContainer
+        toastClassName="border shadow-sm rounded-lg text-black"
+        bodyClassName="text-sm font-medium"
         position="bottom-right"
         closeButton={false}
       />

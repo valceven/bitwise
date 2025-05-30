@@ -48,7 +48,7 @@ const LogicGateExplorer = ({
   attemptsRemaining = 3,
   currentAttempt = 1,
   maxAttempts = 3,
-  studentAssessmentId
+  studentAssessmentId,
 }) => {
   // Assessment states
   const [currentStep, setCurrentStep] = useState(0);
@@ -221,7 +221,7 @@ const LogicGateExplorer = ({
         correctAnswer: 0,
         explanation:
           "This is an AND gate because it only outputs 1 when both inputs are 1.",
-      }
+      },
     },
     {
       type: "symbolRecognition",
@@ -305,8 +305,12 @@ const LogicGateExplorer = ({
   const hasQuestion = useCallback(() => {
     const step = assessmentSteps[currentStep];
     // Handle both direct questions and nested challenge questions
-    return (step.options && step.correctAnswer !== undefined) || 
-           (step.challenge && step.challenge.options && step.challenge.correctAnswer !== undefined);
+    return (
+      (step.options && step.correctAnswer !== undefined) ||
+      (step.challenge &&
+        step.challenge.options &&
+        step.challenge.correctAnswer !== undefined)
+    );
   }, [currentStep, assessmentSteps]);
 
   const hasAnsweredCurrent = useCallback(() => {
@@ -383,14 +387,14 @@ const LogicGateExplorer = ({
   const finishAssessment = async () => {
     setIsCompleted(true);
     const finalScore = (score / totalQuestions) * 100;
-    
+
     const assessmentData = {
       percentage: Math.round(finalScore),
       score: score,
       totalQuestions: totalQuestions,
       userAnswers: userAnswers,
       currentAttempt: currentAttempt,
-      maxAttempts: maxAttempts
+      maxAttempts: maxAttempts,
     };
 
     console.log(
@@ -415,9 +419,9 @@ const LogicGateExplorer = ({
       totalQuestions: totalQuestions,
       userAnswers: userAnswers,
       currentAttempt: currentAttempt,
-      maxAttempts: maxAttempts
+      maxAttempts: maxAttempts,
     };
-    
+
     if (onFinish) {
       onFinish(assessmentData);
     } else if (onComplete) {
@@ -957,20 +961,59 @@ const LogicGateExplorer = ({
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b-2" style={{ borderColor: colors.violetz }}>
-                        <th className="px-4 py-2 text-left font-bold" style={{ color: colors.grayz }}>Input A</th>
-                        <th className="px-4 py-2 text-left font-bold" style={{ color: colors.grayz }}>Input B</th>
-                        <th className="px-4 py-2 text-left font-bold" style={{ color: colors.violetz }}>Output</th>
+                      <tr
+                        className="border-b-2"
+                        style={{ borderColor: colors.violetz }}
+                      >
+                        <th
+                          className="px-4 py-2 text-left font-bold"
+                          style={{ color: colors.grayz }}
+                        >
+                          Input A
+                        </th>
+                        <th
+                          className="px-4 py-2 text-left font-bold"
+                          style={{ color: colors.grayz }}
+                        >
+                          Input B
+                        </th>
+                        <th
+                          className="px-4 py-2 text-left font-bold"
+                          style={{ color: colors.violetz }}
+                        >
+                          Output
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {step.challenge.inputs.map((row, idx) => (
-                        <tr key={idx} className="border-b" style={{ borderColor: `${colors.violetz}20` }}>
-                          <td className="px-4 py-3 font-medium" style={{ color: colors.grayz }}>{row.a}</td>
-                          <td className="px-4 py-3 font-medium" style={{ color: colors.grayz }}>{row.b}</td>
-                          <td className="px-4 py-3 font-bold" style={{ 
-                            color: row.output ? colors.emeraldz : colors.coralz 
-                          }}>{row.output}</td>
+                        <tr
+                          key={idx}
+                          className="border-b"
+                          style={{ borderColor: `${colors.violetz}20` }}
+                        >
+                          <td
+                            className="px-4 py-3 font-medium"
+                            style={{ color: colors.grayz }}
+                          >
+                            {row.a}
+                          </td>
+                          <td
+                            className="px-4 py-3 font-medium"
+                            style={{ color: colors.grayz }}
+                          >
+                            {row.b}
+                          </td>
+                          <td
+                            className="px-4 py-3 font-bold"
+                            style={{
+                              color: row.output
+                                ? colors.emeraldz
+                                : colors.coralz,
+                            }}
+                          >
+                            {row.output}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -1023,10 +1066,7 @@ const LogicGateExplorer = ({
                     >
                       {item.symbol}
                     </div>
-                    <p
-                      className="font-bold"
-                      style={{ color: colors.grayz }}
-                    >
+                    <p className="font-bold" style={{ color: colors.grayz }}>
                       {item.name}
                     </p>
                   </div>
@@ -1085,10 +1125,7 @@ const LogicGateExplorer = ({
                       >
                         {scenario.scenario}
                       </p>
-                      <p
-                        className="text-sm"
-                        style={{ color: colors.grayz }}
-                      >
+                      <p className="text-sm" style={{ color: colors.grayz }}>
                         {scenario.explanation}
                       </p>
                     </div>
@@ -1260,7 +1297,10 @@ const LogicGateExplorer = ({
                 </Button>
               )}
 
-              <Button onClick={handleFinishAssessment} className="flex items-center gap-2">
+              <Button
+                onClick={handleFinishAssessment}
+                className="flex items-center gap-2"
+              >
                 <Award className="h-4 w-4" />
                 Finish Assessment
               </Button>
@@ -1278,10 +1318,15 @@ const LogicGateExplorer = ({
   const renderQuestion = (step) => {
     // Handle different question structures
     let question, options, correctAnswer;
-    
+
     if (step.type === "gateIdentification") {
       // For gateIdentification, data is nested under challenge
-      if (!step.challenge || !step.challenge.question || !step.challenge.options) return null;
+      if (
+        !step.challenge ||
+        !step.challenge.question ||
+        !step.challenge.options
+      )
+        return null;
       question = step.challenge.question;
       options = step.challenge.options;
       correctAnswer = step.challenge.correctAnswer;
@@ -1434,7 +1479,7 @@ const LogicGateExplorer = ({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto pb-16 px-4 min-h-screen">
+    <div className="flex flex-col w-full max-w-4xl mx-auto pb-16 px-4 ">
       {/* Progress bar */}
       <div className="p-4 mb-4">
         <ProgressBar value={progress} />

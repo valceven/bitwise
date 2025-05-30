@@ -48,7 +48,7 @@ const TruthTableConstructionAssessment = ({
   attemptsRemaining = 3,
   currentAttempt = 1,
   maxAttempts = 3,
-  studentAssessmentId
+  studentAssessmentId,
 }) => {
   // Assessment states - FIXED to match HistoricalAssessment pattern
   const [currentStep, setCurrentStep] = useState(0);
@@ -366,14 +366,14 @@ const TruthTableConstructionAssessment = ({
   const finishAssessment = async () => {
     setIsCompleted(true);
     const finalScore = (score / totalQuestions) * 100;
-    
+
     const assessmentData = {
       percentage: Math.round(finalScore),
       score: score,
       totalQuestions: totalQuestions,
       userAnswers: userAnswers,
       currentAttempt: currentAttempt,
-      maxAttempts: maxAttempts
+      maxAttempts: maxAttempts,
     };
 
     console.log(
@@ -398,9 +398,9 @@ const TruthTableConstructionAssessment = ({
       totalQuestions: totalQuestions,
       userAnswers: userAnswers,
       currentAttempt: currentAttempt,
-      maxAttempts: maxAttempts
+      maxAttempts: maxAttempts,
     };
-    
+
     if (onFinish) {
       onFinish(assessmentData);
     } else if (onComplete) {
@@ -908,13 +908,19 @@ const TruthTableConstructionAssessment = ({
                       key={num}
                       onClick={() => setSelectedVariables(num)}
                       className={`px-6 py-3 rounded-lg font-bold transition-all ${
-                        selectedVariables === num ? "shadow-lg" : "hover:shadow-md"
+                        selectedVariables === num
+                          ? "shadow-lg"
+                          : "hover:shadow-md"
                       }`}
                       style={{
                         backgroundColor:
-                          selectedVariables === num ? colors.ambez : colors.white,
+                          selectedVariables === num
+                            ? colors.ambez
+                            : colors.white,
                         color:
-                          selectedVariables === num ? colors.white : colors.ambez,
+                          selectedVariables === num
+                            ? colors.white
+                            : colors.ambez,
                         border: `2px solid ${colors.ambez}`,
                       }}
                     >
@@ -932,7 +938,9 @@ const TruthTableConstructionAssessment = ({
                       className="text-lg font-bold"
                       style={{ color: colors.emeraldz }}
                     >
-                      With {selectedVariables} variable{selectedVariables > 1 ? "s" : ""}: 2^{selectedVariables} = {Math.pow(2, selectedVariables)} rows
+                      With {selectedVariables} variable
+                      {selectedVariables > 1 ? "s" : ""}: 2^{selectedVariables}{" "}
+                      = {Math.pow(2, selectedVariables)} rows
                     </p>
                   </div>
 
@@ -952,37 +960,51 @@ const TruthTableConstructionAssessment = ({
                               background: `linear-gradient(135deg, ${colors.tealz}, ${colors.cyanz})`,
                             }}
                           >
-                            {Array.from({ length: selectedVariables }, (_, i) => (
-                              <th key={i} className="p-2 border text-white font-bold">
-                                {String.fromCharCode(65 + i)}
-                              </th>
-                            ))}
+                            {Array.from(
+                              { length: selectedVariables },
+                              (_, i) => (
+                                <th
+                                  key={i}
+                                  className="p-2 border text-white font-bold"
+                                >
+                                  {String.fromCharCode(65 + i)}
+                                </th>
+                              )
+                            )}
                             <th className="p-2 border text-white font-bold">
                               Output
                             </th>
                           </tr>
                         </thead>
                         <tbody>
-                          {generateTruthTableRows(selectedVariables).map((row, rowIndex) => (
-                            <tr
-                              key={rowIndex}
-                              style={{
-                                backgroundColor:
-                                  rowIndex % 2 === 0
-                                    ? colors.white
-                                    : `${colors.skyz}10`,
-                              }}
-                            >
-                              {row.map((cell, cellIndex) => (
-                                <td key={cellIndex} className="p-2 border font-medium">
-                                  {cell}
+                          {generateTruthTableRows(selectedVariables).map(
+                            (row, rowIndex) => (
+                              <tr
+                                key={rowIndex}
+                                style={{
+                                  backgroundColor:
+                                    rowIndex % 2 === 0
+                                      ? colors.white
+                                      : `${colors.skyz}10`,
+                                }}
+                              >
+                                {row.map((cell, cellIndex) => (
+                                  <td
+                                    key={cellIndex}
+                                    className="p-2 border font-medium"
+                                  >
+                                    {cell}
+                                  </td>
+                                ))}
+                                <td
+                                  className="p-2 border font-medium"
+                                  style={{ color: colors.violetz }}
+                                >
+                                  ?
                                 </td>
-                              ))}
-                              <td className="p-2 border font-medium" style={{ color: colors.violetz }}>
-                                ?
-                              </td>
-                            </tr>
-                          ))}
+                              </tr>
+                            )
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -993,10 +1015,7 @@ const TruthTableConstructionAssessment = ({
                   className="mt-4 p-4 rounded-lg"
                   style={{ backgroundColor: `${colors.lavenderz}20` }}
                 >
-                  <p
-                    className="text-sm"
-                    style={{ color: colors.grayz }}
-                  >
+                  <p className="text-sm" style={{ color: colors.grayz }}>
                     {step.instructionalText}
                   </p>
                 </div>
@@ -1034,10 +1053,7 @@ const TruthTableConstructionAssessment = ({
               className="p-4 rounded-lg"
               style={{ backgroundColor: `${colors.skyz}10` }}
             >
-              <p
-                className="font-medium"
-                style={{ color: colors.grayz }}
-              >
+              <p className="font-medium" style={{ color: colors.grayz }}>
                 {step.operationDescription}
               </p>
             </div>
@@ -1128,10 +1144,7 @@ const TruthTableConstructionAssessment = ({
               >
                 Security System Scenario:
               </h3>
-              <p
-                className="text-base"
-                style={{ color: colors.grayz }}
-              >
+              <p className="text-base" style={{ color: colors.grayz }}>
                 {step.scenario}
               </p>
             </div>
@@ -1299,7 +1312,10 @@ const TruthTableConstructionAssessment = ({
                 </Button>
               )}
 
-              <Button onClick={handleFinishAssessment} className="flex items-center gap-2">
+              <Button
+                onClick={handleFinishAssessment}
+                className="flex items-center gap-2"
+              >
                 <Award className="h-4 w-4" />
                 Finish Assessment
               </Button>
@@ -1458,7 +1474,7 @@ const TruthTableConstructionAssessment = ({
   };
 
   return (
-    <div className="flex flex-col w-full max-w-4xl mx-auto pb-16 px-4 min-h-screen">
+    <div className="flex flex-col w-full max-w-4xl mx-auto pb-16 px-4 ">
       {/* Progress bar */}
       <div className="p-4 mb-4">
         <ProgressBar value={progress} />

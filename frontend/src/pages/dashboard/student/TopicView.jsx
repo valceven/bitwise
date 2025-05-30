@@ -11,7 +11,7 @@ import { topic4Sections } from "../../../components/sections/lesson2/topic4/Topi
 import { topic2Sections } from "../../../components/sections/lesson1/topic2/Topic2Sections";
 import { topic3Sections } from "../../../components/sections/lesson1/topic3/Topic3Sections";
 import { topic5Sections } from "../../../components/sections/lesson2/topic5/Topic5Sections";
-import { topic6Sections } from '../../../components/sections/lesson2/topic6/Topic6Sections';
+import { topic6Sections } from "../../../components/sections/lesson2/topic6/Topic6Sections";
 import { topic7Sections } from "../../../components/sections/lesson3/topic7/Topic7Sections";
 import { topic8Sections } from "../../../components/sections/lesson4/topic8/Topic8Sections";
 import { topic9Sections } from "../../../components/sections/lesson4/topic9/Topic9Sections";
@@ -49,28 +49,25 @@ const TopicView = () => {
     return storedIndex ? parseInt(storedIndex) : 0;
   });
 
-  useEffect(()  => {
-
+  useEffect(() => {
     const viewTopic = async () => {
-
       const response = await classroomApi.fetchClassroomByClassCode(classCode);
       setClassroom(response);
-      
+
       const data = {
         classroomId: response.classroomId,
         topicId: +topicId,
         studentId: user.userID,
-      }
-      
+      };
+
       try {
         await studentTopicApi.enterTopic(data);
       } catch (error) {
         console.error("Error: ", error.message);
       }
-    }
+    };
 
     viewTopic();
-
   }, [topicId]);
 
   const handleNext = () => {
@@ -86,19 +83,18 @@ const TopicView = () => {
   };
 
   const handleFinish = async () => {
-
     const dataz = {
       classroomId: classroom.classroomId,
       topicId: +topicId,
-      studentId: user.userID
+      studentId: user.userID,
     };
-    
+
     try {
       const response = await studentTopicApi.completeTopic(dataz);
       if (response) {
         navigate(`/app/classroom/student/${classroom.classCode}`, {
-        state: { topicId, status: "complete" },
-      });
+          state: { topicId, status: "complete" },
+        });
       }
     } catch (error) {
       console.error("Error completing student: ", error.message);
