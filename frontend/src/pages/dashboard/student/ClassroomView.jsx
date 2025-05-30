@@ -37,66 +37,149 @@ const ClassroomView = ({ classroom, user }) => {
   ];
 
   const subLessonInfo = {
-    1: {
-      title: "Introduction to Basics",
-      description:
-        "Learn the fundamental concepts and get started with the core principles of this lesson.",
-      duration: "15 min",
-      difficulty: "Beginner",
-    },
-    2: {
-      title: "Intermediate Concepts",
-      description:
-        "Dive deeper into the subject matter and explore more complex applications.",
-      duration: "25 min",
-      difficulty: "Intermediate",
-    },
-    3: {
-      title: "Advanced Applications",
-      description:
-        "Master advanced techniques and real-world problem-solving strategies.",
-      duration: "30 min",
-      difficulty: "Advanced",
-    },
-    4: {
-      title: "Foundation Building",
-      description:
-        "Build upon previous knowledge with new foundational concepts.",
+  1: {
+    title: "Introduce Boolean Algebra",
+    description:
+      "Learn the fundamental concepts of Boolean algebra, including binary variables, basic operations, and the historical context of George Boole's mathematical system.",
+    duration: "20 min",
+    difficulty: "Beginner",
+  },
+  2: {
+    title: "Logical Operators",
+    description:
+      "Explore the three fundamental Boolean operators: AND, OR, and NOT. Understand their symbols, behavior, and how they manipulate true/false values.",
+    duration: "25 min",
+    difficulty: "Beginner",
+  },
+  3: {
+    title: "Truth Tables",
+    description:
+      "Master the construction and interpretation of truth tables for all combinations of Boolean operations, including compound expressions.",
+    duration: "30 min",
+    difficulty: "Intermediate",
+  },
+  4: {
+    title: "Laws of Boolean Algebra",
+    description:
+      "Study the fundamental laws including commutative, associative, distributive, identity, complement, and De Morgan's laws with practical examples.",
+    duration: "35 min",
+    difficulty: "Intermediate",
+  },
+  5: {
+    title: "Different ways of solving using boolean algebra laws",
+    description:
+      "Apply Boolean algebra laws to simplify complex expressions using multiple solution approaches and optimization techniques.",
+    duration: "40 min",
+    difficulty: "Advanced",
+  },
+  6: {
+    title: "Calculator Tool",
+    description:
+      "Learn to use Boolean algebra calculators and digital tools for expression evaluation, simplification, and verification of manual solutions.",
+    duration: "15 min",
+    difficulty: "Beginner",
+  },
+  7: {
+    title: "Boolean Algebra in Programming",
+    description:
+      "Discover how Boolean algebra concepts apply to programming languages, conditional statements, logical operations, and algorithm design.",
+    duration: "35 min",
+    difficulty: "Advanced",
+  },
+  8: {
+    title: "Logic gates and logic circuits",
+    description:
+      "Understand how Boolean operations translate to physical logic gates (AND, OR, NOT, NAND, NOR, XOR) and basic digital circuit design.",
+    duration: "45 min",
+    difficulty: "Advanced",
+  },
+  9: {
+    title: "Conversion of Boolean Expression into Logic Circuits",
+    description:
+      "Master the systematic process of transforming Boolean expressions into physical circuit diagrams and optimizing circuit complexity.",
+    duration: "50 min",
+    difficulty: "Expert",
+  },
+};
+
+const assessmentInfo = {
+  1: {
+    title: "Boolean Algebra Fundamentals Quiz",
+    description: "Test your understanding of Boolean algebra basics, binary variables, and the foundational concepts introduced by George Boole.",
+    duration: "15 min",
+    difficulty: "Beginner",
+    questionCount: 10
+  },
+  2: {
+    title: "Logical Operators Assessment", 
+    description: "Evaluate your knowledge of AND, OR, and NOT operators, their symbols, behavior, and manipulation of true/false values.",
+    duration: "18 min", 
+    difficulty: "Beginner",
+    questionCount: 12
+  },
+  3: {
+    title: "Truth Tables Mastery Test",
+    description: "Demonstrate your ability to construct and interpret truth tables for various Boolean operations and compound expressions.",
+    duration: "25 min",
+    difficulty: "Intermediate", 
+    questionCount: 15
+  },
+  4: {
+    title: "Boolean Laws Application Quiz",
+    description: "Apply your knowledge of commutative, associative, distributive, identity, complement, and De Morgan's laws to solve problems.",
+    duration: "30 min",
+    difficulty: "Intermediate",
+    questionCount: 18
+  },
+  5: {
+    title: "Expression Simplification Challenge",
+    description: "Use multiple Boolean algebra laws and optimization techniques to simplify complex expressions through various solution approaches.",
+    duration: "35 min", 
+    difficulty: "Advanced",
+    questionCount: 20
+  },
+  6: {
+    title: "Calculator Tools Proficiency Test",
+    description: "Show your competency in using Boolean algebra calculators and digital tools for expression evaluation and verification.",
+    duration: "12 min",
+    difficulty: "Beginner", 
+    questionCount: 8
+  },
+  7: {
+    title: "Programming Logic Assessment",
+    description: "Apply Boolean algebra concepts to programming scenarios, conditional statements, logical operations, and algorithm design.",
+    duration: "40 min",
+    difficulty: "Advanced",
+    questionCount: 25
+  },
+  8: {
+    title: "Logic Gates and Circuits Exam",
+    description: "Test your understanding of how Boolean operations translate to physical logic gates and basic digital circuit design principles.",
+    duration: "45 min",
+    difficulty: "Advanced", 
+    questionCount: 30
+  },
+  9: {
+    title: "Circuit Conversion Mastery Test",
+    description: "Demonstrate expertise in transforming Boolean expressions into optimized circuit diagrams and analyzing circuit complexity.",
+    duration: "50 min",
+    difficulty: "Expert",
+    questionCount: 35
+  }
+};
+
+// Helper function to get assessment information
+const getAssessmentInfo = (assessmentNumber) => {
+  return (
+    assessmentInfo[assessmentNumber] || {
+      title: `Assessment ${assessmentNumber}`,
+      description: "Test your understanding of the concepts learned in this topic.",
       duration: "20 min",
-      difficulty: "Beginner",
-    },
-    5: {
-      title: "Practical Applications",
-      description: "Apply theoretical knowledge to practical scenarios.",
-      duration: "35 min",
       difficulty: "Intermediate",
-    },
-    6: {
-      title: "Expert Techniques",
-      description:
-        "Master expert-level techniques and advanced problem solving.",
-      duration: "40 min",
-      difficulty: "Advanced",
-    },
-    7: {
-      title: "Specialized Knowledge",
-      description: "Focus on specialized applications and unique scenarios.",
-      duration: "30 min",
-      difficulty: "Advanced",
-    },
-    8: {
-      title: "Integration Skills",
-      description: "Learn to integrate multiple concepts effectively.",
-      duration: "25 min",
-      difficulty: "Intermediate",
-    },
-    9: {
-      title: "Mastery Level",
-      description: "Achieve mastery through comprehensive understanding.",
-      duration: "45 min",
-      difficulty: "Expert",
-    },
-  };
+      questionCount: 10
+    }
+  );
+};
 
   const assessmentToLessonMap = {
     3: 1,
@@ -584,109 +667,124 @@ const ClassroomView = ({ classroom, user }) => {
                 </button>
               </>
             ) : (
-              <>
-                <h2 className="text-xl font-bold mb-2">
-                  Assessment {selectedLessonData.assessmentNumber}
-                </h2>
-                <h3 className="text-lg font-semibold text-blue-600 mb-2">
-                  Topic {selectedLessonData.assessmentNumber} Assessment
-                </h3>
-                <p className="text-gray-600 text-sm mb-4">
-                  Test your understanding of the concepts learned in Topic{" "}
-                  {selectedLessonData.assessmentNumber}.
-                </p>
+              // Replace the existing assessment display section with this:
+<>
+  <h2 className="text-xl font-bold mb-2">
+    Assessment {selectedLessonData.assessmentNumber}
+  </h2>
+  <h3 className="text-lg font-semibold text-blue-600 mb-2">
+    {getAssessmentInfo(selectedLessonData.assessmentNumber).title}
+  </h3>
+  <p className="text-gray-600 text-sm mb-4">
+    {getAssessmentInfo(selectedLessonData.assessmentNumber).description}
+  </p>
 
-                {/* Assessment Score and Attempts Display */}
-                {(() => {
-                  const assessmentData = getAssessmentData(
-                    selectedLessonData.assessmentNumber
-                  );
-                  return (
-                    assessmentData.attempts > 0 && (
-                      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-600">
-                            Score:{" "}
-                            <span className="font-semibold">
-                              {assessmentData.score}%
-                            </span>
-                          </span>
-                          <span className="text-gray-600">
-                            Attempts:{" "}
-                            <span className="font-semibold">
-                              {assessmentData.attempts}/3
-                            </span>
-                          </span>
-                        </div>
-                        {assessmentData.attempts >= 3 && (
-                          <div className="mt-2 text-xs text-orange-600">
-                            Maximum attempts reached
-                          </div>
-                        )}
-                      </div>
-                    )
-                  );
-                })()}
+  {/* Assessment Score and Attempts Display */}
+  {(() => {
+    const assessmentData = getAssessmentData(
+      selectedLessonData.assessmentNumber
+    );
+    return (
+      assessmentData.attempts > 0 && (
+        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-600">
+              Score:{" "}
+              <span className="font-semibold">
+                {assessmentData.score}%
+              </span>
+            </span>
+            <span className="text-gray-600">
+              Attempts:{" "}
+              <span className="font-semibold">
+                {assessmentData.attempts}/3
+              </span>
+            </span>
+          </div>
+          {assessmentData.attempts >= 3 && (
+            <div className="mt-2 text-xs text-orange-600">
+              Maximum attempts reached
+            </div>
+          )}
+        </div>
+      )
+    );
+  })()}
 
-                <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                  <div className="flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <polyline points="12 6 12 12 16 14" />
-                    </svg>
-                    10 min
-                  </div>
-                  <div className="flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-1"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M9 11H7a2 2 0 000 4h2m6-4h2a2 2 0 110 4h-2m-6-4h6" />
-                    </svg>
-                    Assessment
-                  </div>
-                </div>
-                {isAssessmentCompleted(selectedLessonData.assessmentNumber) && (
-                  <div className="mb-4 p-2 bg-green-100 text-green-800 rounded-lg text-sm flex items-center">
-                    <svg
-                      className="w-4 h-4 mr-2"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Completed
-                  </div>
-                )}
-                <button
-                  onClick={handleEnterLesson}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
-                >
-                  {isAssessmentMaxAttempts(
-                    selectedLessonData.assessmentNumber
-                  ) ||
-                  isAssessmentCompleted(selectedLessonData.assessmentNumber)
-                    ? "Review Assessment"
-                    : "Start Assessment"}
-                </button>
-              </>
+  <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
+    <div className="flex items-center">
+      <svg
+        className="w-4 h-4 mr-1"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+      {getAssessmentInfo(selectedLessonData.assessmentNumber).duration}
+    </div>
+    <div className="flex items-center">
+      <svg
+        className="w-4 h-4 mr-1"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M9 11H7a2 2 0 000 4h2m6-4h2a2 2 0 110 4h-2m-6-4h6" />
+      </svg>
+      {getAssessmentInfo(selectedLessonData.assessmentNumber).difficulty}
+    </div>
+    <div className="flex items-center">
+      <svg
+        className="w-4 h-4 mr-1"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M8.5 12.5l3 3L19 8" />
+        <circle cx="12" cy="12" r="10" />
+      </svg>
+      {getAssessmentInfo(selectedLessonData.assessmentNumber).questionCount} questions
+    </div>
+  </div>
+  
+  {isAssessmentCompleted(selectedLessonData.assessmentNumber) && (
+    <div className="mb-4 p-2 bg-green-100 text-green-800 rounded-lg text-sm flex items-center">
+      <svg
+        className="w-4 h-4 mr-2"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fillRule="evenodd"
+          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+          clipRule="evenodd"
+        />
+      </svg>
+      Completed
+    </div>
+  )}
+  
+  <button
+    onClick={handleEnterLesson}
+    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300"
+  >
+    {isAssessmentMaxAttempts(selectedLessonData.assessmentNumber) ||
+    isAssessmentCompleted(selectedLessonData.assessmentNumber)
+      ? "Review Assessment"
+      : "Start Assessment"}
+  </button>
+</>
             )}
           </div>
         )}
